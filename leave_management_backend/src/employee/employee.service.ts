@@ -11,9 +11,4 @@ export class EmployeeService {
         @InjectRepository(Employee)
         private readonly employeeRepository : Repository<Employee>,
     ){}
-    
-    async create(createEmployeeDto:CreateEmployeeDto){
-        const newEmployee = this.employeeRepository.create(createEmployeeDto);
-        return this.employeeRepository.save(newEmployee)
-    }
 }
