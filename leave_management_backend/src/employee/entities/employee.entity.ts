@@ -16,21 +16,25 @@ export class Employee {
   @Column({ nullable: false })
   mobile_number: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP'})
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @Column({ nullable: false })
-  manager_id: number;
+  // @Column({ nullable: false })
+  // @Column()
+  // manager_id: number;
+  @Column({ default: null })
+  manager_id: number | null;
 
-  @ManyToOne(() => Employee, (employee) => employee.directReports)
+  @ManyToOne(() => Employee)//, (employee) => employee.directReports
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
-  @Column({ nullable: false })
-  department_id: number;
+  // @Column({ nullable: false })
+  @Column({ default: null })
+  department_id: number | null;
 
   @ManyToOne(() => Department, (department) => department.employees)
   @JoinColumn({ name: 'department_id' })
@@ -39,7 +43,7 @@ export class Employee {
   // @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   // @JoinColumn({ name: 'emp_id' })
   // leaveRequests: LeaveRequest[];
-  
+
 
   @Column({
     type: 'enum',
@@ -47,5 +51,5 @@ export class Employee {
   })
   role: string;
 
-  directReports: Employee[];
+  // directReports: Employee[];
 }
