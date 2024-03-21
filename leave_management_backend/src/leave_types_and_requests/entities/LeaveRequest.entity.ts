@@ -5,7 +5,7 @@ import { LeaveType } from './LeaveType.entity';
 @Entity('leave_request')
 export class LeaveRequest {
     @PrimaryGeneratedColumn()
-    leave_request_id: number; 
+    leave_request_id: number;
 
     @Column({ nullable: false })
     emp_id: number;
@@ -27,7 +27,7 @@ export class LeaveRequest {
     @Column({ type: 'date', nullable: false })
     end_date: Date;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     reason: string;
 
     @Column({
@@ -41,4 +41,7 @@ export class LeaveRequest {
 
     @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
+
+    @Column({ type: 'varchar', default : 'Not Sent' })
+    mail_status: string
 }
