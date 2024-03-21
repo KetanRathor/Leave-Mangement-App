@@ -9,6 +9,6 @@ export class EmployeeController {
 
   @Post()
   async createEmployee(@Body() createEmployeeDto : CreateEmployeeDto){
-
+return this.employeeService.create(createEmployeeDto);
   }
 }
