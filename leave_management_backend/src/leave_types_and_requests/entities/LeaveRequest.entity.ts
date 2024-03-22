@@ -27,8 +27,9 @@ export class LeaveRequest {
     @Column({ type: 'date', nullable: false })
     end_date: Date;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true})
     reason: string;
+
 
     @Column({
         type: 'enum',
