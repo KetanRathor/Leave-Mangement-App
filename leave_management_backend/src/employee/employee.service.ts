@@ -6,9 +6,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { Department } from './entities/Department.entity';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { Employee } from './entities/Employee.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class EmployeeService {
