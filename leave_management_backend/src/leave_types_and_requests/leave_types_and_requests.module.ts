@@ -10,4 +10,4 @@ import { LeaveType } from './entities/LeaveType.entity';
   controllers: [LeaveTypesAndRequestsController],
   providers: [LeaveTypesAndRequestsService],
 })
-export class LeaveTypesAndRequestsModule { }
+export class LeaveTypesAndRequestsModule {}

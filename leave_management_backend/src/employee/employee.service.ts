@@ -7,6 +7,7 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 import { Department } from './entities/Department.entity';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
+
 @Injectable()
 export class EmployeeService {
     constructor(
