@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
-// import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_request.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Employee } from 'src/employee/entities/Employee.entity';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
@@ -47,11 +47,23 @@ export class LeaveTypesAndRequestsService {
     return 'Leave request rejected.';
   }
 
-  async getPendingLeaveRequests(): Promise<{ id: number, status: string }[]> {
-    const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
-    return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
-  }
+  // async getPendingLeaveRequests(): Promise<{ id: number, status: string, }[]> {
+  //   const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
+  //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
+  // }
 
+  // async getPendingLeaveRequests(): Promise<{ id:number, status: string, employeeName:string}[]>{
+  //   const pendingRequests = await this.leaveRepository.createQueryBuilder('leaveRequest')
+  //   .leftJoinAndSelect(Employee, 'employee', 'employee.emp_id=leaveRequest.emp_id')
+  //   .where('leaveRequest.status=:status',{status:'pending'})
+  //   .getMany()
+
+  //   return pendingRequests.map(request=>({
+  //     id:request.leave_request_id,
+  //     status:request.status,
+  //     employeeName:request.employee.name
+  //   }))
+  // }
 
   
 }
