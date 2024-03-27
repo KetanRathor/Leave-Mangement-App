@@ -40,9 +40,9 @@ export class Employee {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  // @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  // @JoinColumn({ name: 'emp_id' })
-  // leaveRequests: LeaveRequest[];
+  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
+  @JoinColumn({ name: 'emp_id' })
+  leaveRequests: LeaveRequest[];
 
 
   @Column({
