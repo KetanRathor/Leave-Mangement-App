@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './entities/Employee.entity';
@@ -86,6 +86,15 @@ export class EmployeeService {
         return this.employeeRepository.findOneBy({ e_id });
     }
 
-    
+    //Show Employee List
+    async findEmployees(){
+        try 
+        {
+            return await this.employeeRepository.find()
+        }
+        catch(error){
+            throw new HttpException('Unable to find employee.',HttpStatus.BAD_REQUEST)
+        }
+    }
 
 }

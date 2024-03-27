@@ -46,6 +46,9 @@ export class EmployeeController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
   }
+ 
+
+ 
 
   //Show Profile or display employee details
   @Get(':id')
@@ -56,11 +59,13 @@ export class EmployeeController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
   }
-
-
   
-  
+  @Get()
+  showEmployeeList() {
+    return this.employeeService.findEmployees();
+  }
 
 
-  
+
+
 }
