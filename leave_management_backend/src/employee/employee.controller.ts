@@ -3,6 +3,7 @@ import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Employee } from './entities/Employee.entity';
 
 @Controller('employees')
 export class EmployeeController {
@@ -54,6 +55,13 @@ export class EmployeeController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
+  }
+
+
+  //Show employee list
+  @Get()
+  async findAll(): Promise<Employee[]> {
+    return await this.employeeService.employeeList();
   }
 
 
