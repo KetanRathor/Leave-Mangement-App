@@ -3,6 +3,7 @@ import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Employee } from './entities/Employee.entity';
 
 @Controller('employees')
 export class EmployeeController {
