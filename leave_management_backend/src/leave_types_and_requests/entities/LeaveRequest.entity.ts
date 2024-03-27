@@ -27,22 +27,23 @@ export class LeaveRequest {
     @Column({ type: 'date', nullable: false })
     end_date: Date;
 
-    @Column({ nullable: true})
+    @Column({ nullable: true })
     reason: string;
 
 
     @Column({
         type: 'enum',
-        enum: ['pending', 'approved', 'rejected'],
+        enum: ['approved', 'pending', 'rejected'],
+        default:'pending'
     })
     status: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
 
-    @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
+    @Column({default: () => 'CURRENT_TIMESTAMP',  type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
-    @Column({ type: 'varchar', default : 'Not Sent' })
+    @Column({ type: 'varchar', default: 'Not Sent' })
     mail_status: string
 }

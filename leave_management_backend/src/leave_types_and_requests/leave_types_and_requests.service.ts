@@ -25,19 +25,33 @@ export class LeaveTypesAndRequestsService {
     return await this.leaveRepository.save(newLeaveRequest);
   }
 
-  findAll() {
-    return `This action returns all leaveTypesAndRaxequests`;
+
+
+  async acceptLeaveRequest(leave_request_id: number, ): Promise<string> {
+    const leaveRequest = await this.leaveRepository.findOneBy({leave_request_id});
+    if (!leaveRequest) {
+      return 'Leave request not found.';
+    }
+    leaveRequest.status = 'approved';
+    await this.leaveRepository.save(leaveRequest);
+    return 'Leave request approved.';
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} leaveTypesAndRequest`;
+  async rejectLeaveRequest(leave_request_id: number): Promise<string> {
+    const leaveRequest = await this.leaveRepository.findOneBy({ leave_request_id });
+    if (!leaveRequest) {
+      return 'Leave request not found.';
+    }
+    leaveRequest.status = 'rejected';
+    await this.leaveRepository.save(leaveRequest);
+    return 'Leave request rejected.';
   }
 
-  // update(id: number, updateLeaveTypesAndRequestDto: UpdateLeaveTypesAndRequestDto) {
-  //   return `This action updates a #${id} leaveTypesAndRequest`;
-  // }
-
-  remove(id: number) {
-    return `This action removes a #${id} leaveTypesAndRequest`;
+  async getPendingLeaveRequests(): Promise<{ id: number, status: string }[]> {
+    const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
+    return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   }
+
+
+  
 }
