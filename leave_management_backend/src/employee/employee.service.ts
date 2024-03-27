@@ -81,6 +81,14 @@ export class EmployeeService {
         return await this.employeeRepository.remove(employee);
     }
 
+    async deleteDepartment(department_id: number) {
+        const department = await this.departmentRepository.findOneBy({ department_id })
+        if (!department) {
+            throw new NotFoundException('Department not found.');
+        }
+        return await this.departmentRepository.remove(department);
+    }
+
     //Show Employe Profile
     async showProfile(e_id: number) {
         return this.employeeRepository.findOneBy({ e_id });
