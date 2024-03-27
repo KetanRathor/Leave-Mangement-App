@@ -4,12 +4,15 @@ import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { LeaveType } from './entities/LeaveType.entity';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
   constructor(
     @InjectRepository(LeaveRequest)
-    private readonly leaveRepository: Repository<LeaveRequest>,
+    private readonly leaveRequestRepository: Repository<LeaveRequest>,
+    @InjectRepository(LeaveType)
+    private readonly leaveTypeRepository: Repository<LeaveType>,
   ) {}
 
   async createRequest(
@@ -21,30 +24,56 @@ export class LeaveTypesAndRequestsService {
     if (!createLeaveDto.leave_type_id) {
       throw new BadRequestException('Leave Type Id is required');
     }
-    const newLeaveRequest = this.leaveRepository.create(createLeaveDto);
-    return await this.leaveRepository.save(newLeaveRequest);
+    const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
+    return await this.leaveRequestRepository.save(newLeaveRequest);
   }
 
 
 
   async acceptLeaveRequest(leave_request_id: number, ): Promise<string> {
-    const leaveRequest = await this.leaveRepository.findOneBy({leave_request_id});
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id});
     if (!leaveRequest) {
       return 'Leave request not found.';
     }
     leaveRequest.status = 'approved';
-    await this.leaveRepository.save(leaveRequest);
+    await this.leaveRequestRepository.save(leaveRequest);
     return 'Leave request approved.';
   }
 
   async rejectLeaveRequest(leave_request_id: number): Promise<string> {
-    const leaveRequest = await this.leaveRepository.findOneBy({ leave_request_id });
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
     if (!leaveRequest) {
       return 'Leave request not found.';
     }
     leaveRequest.status = 'rejected';
-    await this.leaveRepository.save(leaveRequest);
+    await this.leaveRequestRepository.save(leaveRequest);
     return 'Leave request rejected.';
+  }
+
+  async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
+    const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
+    if (!leaveType) {
+      throw new Error('Invalid leave type');
+    }
+  
+    const approvedRequests = await this.leaveRequestRepository.find({
+      where: {
+        leave_type_id: leave_type_id,
+        status: 'Approved',
+      },
+      relations: ['employee'],
+    });
+  
+    const employeeRequests = approvedRequests.filter(
+      (request) => request.employee.e_id === emp_id
+    );
+
+    const totalDaysTaken = employeeRequests.reduce((total, request) => {
+      const days = (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24);
+      return total - days;
+    }, 0);
+  
+    return leaveType.default_balance - totalDaysTaken;
   }
 
   // async getPendingLeaveRequests(): Promise<{ id: number, status: string, }[]> {

@@ -47,7 +47,15 @@ export class EmployeeController {
     }
   }
  
-
+  @Delete('/department/:id')
+  async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.employeeService.deleteDepartment(id);
+      return 'Department Deleted Successfully'
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
+    }
+  }
  
 
   //Show Profile or display employee details
