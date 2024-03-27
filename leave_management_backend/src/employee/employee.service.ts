@@ -86,9 +86,6 @@ export class EmployeeService {
         return this.employeeRepository.findOneBy({ e_id });
     }
 
-    //Show all the employees List
-    async employeeList(): Promise<Employee[]> {
-        return await this.employeeRepository.find();
-      }
+    
 
 }

@@ -58,11 +58,8 @@ export class EmployeeController {
   }
 
 
-  //Show employee list
-  @Get()
-  async findAll(): Promise<Employee[]> {
-    return await this.employeeService.employeeList();
-  }
+  
+  
 
 
   
