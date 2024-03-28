@@ -5,7 +5,7 @@ import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveReque
 @Entity('employee')
 export class Employee {
   @PrimaryGeneratedColumn()
-  e_id: number;
+  emp_id: number;
 
   @Column({ nullable: false })
   name: string;
@@ -28,7 +28,7 @@ export class Employee {
   @Column({ default: null })
   manager_id: number | null;
 
-  @ManyToOne(() => Employee)//, (employee) => employee.directReports
+  @ManyToOne(() => Employee)
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
@@ -40,16 +40,13 @@ export class Employee {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  @JoinColumn({ name: 'emp_id' })
-  leaveRequests: LeaveRequest[];
-
-
   @Column({
     type: 'enum',
     enum: ['Employee', 'Manager', 'Admin'],
   })
   role: string;
 
-  // directReports: Employee[];
+  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
+  @JoinColumn({ name: 'leave_request_id'})
+  leaveRequests: LeaveRequest[];
 }

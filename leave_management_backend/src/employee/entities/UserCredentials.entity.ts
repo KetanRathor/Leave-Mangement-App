@@ -11,4 +11,6 @@ export class UserCredentials {
 
   @Column({ nullable: false })
   password: string;
+
+  
 }
