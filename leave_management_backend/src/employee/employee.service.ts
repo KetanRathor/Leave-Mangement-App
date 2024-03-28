@@ -34,9 +34,9 @@ export class EmployeeService {
         if (createEmployeeDto.role === "Admin") {
             newEmployee.manager_id = null;
         }
-        else if (createEmployeeDto.role === "Manager") {
-            newEmployee.manager_id = 1;
-        }
+        // else if (createEmployeeDto.role === "Manager") {
+        //     newEmployee.manager_id = 1;
+        // }
         else {
             newEmployee.manager_id = createEmployeeDto.manager_id;
         }
@@ -49,8 +49,8 @@ export class EmployeeService {
     }
 
     //Update employee using id
-    async updateEmployee(e_id: number, updatedEmployeeDetails: UpdateEmployeeDto): Promise<Employee> {
-        const employee = await this.employeeRepository.findOneBy({ e_id });
+    async updateEmployee(emp_id: number, updatedEmployeeDetails: UpdateEmployeeDto): Promise<Employee> {
+        const employee = await this.employeeRepository.findOneBy({ emp_id });
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
@@ -73,8 +73,8 @@ export class EmployeeService {
     }
 
     //Delete employee using id
-    async deleteEmployee(e_id: number) {
-        const employee = await this.employeeRepository.findOneBy({ e_id })
+    async deleteEmployee(emp_id: number) {
+        const employee = await this.employeeRepository.findOneBy({ emp_id })
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
@@ -90,8 +90,8 @@ export class EmployeeService {
     }
 
     //Show Employe Profile
-    async showProfile(e_id: number) {
-        return this.employeeRepository.findOneBy({ e_id });
+    async showProfile(emp_id: number) {
+        return this.employeeRepository.findOneBy({ emp_id });
     }
 
     //Show Employee List

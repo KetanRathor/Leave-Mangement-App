@@ -62,8 +62,8 @@ import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveReque
 @Entity('employee')
 export class Employee {
   @PrimaryGeneratedColumn()
-  e_id: number;
-
+  emp_id: number;
+  
   @Column({ nullable: false })
   name: string;
 

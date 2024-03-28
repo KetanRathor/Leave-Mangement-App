@@ -86,7 +86,7 @@ export class LeaveRequest {
     @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
-    @Column({ type: 'varchar', default: 'Not Sent' })
+    @Column({ type: 'varchar', default: 'Not Sent', nullable : true })
     mail_status: string;
 
     @ManyToOne(() => LeaveType, (leaveType) => leaveType.leaveRequests)
@@ -94,6 +94,6 @@ export class LeaveRequest {
     leaveType: LeaveType;
 
     @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
-    @JoinColumn({ name: 'e_id' })
+    @JoinColumn({ name: 'emp_id'})
     employee: Employee;
 }   
