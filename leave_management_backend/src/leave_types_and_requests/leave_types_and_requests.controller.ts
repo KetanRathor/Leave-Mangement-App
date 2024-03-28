@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, 
 import { LeaveTypesAndRequestsService } from './leave_types_and_requests.service';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_request.dto';
+import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
@@ -14,18 +15,24 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
+  @Post("/leave-type")
+  createLeaveType(@Body() createLeaveType : CreateLeaveTypeDto){
+    return this.leaveTypesAndRequestsService.createLeaveType(createLeaveType);
+  }
+
+
   @Patch(':id/accept')
    async acceptLeaveRequest(@Param('id', ParseIntPipe) requestId: number) {
         return this.leaveTypesAndRequestsService.acceptLeaveRequest(requestId);
     }
 
-    @Get(':emp_id/leave-balance/:leave_type_id')
-  async getEmployeeLeaveBalance(
-    @Param('emp_id') emp_id: number,
-    @Param('leave_type_id') leave_type_id: number,
-  ): Promise<number> {
-    return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
-  }
+  //   @Get(':emp_id/leave-balance/:leave_type_id')
+  // async getEmployeeLeaveBalance(
+  //   @Param('emp_id') emp_id: number,
+  //   @Param('leave_type_id') leave_type_id: number,
+  // ): Promise<number> {
+  //   return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
+  // }
 
 //   @Post('accept')
 // async acceptLeaveRequest(@Body('id') requestId: number) {
