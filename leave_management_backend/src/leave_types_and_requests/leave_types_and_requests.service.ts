@@ -71,14 +71,13 @@ export class LeaveTypesAndRequestsService {
   //   });
   
   //   const employeeRequests = approvedRequests.filter(
-  //     (request) => request.employee.e_id === emp_id
+  //     (request) => request.employee.emp_id === emp_id
   //   );
 
   //   const totalDaysTaken = employeeRequests.reduce((total, request) => {
   //     const days = (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24);
   //     return total - days;
   //   }, 0);
-  
   //   return leaveType.default_balance - totalDaysTaken;
   // }
 
@@ -100,5 +99,4 @@ export class LeaveTypesAndRequestsService {
   //   }))
   // }
 
-  
 }
