@@ -19,14 +19,6 @@ export class LeaveTypesAndRequestsController {
         return this.leaveTypesAndRequestsService.acceptLeaveRequest(requestId);
     }
 
-    @Get(':emp_id/leave-balance/:leave_type_id')
-  async getEmployeeLeaveBalance(
-    @Param('emp_id') emp_id: number,
-    @Param('leave_type_id') leave_type_id: number,
-  ): Promise<number> {
-    return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
-  }
-
 //   @Post('accept')
 // async acceptLeaveRequest(@Body('id') requestId: number) {
 //   try {
@@ -44,10 +36,10 @@ export class LeaveTypesAndRequestsController {
         return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
     }
 
-    // @Get('/pending')
-    // async getPendingLeaveRequests(): Promise<{ id: number, status: string, employeeName : string }[]> {
-    //     return await this.leaveTypesAndRequestsService.getPendingLeaveRequests();
-    // }
+    @Get()
+    async getPendingLeaveRequests(): Promise<{ id: number, status: string, employeeName : string }[]> {
+        return await this.leaveTypesAndRequestsService.getPendingLeaveRequests();
+    }
 
 
 

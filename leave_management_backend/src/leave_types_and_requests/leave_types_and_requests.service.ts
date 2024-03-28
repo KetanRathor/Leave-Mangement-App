@@ -50,49 +50,50 @@ export class LeaveTypesAndRequestsService {
     return 'Leave request rejected.';
   }
 
-  async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
-    const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
-    if (!leaveType) {
-      throw new Error('Invalid leave type');
-    }
+  // async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
+  //   const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
+  //   if (!leaveType) {
+  //     throw new Error('Invalid leave type');
+  //   }
   
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        leave_type_id: leave_type_id,
-        status: 'Approved',
-      },
-      relations: ['employee'],
-    });
+  //   const approvedRequests = await this.leaveRequestRepository.find({
+  //     where: {
+  //       leave_type_id: leave_type_id,
+  //       status: 'Approved',
+  //     },
+  //     relations: ['employee'],
+  //   });
   
-    const employeeRequests = approvedRequests.filter(
-      (request) => request.employee.e_id === emp_id
-    );
+  //   const employeeRequests = approvedRequests.filter(
+  //     (request) => request.employee.e_id === emp_id
+  //   );
 
-    const totalDaysTaken = employeeRequests.reduce((total, request) => {
-      const days = (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24);
-      return total - days;
-    }, 0);
+  //   const totalDaysTaken = employeeRequests.reduce((total, request) => {
+  //     const days = (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24);
+  //     return total - days;
+  //   }, 0);
   
-    return leaveType.default_balance - totalDaysTaken;
-  }
+  //   return leaveType.default_balance - totalDaysTaken;
+  // }
 
   // async getPendingLeaveRequests(): Promise<{ id: number, status: string, }[]> {
   //   const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
 
-  // async getPendingLeaveRequests(): Promise<{ id:number, status: string, employeeName:string}[]>{
-  //   const pendingRequests = await this.leaveRepository.createQueryBuilder('leaveRequest')
-  //   .leftJoinAndSelect(Employee, 'employee', 'employee.emp_id=leaveRequest.emp_id')
-  //   .where('leaveRequest.status=:status',{status:'pending'})
-  //   .getMany()
+  async getPendingLeaveRequests(): Promise<{ id:number, status: string, employeeName:string}[]>{
+    const pendingRequests = await this.leaveRequestRepository.createQueryBuilder('leaveRequest')
+    .leftJoinAndSelect(Employee, 'employee', 'employee.emp_id=leaveRequest.emp_id')
+    .where('leaveRequest.status=:status',{status:'pending'})
+    .getMany()
 
-  //   return pendingRequests.map(request=>({
-  //     id:request.leave_request_id,
-  //     status:request.status,
-  //     employeeName:request.employee.name
-  //   }))
-  // }
+    return pendingRequests.map(request=>({
+      id:request.leave_request_id,
+      status:request.status,
+      employeeName:request.employee.name
+      // employeeName: request.employee ? request.employee.name : 'Unknown'
+    }))
+  }
 
   
 }

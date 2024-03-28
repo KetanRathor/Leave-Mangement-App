@@ -58,8 +58,8 @@ export class LeaveRequest {
     @PrimaryGeneratedColumn()
     leave_request_id: number;
 
-    @Column({ nullable: false })
-    emp_id: number;
+    // @Column({ nullable: false })
+    // emp_id: number;
 
     @Column({ nullable: false })
     leave_type_id: number;
@@ -94,6 +94,6 @@ export class LeaveRequest {
     leaveType: LeaveType;
 
     @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
-    @JoinColumn({ name: 'e_id' })
+    @JoinColumn({ name: 'emp_id' })
     employee: Employee;
 }   
