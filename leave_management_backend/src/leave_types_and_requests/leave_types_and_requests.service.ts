@@ -87,17 +87,13 @@ export class LeaveTypesAndRequestsService {
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
 
-  async getPendingLeaveRequests(): Promise<{ id:number, status: string, employeeName:string}[]>{
-    const pendingRequests = await this.leaveRequestRepository.createQueryBuilder('leaveRequest')
-    .leftJoinAndSelect(Employee, 'employee', 'employee.emp_id=leaveRequest.emp_id')
-    .where('leaveRequest.status=:status',{status:'pending'})
-    .getMany()
+  async getPendingLeaveRequests(status:string){
+    const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
 
     return pendingRequests.map(request=>({
       id:request.leave_request_id,
       status:request.status,
-      employeeName:request.employee.name
-      // employeeName: request.employee ? request.employee.name : 'Unknown'
+      employeeName:request?.employee?.name
     }))
   }
 
