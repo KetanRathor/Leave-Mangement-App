@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { LeaveType } from './entities/LeaveType.entity';
+import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
@@ -28,7 +29,10 @@ export class LeaveTypesAndRequestsService {
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
 
-
+  async createLeaveType(leaveTypeDetails : CreateLeaveTypeDto) {
+    const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
+    return await this.leaveTypeRepository.save(newLeaveType);
+  }
 
   async acceptLeaveRequest(leave_request_id: number, ): Promise<string> {
     const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id});
@@ -49,6 +53,8 @@ export class LeaveTypesAndRequestsService {
     await this.leaveRequestRepository.save(leaveRequest);
     return 'Leave request rejected.';
   }
+
+
 
   // async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
   //   const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });

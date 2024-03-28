@@ -63,7 +63,7 @@ import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveReque
 export class Employee {
   @PrimaryGeneratedColumn()
   emp_id: number;
-
+  
   @Column({ nullable: false })
   name: string;
 

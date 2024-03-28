@@ -34,9 +34,9 @@ export class EmployeeService {
         if (createEmployeeDto.role === "Admin") {
             newEmployee.manager_id = null;
         }
-        else if (createEmployeeDto.role === "Manager") {
-            newEmployee.manager_id = 1;
-        }
+        // else if (createEmployeeDto.role === "Manager") {
+        //     newEmployee.manager_id = 1;
+        // }
         else {
             newEmployee.manager_id = createEmployeeDto.manager_id;
         }
