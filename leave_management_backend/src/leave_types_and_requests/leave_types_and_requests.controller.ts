@@ -51,7 +51,7 @@ export class LeaveTypesAndRequestsController {
         return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
     }
 
-    @Get('/pending')
+    @Get()
     async getPendingLeaveRequests(): Promise<{ id: number, status: string, employeeName : string }[]> {
         return await this.leaveTypesAndRequestsService.getPendingLeaveRequests();
     }

@@ -58,8 +58,8 @@ export class LeaveRequest {
     @PrimaryGeneratedColumn()
     leave_request_id: number;
 
-    @Column({ nullable: false })
-    emp_id: number;
+    // @Column({ nullable: false })
+    // emp_id: number;
 
     @Column({ nullable: false })
     leave_type_id: number;
