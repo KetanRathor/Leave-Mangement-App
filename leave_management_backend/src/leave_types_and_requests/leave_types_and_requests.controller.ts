@@ -47,13 +47,13 @@ export class LeaveTypesAndRequestsController {
 
 
     @Patch(':id/reject')
-    async rejectLeaveRequest(@Body('id') requestId: number) {
+    async rejectLeaveRequest(@Param('id') requestId: number) {
         return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
     }
 
     @Get()
     async getPendingLeaveRequests(
-      // @Query('status') 
+      @Query('status') 
     status: string)
     // : Promise<{ id: number, status: string, employeeName : string }[]>
      {

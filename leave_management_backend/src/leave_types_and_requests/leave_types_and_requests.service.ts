@@ -87,13 +87,15 @@ export class LeaveTypesAndRequestsService {
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
 
-  async getPendingLeaveRequests(status:string){
+  async getPendingLeaveRequests(status="pending"){
+
     const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
 
+    console.log(pendingRequests)
     return pendingRequests.map(request=>({
       id:request.leave_request_id,
       status:request.status,
-      employeeName:request?.employee?.name
+      employeeName:request.employee.name
     }))
   }
 
