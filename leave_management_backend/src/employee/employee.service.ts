@@ -25,28 +25,32 @@ export class EmployeeService {
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
         const newEmployee = new Employee();
+      
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if (!emailRegex.test(createEmployeeDto.email)) {
+          throw new Error('Invalid email format. Please enter a valid email address.');
+        }
+      
+        const mobileRegex = /^\d{10}$/;
+        if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
+          throw new Error('Invalid mobile number format. Please enter a valid phone number.');
+        }
+      
         newEmployee.name = createEmployeeDto.name;
         newEmployee.email = createEmployeeDto.email;
         newEmployee.mobile_number = createEmployeeDto.mobile_number;
-        newEmployee.department_id = createEmployeeDto.department_id
+        newEmployee.department_id = createEmployeeDto.department_id;
         newEmployee.role = createEmployeeDto.role;
-
+      
         if (createEmployeeDto.role === "Admin") {
-            newEmployee.manager_id = null;
+          newEmployee.manager_id = null;
+        } else {
+          newEmployee.manager_id = createEmployeeDto.manager_id;
         }
-        // else if (createEmployeeDto.role === "Manager") {
-        //     newEmployee.manager_id = 1;
-        // }
-        else {
-            newEmployee.manager_id = createEmployeeDto.manager_id;
-        }
-
-        // if (createEmployeeDto.role === 'Employee') {
-        //     newEmployee.manager_id = createEmployeeDto.manager_id;
-        // }
-
+      
         return await this.employeeRepository.save(newEmployee);
-    }
+      }
+      
 
     //Update employee using id
     async updateEmployee(emp_id: number, updatedEmployeeDetails: UpdateEmployeeDto): Promise<Employee> {
@@ -55,19 +59,11 @@ export class EmployeeService {
             throw new NotFoundException('Employee not found.');
         }
 
-        // employee.name = updatedEmployeeDetails.name;
-        // employee.email = updatedEmployeeDetails.email;
-        // employee.mobile_number = updatedEmployeeDetails.mobile_number;
-        // employee.role = updatedEmployeeDetails.role;
-        // employee.manager_id = updatedEmployeeDetails.manager_id;
-        // employee.department_id = updatedEmployeeDetails.department_id;
-
         for (const key in updatedEmployeeDetails) {
             if (updatedEmployeeDetails[key] !== undefined) {
                 employee[key] = updatedEmployeeDetails[key];
             }
         }
-
 
         return await this.employeeRepository.save(employee);
     }
@@ -104,5 +100,4 @@ export class EmployeeService {
             throw new HttpException('Unable to find employee.',HttpStatus.BAD_REQUEST)
         }
     }
-
 }

@@ -14,28 +14,33 @@ export class LeaveTypesAndRequestsService {
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
     @InjectRepository(LeaveType)
     private readonly leaveTypeRepository: Repository<LeaveType>,
-  ) {}
+  ) { }
 
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
   ): Promise<LeaveRequest> {
+    const newRequest = new LeaveRequest();
+
     if (!createLeaveDto.emp_id) {
       throw new BadRequestException('Employee ID (emp_id) is required');
     }
     if (!createLeaveDto.leave_type_id) {
       throw new BadRequestException('Leave Type Id is required');
     }
+
+    // newRequest.emp_id = createLeaveDto.emp_id;
+
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
 
-  async createLeaveType(leaveTypeDetails : CreateLeaveTypeDto) {
+  async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto) {
     const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
     return await this.leaveTypeRepository.save(newLeaveType);
   }
 
-  async acceptLeaveRequest(leave_request_id: number, ): Promise<string> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id});
+  async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
     if (!leaveRequest) {
       return 'Leave request not found.';
     }
@@ -54,33 +59,34 @@ export class LeaveTypesAndRequestsService {
     return 'Leave request rejected.';
   }
 
+  async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
+    const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
+    if (!leaveType) {
+      throw new Error('Invalid leave type');
+    }
 
+    const approvedRequests = await this.leaveRequestRepository.find({
+      where: {
+        leave_type_id: leave_type_id,
+        status: 'approved',
+        emp_id: emp_id
+      },
+      relations: ['employee'],
+    });
 
-  // async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
-  //   const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
-  //   if (!leaveType) {
-  //     throw new Error('Invalid leave type');
-  //   }
-  
-  //   const approvedRequests = await this.leaveRequestRepository.find({
-  //     where: {
-  //       leave_type_id: leave_type_id,
-  //       status: 'Approved',
-  //     },
-  //     relations: ['employee'],
-  //   });
-  
-  //   const employeeRequests = approvedRequests.filter(
-  //     (request) => request.employee.e_id === emp_id
-  //   );
+    const employeeRequests = approvedRequests.filter(
+      (request) => request.employee.emp_id === emp_id
+    );
 
-  //   const totalDaysTaken = employeeRequests.reduce((total, request) => {
-  //     const days = (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24);
-  //     return total - days;
-  //   }, 0);
-  
-  //   return leaveType.default_balance - totalDaysTaken;
-  // }
+    const totalDaysTaken = employeeRequests.reduce((total, request) => {
+      const days = ((new Date(request.start_date)).getTime() - (new Date(request.end_date)).getTime()) / (1000 * 60 * 60 * 24);
+      // const days = (request.end_date as Date).getTime() - request.start_date.getTime() / (1000 * 60 * 60 * 24);
+
+      return total - days;
+    }, 0);
+
+    return leaveType.default_balance - totalDaysTaken;
+  }
 
   // async getPendingLeaveRequests(): Promise<{ id: number, status: string, }[]> {
   //   const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
@@ -98,6 +104,4 @@ export class LeaveTypesAndRequestsService {
       employeeName:request.employee.name
     }))
   }
-
-  
 }
