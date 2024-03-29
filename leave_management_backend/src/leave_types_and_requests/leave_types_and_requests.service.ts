@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { LeaveType } from './entities/LeaveType.entity';
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
+import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
@@ -34,9 +35,12 @@ export class LeaveTypesAndRequestsService {
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
 
-  async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto) {
-    const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
-    return await this.leaveTypeRepository.save(newLeaveType);
+  async getLeaveRequest(leave_request_id : number): Promise<LeaveRequest>{
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id})
+    if(!leaveRequest){
+      throw new BadRequestException('No Leave Request Found');
+    }
+    return leaveRequest;
   }
 
   async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
@@ -97,5 +101,34 @@ export class LeaveTypesAndRequestsService {
       status: request.status,
       employeeName: request?.employee?.name
     }))
+  }
+  
+  async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto): Promise<LeaveType> {
+    const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
+    return await this.leaveTypeRepository.save(newLeaveType);
+  }
+
+  async updateLeaveType(leave_type_id: number, updateLeaveTypeDto: UpdateLeaveTypeDto): Promise<LeaveType> {
+    const leaveType = await this.leaveTypeRepository.findOne({
+      where: {
+        leave_type_id: leave_type_id
+      }
+    })
+
+    leaveType.leave_type_name = updateLeaveTypeDto.leave_type_name;
+    leaveType.default_balance = updateLeaveTypeDto.default_balance;
+
+    return await this.leaveTypeRepository.save({
+      ...leaveType,
+      leave_type_id
+    });
+  }
+
+  async getLeaveTypes(): Promise<LeaveType[]> {
+    const leaveTypes = await this.leaveTypeRepository.find();
+    if(!leaveTypes){
+      throw new BadRequestException("No Leave Types")
+    }
+    return leaveTypes;
   }
 }
