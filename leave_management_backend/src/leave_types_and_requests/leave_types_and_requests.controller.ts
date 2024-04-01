@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, Put, Patch, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, Put, Patch, ParseIntPipe, Query, BadRequestException } from '@nestjs/common';
 import { LeaveTypesAndRequestsService } from './leave_types_and_requests.service';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_request.dto';
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
+import { LeaveRequest } from './entities/LeaveRequest.entity';
 
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
@@ -15,28 +16,49 @@ export class LeaveTypesAndRequestsController {
       createLeaveTypesAndRequestDto,
     );
   }
+  @Get()
+  async findAll() {
+    return this.leaveTypesAndRequestsService.findAll();
+  }
+
+  @Get(':leave_request_id')
+  findOne(@Param('leave_request_id') leave_request_id: number) {
+    // console.log('Finding leave request with ID:', leave_request_id);
+    return this.leaveTypesAndRequestsService.findOne(+leave_request_id);
+}
+
+@Put(':leave_request_id/status')
+async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() body: { status: string }): Promise<LeaveRequest> {
+  if (!body.status) {
+    throw new BadRequestException('Status is required');
+  }
+    return this.leaveTypesAndRequestsService.updateStatus(
+      leave_request_id,
+      body.status,
+    );
+}
 
   @Get('/leaveRequest/:id')
   getLeaveRequest(@Param('id', ParseIntPipe) id : number){
     return this.leaveTypesAndRequestsService.getLeaveRequest(id);
   }
 
-  @Patch(':id/accept')
-  async acceptLeaveRequest(@Param('id', ParseIntPipe) requestId: number) {
-    return this.leaveTypesAndRequestsService.acceptLeaveRequest(requestId);
-  }
+  // @Patch(':id/accept')
+  // async acceptLeaveRequest(@Param('id', ParseIntPipe) requestId: number) {
+  //   return this.leaveTypesAndRequestsService.acceptLeaveRequest(requestId);
+  // }
 
-  @Patch(':id/reject')
-  async rejectLeaveRequest(@Body('id') requestId: number) {
-    return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
-  }
+  // @Patch(':id/reject')
+  // async rejectLeaveRequest(@Body('id') requestId: number) {
+  //   return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
+  // }
 
-  @Get('/pending')
-  async getPendingLeaveRequests(status: string)
-  // : Promise<{ id: number, status: string, employeeName : string }[]> 
-  {
-    return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
-  }
+  // @Get('/pending')
+  // async getPendingLeaveRequests(status: string)
+  // // : Promise<{ id: number, status: string, employeeName : string }[]> 
+  // {
+  //   return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
+  // }
 
   @Get(':emp_id/leave-balance/:leave_type_id')
   async getEmployeeLeaveBalance(
