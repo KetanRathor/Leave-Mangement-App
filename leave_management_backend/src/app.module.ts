@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { EmployeeModule } from './employee/employee.module';
 import { ConfigModule } from '@nestjs/config';
 import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_types_and_requests.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_ty
     }),
     DatabaseModule,
     EmployeeModule,
-    LeaveTypesAndRequestsModule
+    LeaveTypesAndRequestsModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
