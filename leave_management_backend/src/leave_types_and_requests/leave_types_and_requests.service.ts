@@ -10,6 +10,9 @@ import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
+  // updateStatus(leave_request_id: number, status: string): any {
+  //   throw new Error('Method not implemented.');
+  // }
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
@@ -34,34 +37,52 @@ export class LeaveTypesAndRequestsService {
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
+  findOne(leave_request_id: number): Promise<LeaveRequest> {
+    console.log(leave_request_id);
+    return this.leaveRequestRepository.findOneBy({ leave_request_id });
+  }
 
-  async getLeaveRequest(leave_request_id : number): Promise<LeaveRequest>{
+  findAll() {
+    return this.leaveRequestRepository.find();
+  }
+
+  async updateStatus(
+    leave_request_id: number,
+    status: string,
+  ): Promise<LeaveRequest> {
+    const leaveRequest = await this.findOne(leave_request_id);
+    leaveRequest.status = status;
+    return this.leaveRequestRepository.save(leaveRequest);
+  }
+  async getLeaveRequest(leave_request_id: number): Promise<LeaveRequest> {
     const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id})
-    if(!leaveRequest){
+    if (!leaveRequest) {
       throw new BadRequestException('No Leave Request Found');
     }
     return leaveRequest;
   }
 
-  async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
-    if (!leaveRequest) {
-      return 'Leave request not found.';
-    }
-    leaveRequest.status = 'approved';
-    await this.leaveRequestRepository.save(leaveRequest);
-    return 'Leave request approved.';
-  }
+  // async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
+  //   const leaveRequest = await this.leaveRequestRepository.findOneBy({
+  //     leave_request_id,
+  //   });
+  //   if (!leaveRequest) {
+  //     return 'Leave request not found.';
+  //   }
+  //   leaveRequest.status = 'approved';
+  //   await this.leaveRequestRepository.save(leaveRequest);
+  //   return 'Leave request approved.';
+  // }
 
-  async rejectLeaveRequest(leave_request_id: number): Promise<string> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
-    if (!leaveRequest) {
-      return 'Leave request not found.';
-    }
-    leaveRequest.status = 'rejected';
-    await this.leaveRequestRepository.save(leaveRequest);
-    return 'Leave request rejected.';
-  }
+  // async rejectLeaveRequest(leave_request_id: number): Promise<string> {
+  //   const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
+  //   if (!leaveRequest) {
+  //     return 'Leave request not found.';
+  //   }
+  //   leaveRequest.status = 'rejected';
+  //   await this.leaveRequestRepository.save(leaveRequest);
+  //   return 'Leave request rejected.';
+  // }
 
   async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
     const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
