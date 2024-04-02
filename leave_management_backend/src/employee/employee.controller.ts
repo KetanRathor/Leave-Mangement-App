@@ -1,9 +1,10 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './entities/Employee.entity';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('employees')
 export class EmployeeController {
@@ -68,12 +69,9 @@ export class EmployeeController {
     }
   }
   
+  // @UseGuards(AuthGuard)
   @Get()
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
-
-
-
-
 }

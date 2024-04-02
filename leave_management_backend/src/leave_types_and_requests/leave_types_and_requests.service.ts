@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Repository } from 'typeorm';
@@ -6,9 +6,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { LeaveType } from './entities/LeaveType.entity';
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
+import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
+  // updateStatus(leave_request_id: number, status: string): any {
+  //   throw new Error('Method not implemented.');
+  // }
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
@@ -33,32 +37,52 @@ export class LeaveTypesAndRequestsService {
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
-
-  async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto) {
-    const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
-    return await this.leaveTypeRepository.save(newLeaveType);
+  findOne(leave_request_id: number): Promise<LeaveRequest> {
+    console.log(leave_request_id);
+    return this.leaveRequestRepository.findOneBy({ leave_request_id });
   }
 
-  async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
+  findAll() {
+    return this.leaveRequestRepository.find();
+  }
+
+  async updateStatus(
+    leave_request_id: number,
+    status: string,
+  ): Promise<LeaveRequest> {
+    const leaveRequest = await this.findOne(leave_request_id);
+    leaveRequest.status = status;
+    return this.leaveRequestRepository.save(leaveRequest);
+  }
+  async getLeaveRequest(leave_request_id: number): Promise<LeaveRequest> {
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id})
     if (!leaveRequest) {
-      return 'Leave request not found.';
+      throw new BadRequestException('No Leave Request Found');
     }
-
-    leaveRequest.status = 'approved';
-    await this.leaveRequestRepository.save(leaveRequest);
-    return 'Leave request approved.';
+    return leaveRequest;
   }
 
-  async rejectLeaveRequest(leave_request_id: number): Promise<string> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
-    if (!leaveRequest) {
-      return 'Leave request not found.';
-    }
-    leaveRequest.status = 'rejected';
-    await this.leaveRequestRepository.save(leaveRequest);
-    return 'Leave request rejected.';
-  }
+  // async acceptLeaveRequest(leave_request_id: number,): Promise<string> {
+  //   const leaveRequest = await this.leaveRequestRepository.findOneBy({
+  //     leave_request_id,
+  //   });
+  //   if (!leaveRequest) {
+  //     return 'Leave request not found.';
+  //   }
+  //   leaveRequest.status = 'approved';
+  //   await this.leaveRequestRepository.save(leaveRequest);
+  //   return 'Leave request approved.';
+  // }
+
+  // async rejectLeaveRequest(leave_request_id: number): Promise<string> {
+  //   const leaveRequest = await this.leaveRequestRepository.findOneBy({ leave_request_id });
+  //   if (!leaveRequest) {
+  //     return 'Leave request not found.';
+  //   }
+  //   leaveRequest.status = 'rejected';
+  //   await this.leaveRequestRepository.save(leaveRequest);
+  //   return 'Leave request rejected.';
+  // }
 
   async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
     const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
@@ -98,11 +122,39 @@ export class LeaveTypesAndRequestsService {
 
     const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
 
-    console.log(pendingRequests)
-    return pendingRequests.map(request=>({
-      id:request.leave_request_id,
-      status:request.status,
-      employeeName:request.employee.name
+    return pendingRequests.map(request => ({
+      id: request.leave_request_id,
+      status: request.status,
+      employeeName: request?.employee?.name
     }))
+  }
+  
+  async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto): Promise<LeaveType> {
+    const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
+    return await this.leaveTypeRepository.save(newLeaveType);
+  }
+
+  async updateLeaveType(leave_type_id: number, updateLeaveTypeDto: UpdateLeaveTypeDto): Promise<LeaveType> {
+    const leaveType = await this.leaveTypeRepository.findOne({
+      where: {
+        leave_type_id: leave_type_id
+      }
+    })
+
+    leaveType.leave_type_name = updateLeaveTypeDto.leave_type_name;
+    leaveType.default_balance = updateLeaveTypeDto.default_balance;
+
+    return await this.leaveTypeRepository.save({
+      ...leaveType,
+      leave_type_id
+    });
+  }
+
+  async getLeaveTypes(): Promise<LeaveType[]> {
+    const leaveTypes = await this.leaveTypeRepository.find();
+    if(!leaveTypes){
+      throw new BadRequestException("No Leave Types")
+    }
+    return leaveTypes;
   }
 }
