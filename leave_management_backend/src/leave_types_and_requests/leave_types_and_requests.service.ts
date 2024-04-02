@@ -44,6 +44,7 @@ export class LeaveTypesAndRequestsService {
     if (!leaveRequest) {
       return 'Leave request not found.';
     }
+
     leaveRequest.status = 'approved';
     await this.leaveRequestRepository.save(leaveRequest);
     return 'Leave request approved.';
