@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_types_and_requests.module';
 import { AuthModule } from './auth/auth.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
