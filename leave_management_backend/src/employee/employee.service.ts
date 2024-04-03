@@ -6,6 +6,8 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { Department } from './entities/Department.entity';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
 
 
 @Injectable()
@@ -14,7 +16,11 @@ export class EmployeeService {
         @InjectRepository(Employee)
         private readonly employeeRepository: Repository<Employee>,
         @InjectRepository(Department)
-        private readonly departmentRepository: Repository<Department>
+        private readonly departmentRepository: Repository<Department>,
+        @InjectRepository(UserCredentials)
+        private readonly userCredentialRepository: Repository<UserCredentials>,
+        private readonly authService : AuthService
+
     ) { }
 
 // Create Department
@@ -24,7 +30,7 @@ export class EmployeeService {
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-        const newEmployee = new Employee();
+        const newEmployee = this.employeeRepository.create(createEmployeeDto);
       
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if (!emailRegex.test(createEmployeeDto.email)) {
@@ -36,18 +42,30 @@ export class EmployeeService {
           throw new Error('Invalid mobile number format. Please enter a valid phone number.');
         }
       
-        newEmployee.name = createEmployeeDto.name;
-        newEmployee.email = createEmployeeDto.email;
-        newEmployee.mobile_number = createEmployeeDto.mobile_number;
-        newEmployee.department_id = createEmployeeDto.department_id;
-        newEmployee.role = createEmployeeDto.role;
+        const generatedPassword = this.authService.generateRandomPassword(10);
+        console.log('Original Password:', generatedPassword);
+
+        const encryptedPassword = this.authService.encrypt(generatedPassword);
+
+        const newUserCredential = this.userCredentialRepository.create({
+            email:createEmployeeDto.email,
+            password:encryptedPassword
+        })
+
+        await this.userCredentialRepository.save(newUserCredential);
+
+        const originalPassword = this.authService.decrypt(encryptedPassword);
+
+    // Log the original password to the console
+    console.log('Original Password:', originalPassword);
       
         if (createEmployeeDto.role === "Admin") {
           newEmployee.manager_id = null;
         } else {
           newEmployee.manager_id = createEmployeeDto.manager_id;
         }
-      
+        
+        
         return await this.employeeRepository.save(newEmployee);
       }
       
