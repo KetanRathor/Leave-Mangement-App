@@ -10,6 +10,7 @@ import { DepartmentController } from './department/department.controller';
 import { DepartmentService } from './department/department.service';
 import { DepartmentModule } from './department/department.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({

@@ -3,6 +3,7 @@ import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 
 @Controller('employees')
 export class EmployeeController {
@@ -18,6 +19,17 @@ export class EmployeeController {
     }
   }
   
+  // @UseGuards(AuthGuard)
+  // @Post('/department')
+  // async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
+  //   try {
+  //     return await this.employeeService.createDepartment(createDepartmentDto);
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+
+  @UseGuards(AuthGuard)
   @Put(':id')
   async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto) {
     try {
@@ -26,6 +38,8 @@ export class EmployeeController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @UseGuards(AuthGuard)
 
   @Delete(':id')
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
@@ -37,7 +51,22 @@ export class EmployeeController {
     }
   }
  
+  // @UseGuards(AuthGuard)
+
+  // @Delete('/department/:id')
+  // async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
+  //   try {
+  //     await this.employeeService.deleteDepartment(id);
+  //     return 'Department Deleted Successfully'
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
+  //   }
+  // }
+ 
+
   //Show Profile or display employee details
+  @UseGuards(AuthGuard)
+
   @Get(':id')
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -47,7 +76,7 @@ export class EmployeeController {
     }
   }
   
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get()
   showEmployeeList() {
     return this.employeeService.findEmployees();

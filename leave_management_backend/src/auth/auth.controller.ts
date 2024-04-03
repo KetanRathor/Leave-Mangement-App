@@ -29,9 +29,16 @@ export class AuthController {
         return token;
     }
 
-    @UseGuards(AuthGuard)
-    @Get('profile')
-    getProfile(@Request() req){
-        return req.user;
-    }
+    // @UseGuards(AuthGuard)
+    // @Get('profile')
+    // getProfile(@Request() req){
+    //     return req.user;
+    // }
+
+//     @UseGuards(AuthGuard)
+//     @Get('EmployeeList')
+//   showEmployeeList(@Request() req) {
+//     return req.user;
+//   }
+
 }

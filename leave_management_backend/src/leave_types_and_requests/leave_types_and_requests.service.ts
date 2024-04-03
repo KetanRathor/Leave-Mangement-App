@@ -113,9 +113,14 @@ export class LeaveTypesAndRequestsService {
     return leaveType.default_balance - totalDaysTaken;
   }
 
-  //Getting employee name with specific status
-  async getPendingLeaveRequests(status = "pending") {
-    const pendingRequests = await this.leaveRequestRepository.find({ where: { status }, relations: ['employee'] })
+  // async getPendingLeaveRequests(): Promise<{ id: number, status: string, }[]> {
+  //   const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
+  //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
+  // }
+
+  async getPendingLeaveRequests(status="pending"){
+
+    const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
 
     return pendingRequests.map(request => ({
       id: request.leave_request_id,
