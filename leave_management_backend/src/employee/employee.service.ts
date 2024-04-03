@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './entities/Employee.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { CreateDepartmentDto } from './dto/create-department.dto';
-import { Department } from './entities/Department.entity';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
@@ -15,18 +13,13 @@ export class EmployeeService {
     constructor(
         @InjectRepository(Employee)
         private readonly employeeRepository: Repository<Employee>,
-        @InjectRepository(Department)
-        private readonly departmentRepository: Repository<Department>,
+        // @InjectRepository(Department)
+        // private readonly departmentRepository: Repository<Department>,
         @InjectRepository(UserCredentials)
         private readonly userCredentialRepository: Repository<UserCredentials>,
         private readonly authService : AuthService
 
     ) { }
-
-// Create Department
-    async createDepartment(departmentName: CreateDepartmentDto) {
-        return await this.departmentRepository.save(departmentName);
-    }
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
@@ -69,7 +62,6 @@ export class EmployeeService {
         return await this.employeeRepository.save(newEmployee);
       }
       
-
     //Update employee using id
     async updateEmployee(emp_id: number, updatedEmployeeDetails: UpdateEmployeeDto): Promise<Employee> {
         const employee = await this.employeeRepository.findOneBy({ emp_id });
@@ -93,14 +85,6 @@ export class EmployeeService {
             throw new NotFoundException('Employee not found.');
         }
         return await this.employeeRepository.remove(employee);
-    }
-
-    async deleteDepartment(department_id: number) {
-        const department = await this.departmentRepository.findOneBy({ department_id })
-        if (!department) {
-            throw new NotFoundException('Department not found.');
-        }
-        return await this.departmentRepository.remove(department);
     }
 
     //Show Employe Profile
