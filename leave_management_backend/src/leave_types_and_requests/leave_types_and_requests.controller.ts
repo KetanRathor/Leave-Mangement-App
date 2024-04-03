@@ -5,7 +5,8 @@ import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_requ
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('leave')
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
   constructor(private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService) { }
