@@ -5,7 +5,7 @@ import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveReque
 @Entity('employee')
 export class Employee {
   @PrimaryGeneratedColumn()
-  emp_id: number;
+  id: number;
 
   @Column({ nullable: false })
   name: string;
@@ -16,12 +16,26 @@ export class Employee {
   @Column({ nullable: false })
   mobile_number: string;
 
+  @Column({ default: false })
+  deleted: boolean;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
+  @Column({nullable:false,default: 'system'})
+  created_by: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+   
+  @Column({nullable:false,default: 'system'})
+  updated_by: string;
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  deleted_at: Date;
+
+  @Column({nullable:false,default: 'system'})
+  deleted_by: string;
   // @Column({ nullable: false })
   // @Column()
   // manager_id: number;

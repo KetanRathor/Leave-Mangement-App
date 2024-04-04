@@ -5,7 +5,7 @@ import { LeaveType } from './LeaveType.entity';
 @Entity('leave_request')
 export class LeaveRequest {
     @PrimaryGeneratedColumn()
-    leave_request_id: number;
+    id: number;
 
     @Column({ nullable: false })
     emp_id: number;
@@ -32,11 +32,14 @@ export class LeaveRequest {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
 
+    @Column({nullable:false,default:'system'})
+    created_by: string;
+
     @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
-    @Column({ type: 'varchar', default: 'Not Sent', nullable : true })
-    mail_status: string;
+    @Column({nullable:false,default:'system'})
+    updated_by: string;
 
     @ManyToOne(() => LeaveType, (leaveType) => leaveType.leaveRequests)
     @JoinColumn({ name: 'leave_type_id' })

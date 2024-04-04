@@ -6,6 +6,7 @@ import { EmployeeModule } from './employee/employee.module';
 import { ConfigModule } from '@nestjs/config';
 import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_types_and_requests.module';
 import { AuthModule } from './auth/auth.module';
+import { HolidayModule } from './holiday/holiday.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     EmployeeModule,
     LeaveTypesAndRequestsModule,
-    AuthModule
+    AuthModule,
+    HolidayModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,16 +1,20 @@
+import { timestamp } from 'rxjs';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Employee } from '../../employee/entities/Employee.entity';
 
-@Entity('user_credentials')
-export class UserCredentials {
+@Entity('holiday')
+export class Holidays {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: false, unique: true })
-  email: string;
+  ocacsion: string;
 
   @Column({ nullable: false })
-  password: string;
-
+  day: string;
   
+  @Column({type:'timestamp'})
+  date: Date
+  
+  @Column({type:'blob'})
+  image: URL
 }

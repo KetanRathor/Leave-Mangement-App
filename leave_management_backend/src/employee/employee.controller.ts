@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDepartmentDto } from './dto/create-department.dto';
@@ -9,17 +9,19 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
-
+  @UseGuards(AuthGuard)
   @Post()
   async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto) {
+    @Body() createEmployeeDto: CreateEmployeeDto,
+    @Request() req,
+    ) {
     try {
-      return await this.employeeService.createEmployee(createEmployeeDto);
+      return await this.employeeService.createEmployee(createEmployeeDto, req);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(AuthGuard)
   @Post('/department')
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     try {
@@ -28,26 +30,26 @@ export class EmployeeController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(AuthGuard)
   @Put(':id')
-  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto) {
+  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto,@Request() req,) {
     try {
-      return await this.employeeService.updateEmployee(id, updateEmployeeDto);
+      return await this.employeeService.updateEmployee(id, updateEmployeeDto,req);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
+  async deleteEmployee(@Param('id', ParseIntPipe) id: number,@Request() req,) {
     try {
-      await this.employeeService.deleteEmployee(id);
+      await this.employeeService.deleteEmployee(id,req);
       return 'Employee Deleted Successfully'
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
     }
   }
- 
+  @UseGuards(AuthGuard)
   @Delete('/department/:id')
   async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -60,6 +62,7 @@ export class EmployeeController {
  
 
   //Show Profile or display employee details
+  @UseGuards(AuthGuard)
   @Get(':id')
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -69,7 +72,7 @@ export class EmployeeController {
     }
   }
   
-  // @UseGuards(AuthGuard)
+ @UseGuards(AuthGuard)
   @Get()
   showEmployeeList() {
     return this.employeeService.findEmployees();

@@ -22,12 +22,10 @@ export class LeaveTypesAndRequestsService {
 
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
+    req: any,
   ): Promise<LeaveRequest> {
     const newRequest = new LeaveRequest();
 
-    if (!createLeaveDto.emp_id) {
-      throw new BadRequestException('Employee ID (emp_id) is required');
-    }
     if (!createLeaveDto.leave_type_id) {
       throw new BadRequestException('Leave Type Id is required');
     }
@@ -35,11 +33,12 @@ export class LeaveTypesAndRequestsService {
     // newRequest.emp_id = createLeaveDto.emp_id;
 
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
+    newLeaveRequest.created_by = req.user.email;
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
-  findOne(leave_request_id: number): Promise<LeaveRequest> {
-    console.log(leave_request_id);
-    return this.leaveRequestRepository.findOneBy({ leave_request_id });
+  
+  findOne(id: number): Promise<LeaveRequest> {
+    return this.leaveRequestRepository.findOneBy({ id });
   }
 
   findAll() {
@@ -49,13 +48,15 @@ export class LeaveTypesAndRequestsService {
   async updateStatus(
     leave_request_id: number,
     status: string,
+    req:any,
   ): Promise<LeaveRequest> {
     const leaveRequest = await this.findOne(leave_request_id);
     leaveRequest.status = status;
+    leaveRequest.updated_by=req.user.email;
     return this.leaveRequestRepository.save(leaveRequest);
   }
-  async getLeaveRequest(leave_request_id: number): Promise<LeaveRequest> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id})
+  async getLeaveRequest(id: number): Promise<LeaveRequest> {
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({id})
     if (!leaveRequest) {
       throw new BadRequestException('No Leave Request Found');
     }
@@ -100,7 +101,7 @@ export class LeaveTypesAndRequestsService {
     });
 
     const employeeRequests = approvedRequests.filter(
-      (request) => request.employee.emp_id === emp_id
+      (request) => request.employee.id === emp_id
     );
 
     const totalDaysTaken = employeeRequests.reduce((total, request) => {
@@ -118,7 +119,7 @@ export class LeaveTypesAndRequestsService {
     const pendingRequests = await this.leaveRequestRepository.find({ where: { status }, relations: ['employee'] })
 
     return pendingRequests.map(request => ({
-      id: request.leave_request_id,
+      id: request.id,
       status: request.status,
       employeeName: request?.employee?.name
     }))

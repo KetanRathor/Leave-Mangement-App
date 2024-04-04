@@ -29,9 +29,11 @@ export class AuthController {
         return token;
     }
 
-    @UseGuards(AuthGuard)
-    @Get('profile')
-    getProfile(@Request() req){
-        return req.user;
-    }
+    // @UseGuards(AuthGuard)
+    // @Get('profile')
+    // getProfile(@Request() req){
+    //     console.log("User Name : ",req.user.email);
+        
+    //     return req.user;
+    // }
 }
