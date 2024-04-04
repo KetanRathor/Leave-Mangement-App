@@ -15,8 +15,9 @@ dotenv.config();
     , PassportModule,
     JwtModule.register({
       global : true,
-      secret: "ABC",
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.SECRET,
+      signOptions: { expiresIn: '1d' },
+
     }),
   ],
   controllers: [AuthController],

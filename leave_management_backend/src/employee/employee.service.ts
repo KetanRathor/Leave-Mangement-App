@@ -49,7 +49,7 @@ export class EmployeeService {
 
         const originalPassword = this.authService.decrypt(encryptedPassword);
 
-    // Log the original password to the console
+    
     console.log('Original Password:', originalPassword);
       
         if (createEmployeeDto.role === "Admin") {
