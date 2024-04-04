@@ -10,6 +10,7 @@ import {
     HttpCode,
     HttpException,
     HttpStatus,
+    Param,
     Post,
     Request,
     UseGuards
@@ -29,6 +30,7 @@ export class AuthController {
         return token;
     }
 
+    
     // @UseGuards(AuthGuard)
     // @Get('profile')
     // getProfile(@Request() req){
