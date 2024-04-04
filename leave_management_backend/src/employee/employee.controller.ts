@@ -10,6 +10,13 @@ export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'created user object as response',
+    type: Employee,
+  })
+  @ApiBadRequestResponse({
+    description:'User cannot register. Try Again'
+  })
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto) {
     try {
@@ -31,6 +38,7 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Put(':id')
+  
   async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto) {
     try {
       return await this.employeeService.updateEmployee(id, updateEmployeeDto);
@@ -42,6 +50,7 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
 
   @Delete(':id')
+  
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.employeeService.deleteEmployee(id);
