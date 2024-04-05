@@ -47,8 +47,8 @@ export class AuthService {
 
     async validateUser({ email, password }: AuthPayloadDto) {
         console.log("Inside Validate User...");
-        const encryptedValue = this.encrypt("tvsdhsgdvfhs")
-        this.decrypt(this.encrypt("tvsdhsgdvfhs"))
+        // const encryptedValue = this.encrypt("tvsdhsgdvfhs")
+        // this.decrypt(this.encrypt("tvsdhsgdvfhs"))
 
         
 

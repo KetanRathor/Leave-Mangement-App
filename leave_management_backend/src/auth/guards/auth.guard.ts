@@ -6,7 +6,13 @@ import {
   } from '@nestjs/common';
   import { JwtService } from '@nestjs/jwt';
   import { Request } from 'express';
+  import * as dotenv from 'dotenv';
+
+
+dotenv.config();
   
+
+
   @Injectable()
   export class AuthGuard implements CanActivate {
     constructor(private jwtService: JwtService) {}
@@ -22,7 +28,7 @@ import {
           token,
           {
             // secret: jwtConstants.secret
-            secret : process.env.SECRET,
+            secret : "ABC",
             // secret : process.env.SECRET,
           }
         );

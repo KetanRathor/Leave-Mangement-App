@@ -5,44 +5,67 @@ import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_requ
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiTags } from '@nestjs/swagger';
+import { LeaveType } from './entities/LeaveType.entity';
 @ApiTags('leave')
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
   constructor(private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService) { }
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'created leave request',
+    type: LeaveRequest,
+  })
+
   createRequest(@Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto) {
     return this.leaveTypesAndRequestsService.createRequest(
       createLeaveTypesAndRequestDto,
     );
   }
+
   @Get()
+  @ApiCreatedResponse({
+    description: 'all leave requests',
+    type:LeaveRequest
+  })
   async findAll() {
     return this.leaveTypesAndRequestsService.findAll();
   }
 
   @Get(':leave_request_id')
+  @ApiCreatedResponse({
+    description: 'get leave request of specific id'
+  })
   findOne(@Param('leave_request_id') leave_request_id: number) {
     // console.log('Finding leave request with ID:', leave_request_id);
     return this.leaveTypesAndRequestsService.findOne(+leave_request_id);
 }
 
-@Put(':leave_request_id/status')
-async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() body: { status: string }): Promise<LeaveRequest> {
-  if (!body.status) {
-    throw new BadRequestException('Status is required');
-  }
-    return this.leaveTypesAndRequestsService.updateStatus(
-      leave_request_id,
-      body.status,
-    );
-}
+// @Put(':leave_request_id/status')
+// @ApiCreatedResponse({
+//   description: 'updated',
+//   type: LeaveRequest,
+// })
 
-  @Get('/leaveRequest/:id')
-  getLeaveRequest(@Param('id', ParseIntPipe) id : number){
-    return this.leaveTypesAndRequestsService.getLeaveRequest(id);
-  }
+// async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() body: { status: string }): Promise<LeaveRequest> {
+//   if (!body.status) {
+//     throw new BadRequestException('Status is required');
+//   }
+//     return this.leaveTypesAndRequestsService.updateStatus(
+//       leave_request_id,
+//       body.status,
+//     );
+// }
+
+  // @Get('/leaveRequest/:id')
+
+  // // @ApiBadRequestResponse({
+  // //   description:'Cannot Find Leave Request. Try Again'
+  // // })
+  // getLeaveRequest(@Param('id', ParseIntPipe) id : number){
+  //   return this.leaveTypesAndRequestsService.getLeaveRequest(id);
+  // }
 
   // @Patch(':id/accept')
   // async acceptLeaveRequest(@Param('id', ParseIntPipe) requestId: number) {
@@ -62,6 +85,10 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
   // }
 
   @Get(':emp_id/leave-balance/:leave_type_id')
+  @ApiCreatedResponse({
+    description: 'total leaves'
+  })
+  
   async getEmployeeLeaveBalance(
     @Param('emp_id', ParseIntPipe) emp_id: number,
     @Param('leave_type_id', ParseIntPipe) leave_type_id: number,
@@ -70,18 +97,26 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
   }
 
   @Post("/leave-type")
+  @ApiCreatedResponse({
+    description: 'created leave type',
+    type:LeaveType
+  })
   createLeaveType(@Body() createLeaveType: CreateLeaveTypeDto) {
     return this.leaveTypesAndRequestsService.createLeaveType(createLeaveType);
   }
 
-  @Patch(':id/leaveType')
+  @Patch(':id/leaveType') 
+  @ApiCreatedResponse({
+    description: 'updated leave type',
+    type:LeaveType
+  })
   async updateLeaveType(@Param('id', ParseIntPipe) id: number, @Body() updateLeaveTypeDto:UpdateLeaveTypeDto) {
     return await this.leaveTypesAndRequestsService.updateLeaveType(id, updateLeaveTypeDto);
   }
 
-  @Get()
-  async getLeaveTypes(){
-    return await this.leaveTypesAndRequestsService.getLeaveTypes();
-  }
+  // @Get()
+  // async getLeaveTypes(){
+  //   return await this.leaveTypesAndRequestsService.getLeaveTypes();
+  // }
 
 }

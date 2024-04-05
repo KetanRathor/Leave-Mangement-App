@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import * as dotenv from 'dotenv';
+import { LocalStrategy } from './Strategies/local.strategy';
+
 
 dotenv.config();
 

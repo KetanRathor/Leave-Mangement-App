@@ -4,11 +4,14 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import { Employee } from './entities/Employee.entity';
 
+@ApiBearerAuth()
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
-
+  @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
@@ -50,7 +53,10 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
 
   @Delete(':id')
-  
+  @ApiCreatedResponse({
+    description: 'Employee Deleted Successfully',
+
+  })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.employeeService.deleteEmployee(id);
@@ -87,6 +93,10 @@ export class EmployeeController {
   
   @UseGuards(AuthGuard)
   @Get()
+  @ApiCreatedResponse({
+    description: 'get list of all the employees',
+    type: Employee,
+  })
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
