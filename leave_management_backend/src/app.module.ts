@@ -7,6 +7,10 @@ import { ConfigModule } from '@nestjs/config';
 import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_types_and_requests.module';
 import { AuthModule } from './auth/auth.module';
 import { HolidayModule } from './holiday/holiday.module';
+import { DepartmentController } from './department/department.controller';
+import { DepartmentService } from './department/department.service';
+import { DepartmentModule } from './department/department.module';
+
 
 @Module({
   imports: [
@@ -18,7 +22,7 @@ import { HolidayModule } from './holiday/holiday.module';
     EmployeeModule,
     LeaveTypesAndRequestsModule,
     AuthModule,
-    HolidayModule,
+    DepartmentModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 // import { Request } from 'express';
 import { AuthPayloadDto } from './dto/auth.dto';
@@ -10,12 +11,13 @@ import {
     HttpCode,
     HttpException,
     HttpStatus,
+    Param,
     Post,
     Request,
     UseGuards
 } from '@nestjs/common';
 
-
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
 
@@ -29,11 +31,17 @@ export class AuthController {
         return token;
     }
 
+    
     // @UseGuards(AuthGuard)
     // @Get('profile')
     // getProfile(@Request() req){
-    //     console.log("User Name : ",req.user.email);
-        
     //     return req.user;
     // }
+
+//     @UseGuards(AuthGuard)
+//     @Get('EmployeeList')
+//   showEmployeeList(@Request() req) {
+//     return req.user;
+//   }
+
 }

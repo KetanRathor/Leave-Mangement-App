@@ -5,6 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
@@ -12,8 +15,9 @@ import { UserCredentials } from './entities/UserCredentials.entity';
     , PassportModule,
     JwtModule.register({
       global : true,
-      secret:"ABC",
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.SECRET,
+      signOptions: { expiresIn: '1d' },
+
     }),
   ],
   controllers: [AuthController],

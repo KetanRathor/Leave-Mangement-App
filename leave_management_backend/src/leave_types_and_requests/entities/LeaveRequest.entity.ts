@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
-import { LeaveType } from './LeaveType.entity';
+// import { LeaveType } from './LeaveType.entity';
 
 @Entity('leave_request')
 export class LeaveRequest {
@@ -41,9 +41,9 @@ export class LeaveRequest {
     @Column({nullable:false,default:'system'})
     updated_by: string;
 
-    @ManyToOne(() => LeaveType, (leaveType) => leaveType.leaveRequests)
-    @JoinColumn({ name: 'leave_type_id' })
-    leaveType: LeaveType;
+    // @ManyToOne(() => LeaveType, (leaveType) => leaveType.leaveRequests)
+    // @JoinColumn({ name: 'leave_type_id' })
+    // leaveType: LeaveType;
 
     @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
     @JoinColumn({ name: 'emp_id'})
