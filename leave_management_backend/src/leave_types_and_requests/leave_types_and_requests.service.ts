@@ -103,6 +103,35 @@ export class LeaveTypesAndRequestsService {
   //   const pendingRequests = await this.leaveRepository.find({ where: { status: 'pending' } });
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
+  async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
+  const leaveType = this.leaveTypes.find(type => type.leave_type_id === leave_type_id);
+  if (!leaveType) {
+    throw new Error('Invalid leave type');
+  }
+
+  const approvedRequests = await this.leaveRequestRepository.find({
+    where: {
+      leave_type_id: leave_type_id,
+      status: 'approved',
+      emp_id: emp_id
+    },
+    relations: ['employee'],
+  });
+
+  const employeeRequests = approvedRequests.filter(
+    (request) => request.employee.emp_id === emp_id
+  );
+
+  const totalDaysTaken = employeeRequests.reduce((total, request) => {
+    const days = ((new Date(request.start_date)).getTime() - (new Date(request.end_date)).getTime()) / (1000 * 60 * 60 * 24);
+    // const days = (request.end_date as Date).getTime() - request.start_date.getTime() / (1000 * 60 * 60 * 24);
+
+    return total - days;
+  }, 0);
+
+  return leaveType.default_balance - totalDaysTaken;
+}
+
 
   async getPendingLeaveRequests(status="pending"){
 

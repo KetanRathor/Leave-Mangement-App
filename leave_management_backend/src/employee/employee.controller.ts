@@ -10,13 +10,13 @@ export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
 
   @Post()
-  @ApiCreatedResponse({
-    description: 'created user object as response',
-    type: Employee,
-  })
-  @ApiBadRequestResponse({
-    description:'User cannot register. Try Again'
-  })
+  // @ApiCreatedResponse({
+  //   description: 'created user object as response',
+  //   type: Employee,
+  // })
+  // @ApiBadRequestResponse({
+  //   description:'User cannot register. Try Again'
+  // })
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto) {
     try {

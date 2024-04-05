@@ -6,9 +6,13 @@ import { EmployeeModule } from './employee/employee.module';
 import { ConfigModule } from '@nestjs/config';
 import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_types_and_requests.module';
 import { AuthModule } from './auth/auth.module';
-import { DepartmentController } from './department/department.controller';
-import { DepartmentService } from './department/department.service';
+// import { DepartmentController } from './department/department.controller';
+// import { DepartmentService } from './department/department.service';
 import { DepartmentModule } from './department/department.module';
+import { MailService } from './mail/mail.service';
+import { MailController } from './mail/mail.controller';
+import { MailModule } from './mail/mail.module';
+
 
 
 @Module({
@@ -21,9 +25,10 @@ import { DepartmentModule } from './department/department.module';
     EmployeeModule,
     LeaveTypesAndRequestsModule,
     AuthModule,
-    DepartmentModule
+    DepartmentModule,
+    MailModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MailController],
+  providers: [AppService, MailService],
 })
 export class AppModule { }

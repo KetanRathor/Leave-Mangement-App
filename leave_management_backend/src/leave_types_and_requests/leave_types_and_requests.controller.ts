@@ -54,12 +54,12 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
   //   return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
   // }
 
-  // @Get('/pending')
-  // async getPendingLeaveRequests(status: string)
-  // // : Promise<{ id: number, status: string, employeeName : string }[]> 
-  // {
-  //   return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
-  // }
+  @Get('/pending')
+  async getPendingLeaveRequests(status: string)
+  // : Promise<{ id: number, status: string, employeeName : string }[]> 
+  {
+    return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
+  }
 
   // @Get(':emp_id/leave-balance/:leave_type_id')
   // async getEmployeeLeaveBalance(
@@ -68,6 +68,16 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
   // ): Promise<number> {
   //   return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
   // }
+
+  // @Get(':emp_id/leave-balance')
+  // async getEmployeeLeaveBalance(
+  //   @Param('emp_id', ParseIntPipe) emp_id: number,
+  //   @Body('leave_type_name') leave_type_name: string,
+  // ): Promise<number> {
+  //   return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_name);
+  // }
+
+
 
   // @Post("/leave-type")
   // createLeaveType(@Body() createLeaveType: CreateLeaveTypeDto) {

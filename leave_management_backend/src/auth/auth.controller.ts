@@ -1,4 +1,4 @@
-import { ApiTags } from '@nestjs/swagger';
+// import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 // import { Request } from 'express';
 import { AuthPayloadDto } from './dto/auth.dto';
@@ -17,7 +17,7 @@ import {
     UseGuards
 } from '@nestjs/common';
 
-@ApiTags('auth')
+// @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
 

@@ -16,6 +16,7 @@ export class DepartmentService {
     }
 
     //delete department
+    
     async deleteDepartment(department_id: number) {
         const department = await this.departmentRepository.findOneBy({ department_id })
         if (!department) {
