@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv';
+// import { MailService } from 'src/mail/mail.service';
+
 
 
 dotenv.config();
@@ -19,7 +21,8 @@ export class AuthService {
     constructor(
         private jwtService: JwtService,
         @InjectRepository(UserCredentials)
-        private readonly userCredentialsRepository: Repository<UserCredentials>
+        private readonly userCredentialsRepository: Repository<UserCredentials>,
+        // private readonly mailService  : MailService
     ) { }
 
 
@@ -38,7 +41,7 @@ export class AuthService {
     }
 
     decrypt(encryptedText: string): string {
-        console.log("Tesxttttt",encryptedText)
+        // console.log("Tesxttttt",encryptedText)
         // console.log("Key", this.key );
 
         console.log("key dec", process.env.ENCRYPTION_KEY)
@@ -54,6 +57,7 @@ export class AuthService {
     
 
 
+   
     async validateUser({ email, password }: AuthPayloadDto) {
         console.log("Inside Validate User...");
         
@@ -70,12 +74,15 @@ export class AuthService {
             if (!user) return new HttpException('Username incorrect ',403);
             const decryptedStoredPassword = this.decrypt(user.password);
             console.log("decryptedStoredPassword",decryptedStoredPassword)
+            // this.setPassword(decryptedStoredPassword);
             // if(password === user.password){  
                 if (password === decryptedStoredPassword) {
             const { password, ...userdata } = user;
             console.log("password",password);
             const token = await this.jwtService.signAsync(userdata);
+            // await this.mailService.sendPasswordEmail(user.email, decryptedStoredPassword);
             return {access_token : token}
+
               
         }
         else return new HttpException('Password incorrect ',403)
@@ -83,7 +90,8 @@ export class AuthService {
         } catch (error) {
             console.log("error", error)
         }
-       
+        //  await this.mailService.sendPasswordEmail(createEmployeeDto.email,de );
+
       
     }
 

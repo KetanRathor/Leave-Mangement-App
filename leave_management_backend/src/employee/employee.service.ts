@@ -6,6 +6,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
+import { MailService } from 'src/mail/mail.service';
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class EmployeeService {
         // private readonly departmentRepository: Repository<Department>,
         @InjectRepository(UserCredentials)
         private readonly userCredentialRepository: Repository<UserCredentials>,
-        private readonly authService : AuthService
+        private readonly authService : AuthService,
+        private readonly mailService  : MailService
 
     ) { }
 
@@ -50,7 +52,7 @@ export class EmployeeService {
         const originalPassword = this.authService.decrypt(encryptedPassword);
 
     
-    console.log('Original Password:', originalPassword);
+    // console.log('Original Password:', originalPassword);
       
         if (createEmployeeDto.role === "Admin") {
           newEmployee.manager_id = null;
@@ -59,7 +61,12 @@ export class EmployeeService {
         }
         
         
-        return await this.employeeRepository.save(newEmployee);
+        const savedEmployee =  await this.employeeRepository.save(newEmployee);
+
+        await this.mailService.sendPasswordEmail(createEmployeeDto.email,generatedPassword);
+
+
+        return savedEmployee;
       }
       
     //Update employee using id

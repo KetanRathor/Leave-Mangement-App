@@ -1,10 +1,14 @@
-import { Controller, Post,Body, HttpException, HttpStatus, Delete, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post,Body, HttpException, HttpStatus, Delete, Param, ParseIntPipe,UseGuards } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+
 
 @Controller('department')
 export class DepartmentController {
     constructor(private readonly departmentService: DepartmentService) { }
+
+    @UseGuards(AuthGuard)
 
   @Post()
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -15,6 +19,8 @@ export class DepartmentController {
     }
   }
 
+
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
     try {
