@@ -1,21 +1,35 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpStatus, HttpException, Put, Patch, ParseIntPipe, Query, BadRequestException, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  ParseIntPipe,
+  BadRequestException,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { LeaveTypesAndRequestsService } from './leave_types_and_requests.service';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
-import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_request.dto';
-import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
-import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { REQUEST } from '@nestjs/core';
 
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
-  constructor(private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService) { }
+  constructor(
+    private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
+  ) {}
   @UseGuards(AuthGuard)
   @Post()
-  createRequest(@Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,@Request() req) {
+  createRequest(
+    @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,
+    @Request() req,
+  ) {
+    const req_email = req.user.email;
     return this.leaveTypesAndRequestsService.createRequest(
-      createLeaveTypesAndRequestDto,req,
+      createLeaveTypesAndRequestDto,
+      req_email,
     );
   }
   @UseGuards(AuthGuard)
@@ -28,22 +42,27 @@ export class LeaveTypesAndRequestsController {
   findOne(@Param('leave_request_id') leave_request_id: number) {
     // console.log('Finding leave request with ID:', leave_request_id);
     return this.leaveTypesAndRequestsService.findOne(+leave_request_id);
-}
-@UseGuards(AuthGuard)
-@Put(':leave_request_id/status')
-async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() body: { status: string },@Request() req): Promise<LeaveRequest> {
-  if (!body.status) {
-    throw new BadRequestException('Status is required');
   }
+  @UseGuards(AuthGuard)
+  @Put(':leave_request_id/status')
+  async updateStatus(
+    @Param('leave_request_id') leave_request_id: number,
+    @Body() body: { status: string },
+    @Request() req,
+  ): Promise<LeaveRequest> {
+    const req_email = req.user.email;
+    if (!body.status) {
+      throw new BadRequestException('Status is required');
+    }
     return this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
-      req,
+      req_email,
     );
-}
+  }
 
   @Get('/leaveRequest/:id')
-  getLeaveRequest(@Param('id', ParseIntPipe) id : number){
+  getLeaveRequest(@Param('id', ParseIntPipe) id: number) {
     return this.leaveTypesAndRequestsService.getLeaveRequest(id);
   }
 
@@ -59,7 +78,7 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
 
   // @Get('/pending')
   // async getPendingLeaveRequests(status: string)
-  // // : Promise<{ id: number, status: string, employeeName : string }[]> 
+  // // : Promise<{ id: number, status: string, employeeName : string }[]>
   // {
   //   return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
   // }
@@ -86,5 +105,4 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
   // async getLeaveTypes(){
   //   return await this.leaveTypesAndRequestsService.getLeaveTypes();
   // }
-
 }

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -6,25 +13,25 @@ import { ApiProperty } from '@nestjs/swagger';
 @Entity('employee')
 export class Employee {
   @ApiProperty({
-    description:'The id of Employee'
+    description: 'The id of Employee',
   })
   @PrimaryGeneratedColumn()
   id: number;
 
   @ApiProperty({
-    description:'The id of Employee'
+    description: 'The name of Employee',
   })
   @Column({ nullable: false })
   name: string;
 
   @ApiProperty({
-    description:'The email of Employee'
+    description: 'The email of Employee',
   })
   @Column({ nullable: false, unique: true })
   email: string;
 
   @ApiProperty({
-    description:'The mobile number of Employee'
+    description: 'The mobile number of Employee',
   })
   @Column({ nullable: false })
   mobile_number: string;
@@ -33,33 +40,41 @@ export class Employee {
   deleted: boolean;
 
   @ApiProperty({
-    description:'When user was Created'
+    description: 'When user was Created',
   })
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column({nullable:false,default: 'system'})
+  @Column({ nullable: false, default: 'system' })
   created_by: string;
 
   @ApiProperty({
-    description:'When user was Updated'
+    description: 'When user was Updated',
   })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updated_at: Date;
-   
-  @Column({nullable:false,default: 'system'})
+
+  @Column({ nullable: false, default: 'system' })
   updated_by: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   deleted_at: Date;
 
-  @Column({nullable:false,default: 'system'})
+  @Column({ nullable: false, default: 'system' })
   deleted_by: string;
   // @Column({ nullable: false })
   // @Column()
   // manager_id: number;
   @ApiProperty({
-    description:'The manager id of Employee'
+    description: 'The manager id of Employee',
   })
   @Column({ default: null })
   manager_id: number | null;
@@ -83,6 +98,6 @@ export class Employee {
   role: string;
 
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  @JoinColumn({ name: 'leave_request_id'})
+  @JoinColumn({ name: 'leave_request_id' })
   leaveRequests: LeaveRequest[];
 }

@@ -6,12 +6,12 @@ import { CreateHolidaysDto } from './dto/createHolidays.dto';
 
 @Injectable()
 export class HolidayService {
-   constructor(
-   @InjectRepository(Holidays)
+  constructor(
+    @InjectRepository(Holidays)
     private readonly holidayRepository: Repository<Holidays>,
-   ){}
-  
-   findAll() {
+  ) {}
+
+  findAll() {
     return this.holidayRepository.find();
   }
 
@@ -21,10 +21,10 @@ export class HolidayService {
   }
 
   async deleteHoliday(id: number) {
-    const holiday = await this.holidayRepository.findOneBy({ id })
+    const holiday = await this.holidayRepository.findOneBy({ id });
     if (!holiday) {
-        throw new NotFoundException('holiday not found.');
+      throw new NotFoundException('holiday not found.');
     }
     return await this.holidayRepository.remove(holiday);
-}
+  }
 }

@@ -9,7 +9,9 @@ describe('LeaveTypesAndRequestsService', () => {
       providers: [LeaveTypesAndRequestsService],
     }).compile();
 
-    service = module.get<LeaveTypesAndRequestsService>(LeaveTypesAndRequestsService);
+    service = module.get<LeaveTypesAndRequestsService>(
+      LeaveTypesAndRequestsService,
+    );
   });
 
   it('should be defined', () => {

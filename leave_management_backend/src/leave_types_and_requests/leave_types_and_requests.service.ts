@@ -3,18 +3,18 @@ import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_requ
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Employee } from 'src/employee/entities/Employee.entity';
 // import { LeaveType } from './entities/LeaveType.entity';
-import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
-import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
-
   private readonly leaveTypes = [
     { leave_type_id: 1, leave_type_name: 'Full day', default_balance: 21 },
     { leave_type_id: 2, leave_type_name: 'Half day', default_balance: 10 },
-    { leave_type_id: 3, leave_type_name: 'work from home', default_balance: 10 },
+    {
+      leave_type_id: 3,
+      leave_type_name: 'work from home',
+      default_balance: 10,
+    },
   ];
   // updateStatus(leave_request_id: number, status: string): any {
   //   throw new Error('Method not implemented.');
@@ -24,14 +24,12 @@ export class LeaveTypesAndRequestsService {
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
     // @InjectRepository(LeaveType)
     // private readonly leaveTypeRepository: Repository<LeaveType>,
-  ) { }
+  ) {}
 
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
-    req: any,
+    req_email: any,
   ): Promise<LeaveRequest> {
-    const newRequest = new LeaveRequest();
-
     if (!createLeaveDto.leave_type_id) {
       throw new BadRequestException('Leave Type Id is required');
     }
@@ -39,10 +37,10 @@ export class LeaveTypesAndRequestsService {
     // newRequest.emp_id = createLeaveDto.emp_id;
 
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
-    newLeaveRequest.created_by = req.user.email;
+    newLeaveRequest.created_by = req_email;
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
-  
+
   findOne(id: number): Promise<LeaveRequest> {
     return this.leaveRequestRepository.findOneBy({ id });
   }
@@ -54,22 +52,20 @@ export class LeaveTypesAndRequestsService {
   async updateStatus(
     leave_request_id: number,
     status: string,
-    req:any,
+    req_email: any,
   ): Promise<LeaveRequest> {
     const leaveRequest = await this.findOne(leave_request_id);
     leaveRequest.status = status;
-    leaveRequest.updated_by=req.user.email;
+    leaveRequest.updated_by = req_email;
     return this.leaveRequestRepository.save(leaveRequest);
   }
   async getLeaveRequest(id: number): Promise<LeaveRequest> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({id})
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({ id });
     if (!leaveRequest) {
       throw new BadRequestException('No Leave Request Found');
     }
     return leaveRequest;
   }
-
-  
 
   // async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
   //   const leaveType = await this.leaveTypeRepository.findOneBy({ leave_type_id });
@@ -105,17 +101,19 @@ export class LeaveTypesAndRequestsService {
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
 
-  async getPendingLeaveRequests(status="pending"){
+  async getPendingLeaveRequests(status = 'pending') {
+    const pendingRequests = await this.leaveRequestRepository.find({
+      where: { status },
+      relations: ['employee'],
+    });
 
-    const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
-
-    return pendingRequests.map(request => ({
+    return pendingRequests.map((request) => ({
       id: request.id,
       status: request.status,
-      employeeName: request?.employee?.name
-    }))
+      employeeName: request?.employee?.name,
+    }));
   }
-  
+
   // async createLeaveType(leaveTypeDetails: CreateLeaveTypeDto): Promise<LeaveType> {
   //   const newLeaveType = await this.leaveTypeRepository.create(leaveTypeDetails)
   //   return await this.leaveTypeRepository.save(newLeaveType);

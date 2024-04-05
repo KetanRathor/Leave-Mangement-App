@@ -5,8 +5,8 @@ import { Holidays } from './entities/holiday.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Holidays])],
+  imports: [TypeOrmModule.forFeature([Holidays])],
   controllers: [HolidayController],
-  providers: [HolidayService]
+  providers: [HolidayService],
 })
 export class HolidayModule {}

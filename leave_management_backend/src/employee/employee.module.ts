@@ -9,9 +9,9 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserCredentials } from '../auth/entities/UserCredentials.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Employee,Department,UserCredentials])],
+  imports: [TypeOrmModule.forFeature([Employee, Department, UserCredentials])],
   controllers: [EmployeeController],
-  providers: [EmployeeService,AuthService],
-  exports:[EmployeeService]
+  providers: [EmployeeService, AuthService],
+  exports: [EmployeeService],
 })
 export class EmployeeModule {}

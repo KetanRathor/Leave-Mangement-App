@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Employee } from '../../employee/entities/Employee.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('user_credentials')
 export class UserCredentials {
@@ -11,6 +10,4 @@ export class UserCredentials {
 
   @Column({ nullable: false })
   password: string;
-
-  
 }
