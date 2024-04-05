@@ -73,14 +73,11 @@ export class AuthService {
         try {
             if (!user) return new HttpException('Username incorrect ',403);
             const decryptedStoredPassword = this.decrypt(user.password);
-            console.log("decryptedStoredPassword",decryptedStoredPassword)
-            // this.setPassword(decryptedStoredPassword);
-            // if(password === user.password){  
+            console.log("decryptedStoredPassword",decryptedStoredPassword) 
                 if (password === decryptedStoredPassword) {
             const { password, ...userdata } = user;
             console.log("password",password);
             const token = await this.jwtService.signAsync(userdata);
-            // await this.mailService.sendPasswordEmail(user.email, decryptedStoredPassword);
             return {access_token : token}
 
               
@@ -90,7 +87,6 @@ export class AuthService {
         } catch (error) {
             console.log("error", error)
         }
-        //  await this.mailService.sendPasswordEmail(createEmployeeDto.email,de );
 
       
     }
