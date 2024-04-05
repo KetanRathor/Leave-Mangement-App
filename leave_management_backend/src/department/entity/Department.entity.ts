@@ -20,7 +20,7 @@ export class Department {
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
   @Column({ default: 'system' })
