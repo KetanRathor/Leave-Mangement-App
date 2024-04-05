@@ -11,6 +11,13 @@ export class DepartmentController {
     @UseGuards(AuthGuard)
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'created department object as response',
+    type: Department,
+  })
+  @ApiBadRequestResponse({
+    description:'cannot create Department. Try Again'
+  })
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     try {
       return await this.departmentService.createDepartment(createDepartmentDto);

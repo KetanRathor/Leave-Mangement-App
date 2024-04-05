@@ -17,6 +17,7 @@ dotenv.config();
       global: true,
       secret: process.env.SECRET,
       signOptions: { expiresIn: '1d' },
+
     }),
   ],
   controllers: [AuthController],
