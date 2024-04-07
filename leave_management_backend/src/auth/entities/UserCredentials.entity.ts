@@ -6,6 +6,11 @@ export class UserCredentials {
   @PrimaryGeneratedColumn()
   e_id: number;
 
+  // @OneToOne(() => Employee, { onDelete: 'CASCADE' })
+  // @JoinColumn({ name: 'emp_id' })
+  // employee: Employee;
+
+
   @Column({ nullable: false, unique: true })
   email: string;
 

@@ -8,7 +8,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 export class DepartmentController {
     constructor(private readonly departmentService: DepartmentService) { }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
 
   @Post()
   // @ApiCreatedResponse({

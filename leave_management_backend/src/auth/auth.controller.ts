@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthPayloadDto } from './dto/auth.dto';
 // import { AuthGuard } from '@nestjs/passport';
 import { AuthGuard } from './guards/auth.guard';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import {
     Body,
     Controller,
@@ -43,5 +44,27 @@ export class AuthController {
 //   showEmployeeList(@Request() req) {
 //     return req.user;
 //   }
+@Post('forgotpassword')
+async forgotPassword(@Body('email') email: string) {
+    try {
+        await this.authService.forgotPassword(email);
+        return { message: 'OTP sent to your email address' };
+    } catch (error) {
+        
+        return { error: error.message };
+    }
+}
+
+@Post('reset-password')
+    async resetPasswordWithOTP(@Body() resetPasswordDto: ResetPasswordDto) {
+        try {
+            const { email, otp, newPassword, confirmPassword } = resetPasswordDto;
+            await this.authService.resetPasswordWithOTP(email, otp, newPassword, confirmPassword);
+            return { message: 'Password reset successfully' };
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
 
 }

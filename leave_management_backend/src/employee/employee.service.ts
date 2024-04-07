@@ -44,7 +44,8 @@ export class EmployeeService {
 
         const newUserCredential = this.userCredentialRepository.create({
             email:createEmployeeDto.email,
-            password:encryptedPassword
+            password:encryptedPassword,
+            // employee: newEmployee
         })
 
         await this.userCredentialRepository.save(newUserCredential);
@@ -91,7 +92,17 @@ export class EmployeeService {
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
-        return await this.employeeRepository.remove(employee);
+         await this.employeeRepository.remove(employee);
+
+        const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
+
+    if (userCredentials) {
+        // Remove the user credentials
+        await this.userCredentialRepository.remove(userCredentials);
+    }
+
+    return 'Employee and associated UserCredentials deleted successfully.';
+
     }
 
     //Show Employe Profile
