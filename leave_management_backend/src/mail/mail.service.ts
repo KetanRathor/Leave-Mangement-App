@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as nodemailer from 'nodemailer';
-import { AuthService } from 'src/auth/auth.service';
+import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
+import { Repository } from 'typeorm';
+// import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class MailService {
@@ -8,7 +11,9 @@ export class MailService {
     
     // private generatedPassword: string;
     constructor(
-        private  authService : AuthService
+        // private  authService : AuthService
+        // @InjectRepository(UserCredentials)
+        // private readonly userCredentialsRepository: Repository<UserCredentials>
         ) 
     
     {
@@ -23,10 +28,6 @@ export class MailService {
     
     
     async sendPasswordEmail(email: string,password:string): Promise<void> {
-    //     const generatedPassword = this.authService.generateRandomPassword(10);
-    // const encryptedPassword = this.authService.encrypt(generatedPassword);
-    // const originalPassword = this.authService.decrypt(encryptedPassword);
-    // console.log("New Password:", originalPassword)
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -35,14 +36,58 @@ export class MailService {
             text: `Hello,\n\nYour account has been created successfully. Your password is: ${password}\n\nRegards,\nThe Admin Team`
         };
 
-
+       
         this.transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.error('Error sending password email:', error);
-                // Handle error gracefully, maybe log it or do something else
+                
             } else {
                 console.log('Email sent:', info.response);
             }
         });
     }
+
+    
+    async sendOTPEmail(email: string, otp: string){
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Your OTP for Password Reset',
+            text: `Hello,\n\nYour OTP for password reset is: ${otp}\n\nRegards,\nThe Admin Team`
+        };
+        // await this.sendOTPEmail(email,otp);
+
+        this.transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending OTP email:', error);
+            } else {
+                console.log('OTP Email sent:', info.response);
+            }
+        });
+    }
+
+    async sendPasswordResetEmail(email: string){
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Your OTP for Password Reset',
+            text: `Hello,\n\n Your password has been reset successfully. \n\nRegards,\nThe Admin Team`
+        };
+        // await this.sendOTPEmail(email,otp);
+
+        this.transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending OTP email:', error);
+            } else {
+                console.log('OTP Email sent:', info.response);
+            }
+        });
+    }
+
+
+
+
+    
+
+    
 }
