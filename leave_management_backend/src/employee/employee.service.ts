@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Employee } from './entities/Employee.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -24,9 +24,9 @@ export class EmployeeService {
     ) { }
 
     //Create employee
-    async createEmployee(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
+    async createEmployee(createEmployeeDto: CreateEmployeeDto,req_mail:any): Promise<Employee> {
         const newEmployee = this.employeeRepository.create(createEmployeeDto);
-      
+      newEmployee.created_by=req_mail;
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if (!emailRegex.test(createEmployeeDto.email)) {
           throw new Error('Invalid email format. Please enter a valid email address.');
@@ -37,24 +37,8 @@ export class EmployeeService {
           throw new Error('Invalid mobile number format. Please enter a valid phone number.');
         }
       
-        // const generatedPassword = this.authService.generateRandomPassword(10);
-        // console.log('Original Password:', generatedPassword);
-
-        // const encryptedPassword = this.authService.encrypt(generatedPassword);
-
-        // const newUserCredential = this.userCredentialRepository.create({
-        //     email:createEmployeeDto.email,
-        //     password:encryptedPassword,
-        //     // employee: newEmployee
-        // })
-
-        // await this.userCredentialRepository.save(newUserCredential);
-
-        // const originalPassword = this.authService.decrypt(encryptedPassword);
+        
         const userPassword = await this.authService.registerUser(createEmployeeDto.email)
-
-    
-    // console.log('Original Password:', originalPassword);
       
         if (createEmployeeDto.role === "Admin") {
           newEmployee.manager_id = null;
@@ -72,8 +56,8 @@ export class EmployeeService {
       }
       
     //Update employee using id
-    async updateEmployee(emp_id: number, updatedEmployeeDetails: UpdateEmployeeDto): Promise<Employee> {
-        const employee = await this.employeeRepository.findOneBy({ emp_id });
+    async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto,req_mail): Promise<Employee> {
+        const employee = await this.employeeRepository.findOneBy({ id });
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
@@ -83,17 +67,20 @@ export class EmployeeService {
                 employee[key] = updatedEmployeeDetails[key];
             }
         }
+        employee.updated_by=req_mail;
 
         return await this.employeeRepository.save(employee);
     }
 
     //Delete employee using id
-    async deleteEmployee(emp_id: number) {
-        const employee = await this.employeeRepository.findOneBy({ emp_id })
+    async deleteEmployee(id: number,req_mail:string) {
+        const employee = await this.employeeRepository.findOneBy({ id })
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
-         await this.employeeRepository.remove(employee);
+        //  await this.employeeRepository.remove(employee);
+        employee.deleted_by=req_mail;
+    employee.deleted_at=new Date()
 
         const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
 
@@ -102,13 +89,17 @@ export class EmployeeService {
         await this.userCredentialRepository.remove(userCredentials);
     }
 
+    employee.deleted_by=req_mail;
+    employee.deleted_at=new Date()
+    await this.employeeRepository.save(employee)
+
     return 'Employee and associated UserCredentials deleted successfully.';
 
     }
 
     //Show Employe Profile
-    async showProfile(emp_id: number) {
-        return this.employeeRepository.findOneBy({ emp_id });
+    async showProfile(id: number) {
+        return this.employeeRepository.findOneBy({ id });
     }
 
     //Show Employee List
@@ -120,6 +111,6 @@ export class EmployeeService {
         // catch(error){
         //     throw new HttpException('Unable to find employee.',HttpStatus.BAD_REQUEST)
         // }
-        return await this.employeeRepository.find()
+        return await this.employeeRepository.find({where:{deleted_at:IsNull()}})
     }
 }

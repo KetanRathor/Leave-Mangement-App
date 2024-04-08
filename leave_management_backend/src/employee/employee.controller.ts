@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -9,6 +9,8 @@ import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
 
+  @UseGuards(AuthGuard)
+
   @Post()
   // @ApiCreatedResponse({
   //   description: 'created user object as response',
@@ -18,9 +20,10 @@ export class EmployeeController {
   //   description:'User cannot register. Try Again'
   // })
   async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto) {
-    try {
-      return await this.employeeService.createEmployee(createEmployeeDto);
+    @Body() createEmployeeDto: CreateEmployeeDto,@Request() req) {
+    const req_mail=req.user.email;
+      try {
+      return await this.employeeService.createEmployee(createEmployeeDto,req_mail);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -39,9 +42,10 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
   @Put(':id')
   
-  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto) {
+  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto,@Request() req) {
+    const req_mail=req.user.email;
     try {
-      return await this.employeeService.updateEmployee(id, updateEmployeeDto);
+      return await this.employeeService.updateEmployee(id, updateEmployeeDto,req_mail);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -51,9 +55,10 @@ export class EmployeeController {
 
   @Delete(':id')
   
-  async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
+  async deleteEmployee(@Param('id', ParseIntPipe) id: number,@Request() req) {
+    const req_mail=req.user.email;
     try {
-      await this.employeeService.deleteEmployee(id);
+      await this.employeeService.deleteEmployee(id,req_mail);
       return 'Employee Deleted Successfully'
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST)

@@ -4,7 +4,9 @@ import { Employee } from '../../employee/entities/Employee.entity';
 @Entity('user_credentials')
 export class UserCredentials {
   @PrimaryGeneratedColumn()
-  e_id: number;
+  id: number;
+
+  
 
   // @OneToOne(() => Employee, { onDelete: 'CASCADE' })
   // @JoinColumn({ name: 'emp_id' })
@@ -16,6 +18,26 @@ export class UserCredentials {
 
   @Column({ nullable: false })
   password: string;
+
+
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  // created_at: Date;
+  
+  // @Column({ default: '' })
+  // created_by: string;
+
+
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  // updated_at: Date;
+
+  // @Column({ default: '' })
+  // updated_by: string;
+
+  // @Column({ type: 'timestamp',nullable:true })
+  // deleted_at: Date;
+
+  // @Column({ default: '' })
+  // deleted_by: string;
 
   
 }

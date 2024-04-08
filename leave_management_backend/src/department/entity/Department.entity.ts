@@ -8,7 +8,7 @@ export class Department {
   //   description:'The department id '
   // })
   @PrimaryGeneratedColumn()
-  department_id: number;
+  id: number;
 
   // @ApiProperty({
   //   description:'The department name '
