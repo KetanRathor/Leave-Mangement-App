@@ -5,6 +5,7 @@ import { UpdateLeaveTypesAndRequestDto } from './dto/update-leave_types_and_requ
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
+import { leaveTypes } from 'src/constantData/leaveTypeConstantData';
 // import { ApiTags } from '@nestjs/swagger';
 // @ApiTags('leave')
 @Controller('leave')
@@ -61,13 +62,13 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
     return await this.leaveTypesAndRequestsService.getPendingLeaveRequests(status);
   }
 
-  // @Get(':emp_id/leave-balance/:leave_type_id')
-  // async getEmployeeLeaveBalance(
-  //   @Param('emp_id', ParseIntPipe) emp_id: number,
-  //   @Param('leave_type_id', ParseIntPipe) leave_type_id: number,
-  // ): Promise<number> {
-  //   return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
-  // }
+  @Get(':emp_id/leave-balance/:leave_type_id')
+  async getEmployeeLeaveBalance(
+    @Param('emp_id', ParseIntPipe) emp_id: number,
+    @Param('leave_type_id', ParseIntPipe) leave_type_id: number,
+  ): Promise<number> {
+    return await this.leaveTypesAndRequestsService.getBalanceLeaves(emp_id, leave_type_id);
+  }
 
   // @Get(':emp_id/leave-balance')
   // async getEmployeeLeaveBalance(
@@ -91,7 +92,9 @@ async updateStatus(@Param('leave_request_id') leave_request_id: number, @Body() 
 
   // @Get()
   // async getLeaveTypes(){
-  //   return await this.leaveTypesAndRequestsService.getLeaveTypes();
+  //   // return await this.leaveTypesAndRequestsService.getLeaveTypes();
+  //   return leaveTypes;
+
   // }
 
 }

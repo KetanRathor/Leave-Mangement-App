@@ -29,15 +29,7 @@ export class EmployeeController {
     }
   }
   
-  // @UseGuards(AuthGuard)
-  // @Post('/department')
-  // async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
-  //   try {
-  //     return await this.employeeService.createDepartment(createDepartmentDto);
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+ 
 
   @UseGuards(AuthGuard)
   @Put(':id')

@@ -104,13 +104,7 @@ export class EmployeeService {
 
     //Show Employee List
     async findEmployees(){
-        // try 
-        // {
-        //     return await this.employeeRepository.find()
-        // }
-        // catch(error){
-        //     throw new HttpException('Unable to find employee.',HttpStatus.BAD_REQUEST)
-        // }
+        
         return await this.employeeRepository.find({where:{deleted_at:IsNull()}})
     }
 }

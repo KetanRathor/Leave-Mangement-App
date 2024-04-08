@@ -157,18 +157,18 @@ export class AuthService {
                 throw new HttpException('Password must be at least 6 characters long', 400);
             }
         
-            // Validate password confirmation
+            
             if (newPassword !== confirmPassword) {
                 throw new HttpException('Passwords do not match', 400);
             }
             
             const encryptedPassword = this.encrypt(newPassword);
 
-            // Update password in database
+            
             await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
 
             await this.mailService.sendPasswordResetEmail(email)
-            // Remove OTP from cache after successful password reset
+            
             cache.del(email);
       }
 

@@ -24,12 +24,12 @@ import {
         const payload = await this.jwtService.verifyAsync(
           token,
           {
-            // secret: jwtConstants.secret
+            
             secret : process.env.SECRET,
-            // secret : process.env.SECRET,
+           
           }
         );
-        // console.log("payload.....",process.env.SECRET," Type ",typeof process.env.SECRET);
+       
         
         request['user'] = payload;
       } catch {
