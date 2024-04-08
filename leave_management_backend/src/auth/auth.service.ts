@@ -94,7 +94,7 @@ export class AuthService {
       
     }
 
-    async registerUser({ email }: AuthPayloadDto) {
+    async registerUser( email : string) {
         const generatedPassword = this.generateRandomPassword(10); 
         const encryptedPassword = this.encrypt(generatedPassword); 
 
@@ -105,7 +105,7 @@ export class AuthService {
 
         await this.userCredentialsRepository.save(newUser);
 
-        return { message: 'User registered successfully', password: generatedPassword };
+        return  generatedPassword ;
     }
 
     generateRandomPassword(length: number): string {

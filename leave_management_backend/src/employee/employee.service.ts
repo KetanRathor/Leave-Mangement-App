@@ -37,20 +37,21 @@ export class EmployeeService {
           throw new Error('Invalid mobile number format. Please enter a valid phone number.');
         }
       
-        const generatedPassword = this.authService.generateRandomPassword(10);
-        console.log('Original Password:', generatedPassword);
+        // const generatedPassword = this.authService.generateRandomPassword(10);
+        // console.log('Original Password:', generatedPassword);
 
-        const encryptedPassword = this.authService.encrypt(generatedPassword);
+        // const encryptedPassword = this.authService.encrypt(generatedPassword);
 
-        const newUserCredential = this.userCredentialRepository.create({
-            email:createEmployeeDto.email,
-            password:encryptedPassword,
-            // employee: newEmployee
-        })
+        // const newUserCredential = this.userCredentialRepository.create({
+        //     email:createEmployeeDto.email,
+        //     password:encryptedPassword,
+        //     // employee: newEmployee
+        // })
 
-        await this.userCredentialRepository.save(newUserCredential);
+        // await this.userCredentialRepository.save(newUserCredential);
 
-        const originalPassword = this.authService.decrypt(encryptedPassword);
+        // const originalPassword = this.authService.decrypt(encryptedPassword);
+        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
 
     
     // console.log('Original Password:', originalPassword);
@@ -64,7 +65,7 @@ export class EmployeeService {
         
         const savedEmployee =  await this.employeeRepository.save(newEmployee);
 
-        await this.mailService.sendPasswordEmail(createEmployeeDto.email,generatedPassword);
+        await this.mailService.sendPasswordEmail(createEmployeeDto.email,userPassword);
 
 
         return savedEmployee;
