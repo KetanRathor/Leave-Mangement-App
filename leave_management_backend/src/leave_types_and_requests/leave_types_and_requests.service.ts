@@ -43,9 +43,9 @@ export class LeaveTypesAndRequestsService {
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
-  findOne(leave_request_id: number): Promise<LeaveRequest> {
-    console.log(leave_request_id);
-    return this.leaveRequestRepository.findOneBy({ leave_request_id });
+  findOne(id: number): Promise<LeaveRequest> {
+    console.log(id);
+    return this.leaveRequestRepository.findOneBy({ id });
   }
 
   findAll() {
@@ -60,8 +60,8 @@ export class LeaveTypesAndRequestsService {
     leaveRequest.status = status;
     return this.leaveRequestRepository.save(leaveRequest);
   }
-  async getLeaveRequest(leave_request_id: number): Promise<LeaveRequest> {
-    const leaveRequest = await this.leaveRequestRepository.findOneBy({leave_request_id})
+  async getLeaveRequest(id: number): Promise<LeaveRequest> {
+    const leaveRequest = await this.leaveRequestRepository.findOneBy({id})
     if (!leaveRequest) {
       throw new BadRequestException('No Leave Request Found');
     }
@@ -119,7 +119,7 @@ export class LeaveTypesAndRequestsService {
   });
 
   const employeeRequests = approvedRequests.filter(
-    (request) => request.employee.emp_id === emp_id
+    (request) => request.employee.id === emp_id
   );
 
   const totalDaysTaken = employeeRequests.reduce((total, request) => {
@@ -138,7 +138,7 @@ export class LeaveTypesAndRequestsService {
     const pendingRequests =  await this.leaveRequestRepository.find({where: {status}, relations: ['employee']})
 
     return pendingRequests.map(request => ({
-      id: request.leave_request_id,
+      id: request.id,
       status: request.status,
       employeeName: request?.employee?.name
     }))

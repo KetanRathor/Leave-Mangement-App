@@ -7,7 +7,9 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv';
+import { MailService } from 'src/mail/mail.service';
 // import { MailService } from 'src/mail/mail.service';
+import * as cache from 'memory-cache';
 
 
 
@@ -18,11 +20,12 @@ export class AuthService {
 
     
     private readonly iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
+    private readonly otpTTL = 300000;
     constructor(
         private jwtService: JwtService,
         @InjectRepository(UserCredentials)
         private readonly userCredentialsRepository: Repository<UserCredentials>,
-        // private readonly mailService  : MailService
+        private readonly mailService  : MailService
     ) { }
 
 
@@ -91,7 +94,7 @@ export class AuthService {
       
     }
 
-    async registerUser( email: string) {
+    async registerUser( email : string) {
         const generatedPassword = this.generateRandomPassword(10); 
         const encryptedPassword = this.encrypt(generatedPassword); 
 
@@ -102,7 +105,7 @@ export class AuthService {
 
         await this.userCredentialsRepository.save(newUser);
 
-        return generatedPassword ;
+        return  generatedPassword ;
     }
 
     generateRandomPassword(length: number): string {
@@ -116,6 +119,58 @@ export class AuthService {
         return password;
         
     }
+
+    generateOTP() {
+        const digits = '0123456789';
+        let OTP = '';
+        for (let i = 0; i < 6; i++) {
+          const randomIndex = Math.floor(Math.random() * digits.length);
+          OTP += digits[randomIndex];
+        }
+        return OTP;
+      }
+
+    
+      async forgotPassword(email: string) {
+        const user = await this.userCredentialsRepository.findOne({
+          where: { email },
+        });
+    
+        if (!user) {
+          return new HttpException('Email not found', 404);
+        }
+    
+        const otp = this.generateOTP();
+        await this.mailService.sendOTPEmail(email, otp);
+    
+        return { message: 'OTP sent to your email address' };
+      }
+
+      async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string){
+            cache.put(email, otp,this.otpTTL);
+            const cachedOTP =cache.get(email);
+            console.log('Cached OTP:', cachedOTP)
+            if (!cachedOTP || cachedOTP !== otp) {
+                throw new HttpException('Invalid OTP', 400);
+            }
+            if (!newPassword || newPassword.length < 6) {
+                throw new HttpException('Password must be at least 6 characters long', 400);
+            }
+        
+            // Validate password confirmation
+            if (newPassword !== confirmPassword) {
+                throw new HttpException('Passwords do not match', 400);
+            }
+            
+            const encryptedPassword = this.encrypt(newPassword);
+
+            // Update password in database
+            await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
+
+            await this.mailService.sendPasswordResetEmail(email)
+            // Remove OTP from cache after successful password reset
+            cache.del(email);
+      }
 
     
 

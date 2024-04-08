@@ -6,6 +6,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import * as dotenv from 'dotenv';
+import { MailModule } from 'src/mail/mail.module';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ dotenv.config();
       signOptions: { expiresIn: '1d' },
 
     }),
+    MailModule
   ],
   controllers: [AuthController],
   providers: [AuthService],

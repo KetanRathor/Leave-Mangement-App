@@ -9,7 +9,7 @@ export class Employee {
   //   description:'The id of Employee'
   // })
   @PrimaryGeneratedColumn()
-  emp_id: number;
+  id: number;
 
   // @ApiProperty({
   //   description:'The id of Employee'
@@ -34,12 +34,24 @@ export class Employee {
   // })
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+  @Column({ default: '' })
+  created_by: string;
 
   // @ApiProperty({
   //   description:'When user was Updated'
   // })
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  @Column({ default: ''})
+  updated_by: string;
+
+
+  @Column({ type: 'timestamp', nullable:true })
+  deleted_at: Date;
+
+  @Column({ default: ''})
+  deleted_by: string;
 
   // @Column({ nullable: false })
   // @Column()

@@ -12,6 +12,7 @@ import { DepartmentModule } from './department/department.module';
 import { MailService } from './mail/mail.service';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
+// import { MyRedisModule } from './redis/redis.module';
 
 
 
@@ -26,7 +27,13 @@ import { MailModule } from './mail/mail.module';
     LeaveTypesAndRequestsModule,
     AuthModule,
     DepartmentModule,
-    MailModule
+    MailModule,
+    // MyRedisModule.register({
+    //   host: 'localhost', // Redis host
+    //   port: 6379, // Redis port
+    //   // other configuration options if needed
+    // }),
+    // RedisModule,
   ],
   controllers: [AppController, MailController],
   providers: [AppService, MailService],

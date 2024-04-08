@@ -5,7 +5,7 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 @Entity('leave_request')
 export class LeaveRequest {
     @PrimaryGeneratedColumn()
-    leave_request_id: number;
+    id: number;
 
     @Column({ nullable: false })
     emp_id: number;
