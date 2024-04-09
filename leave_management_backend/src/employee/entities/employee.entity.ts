@@ -5,49 +5,93 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('employee')
 export class Employee {
-  @ApiProperty({
-    description:'The id of Employee'
-  })
+  
   @PrimaryGeneratedColumn()
-  emp_id: number;
-
   @ApiProperty({
     description:'The id of Employee'
   })
+  id: number;
+
+  
   @Column({ nullable: false })
+  @ApiProperty({
+    description:'The name of Employee'
+  })
   name: string;
 
+  
+  @Column({ nullable: false, unique: true })
   @ApiProperty({
     description:'The email of Employee'
   })
-  @Column({ nullable: false, unique: true })
   email: string;
 
+  
+  @Column({ nullable: false })
   @ApiProperty({
     description:'The mobile number of Employee'
   })
-  @Column({ nullable: false })
   mobile_number: string;
 
+  @Column({ type:'timestamp'})
   @ApiProperty({
-    description:'When user was Created'
+    description:'The date of birth of Employee'
   })
+  dob: Date;
+
+  @Column({ nullable: false })
+  @ApiProperty({
+    description:'The gender of Employee'
+  })
+  gender: string;
+  
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @ApiProperty({
+    description:'When employee was Created'
+  })
   created_at: Date;
 
+
+  @Column({ default: '' })
   @ApiProperty({
-    description:'When user was Updated'
+    description:'employee created by'
   })
+  created_by: string;
+
+  
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @ApiProperty({
+    description:'When employee was Updated'
+  })
   updated_at: Date;
+
+  @Column({ default: ''})
+  @ApiProperty({
+    description:'Employee Updated By'
+  })
+  updated_by: string;
+
+
+  @Column({ type: 'timestamp', nullable:true })
+  @ApiProperty({
+    description:'The date at which employee deleted'
+  })
+  deleted_at: Date;
+
+  @Column({ default: ''})
+  @ApiProperty({
+    description:'employee deleted by'
+  })
+  deleted_by: string;
 
   // @Column({ nullable: false })
   // @Column()
   // manager_id: number;
+  
+  @Column({ default: null })
   @ApiProperty({
     description:'The manager id of Employee'
   })
-  @Column({ default: null })
   manager_id: number | null;
 
   @ManyToOne(() => Employee)
@@ -56,6 +100,9 @@ export class Employee {
 
   // @Column({ nullable: false })
   @Column({ default: null })
+  @ApiProperty({
+    description:'The department id of Employee'
+  })
   department_id: number | null;
 
   @ManyToOne(() => Department, (department) => department.employees)
@@ -65,6 +112,9 @@ export class Employee {
   @Column({
     type: 'enum',
     enum: ['Employee', 'Manager', 'Admin'],
+  })
+  @ApiProperty({
+    description:'The role of employee'
   })
   role: string;
 

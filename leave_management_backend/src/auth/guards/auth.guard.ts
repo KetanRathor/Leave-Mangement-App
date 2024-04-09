@@ -8,11 +8,8 @@ import {
   import { Request } from 'express';
   import * as dotenv from 'dotenv';
 
-
-dotenv.config();
   
-
-
+  dotenv.config();
   @Injectable()
   export class AuthGuard implements CanActivate {
     constructor(private jwtService: JwtService) {}
@@ -28,7 +25,7 @@ dotenv.config();
           token,
           {
             // secret: jwtConstants.secret
-            secret : "ABC",
+            secret : process.env.SECRET,
             // secret : process.env.SECRET,
           }
         );

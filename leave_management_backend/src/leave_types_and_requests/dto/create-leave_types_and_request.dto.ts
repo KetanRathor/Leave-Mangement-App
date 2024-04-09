@@ -2,39 +2,39 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateLeaveTypesAndRequestDto {
   @ApiProperty({
-    description:"The id of the employee",
-    example:2, 
-    })
+    description:'id of employee',
+    example:'1'
+  })
   emp_id: number;
 
   @ApiProperty({
-    description:"Leave type id",
-    example:2,
-   })
-  leave_type_id: number;
+    description:'the type of leave',
+    'example':'full'
+  })
+  leave_type: string;
 
   @ApiProperty({
-    description:"Start date for leave",
-    example:"2023-05-11",
-   })
+    description:'The start date of leave',
+   example:'2024-04-10'
+  })
   start_date: Date;
 
   @ApiProperty({
-    description:"leave end date",
-    example:"2023-05-12",
-   })
+    description:'The end date of leave',
+    example:'2024-04-11'
+  })
   end_date: Date;
 
   @ApiProperty({
-    description:"The reason for the leave",
-    example:"health issue",
-   })
+    description:'the reason for leave',
+    example:'health issue'
+  })
   reason: string;
 
   @ApiProperty({
-    description:"The status of the leave request",
-    example:"pending",
-   })
+    description:'status of leave request'
+  })
   status: string;
+
   
 }

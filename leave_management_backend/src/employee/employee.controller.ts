@@ -1,34 +1,54 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Put,
+  Param,
+  ParseIntPipe,
+  Delete,
+  Get,
+  UseGuards,
+  Request,
+  Req,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 
+@ApiTags('Employees')
 @ApiBearerAuth()
 @Controller('employees')
 export class EmployeeController {
-  constructor(private readonly employeeService: EmployeeService) { }
+  constructor(private readonly employeeService: EmployeeService) {}
+
   @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
     type: Employee,
   })
-  @ApiBadRequestResponse({
-    description:'User cannot register. Try Again'
-  })
+
   async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto) {
+    @Body() createEmployeeDto: CreateEmployeeDto,
+    @Request() req,
+  ) {
+    const req_mail = req.user.email;
     try {
-      return await this.employeeService.createEmployee(createEmployeeDto);
+      return await this.employeeService.createEmployee(
+        createEmployeeDto,
+        req_mail,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
   // @UseGuards(AuthGuard)
   // @Post('/department')
   // async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -41,31 +61,39 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Put(':id')
-  
-  async updateEmployee(@Param('id', ParseIntPipe) id: number, @Body() updateEmployeeDto: UpdateEmployeeDto) {
+  @ApiCreatedResponse({
+    description:'employee updated successfully',
+    type:Employee
+  })
+  async updateEmployee(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateEmployeeDto: UpdateEmployeeDto,
+    @Request() req,
+  ) {
+    const req_mail = req.user.email;
     try {
-      return await this.employeeService.updateEmployee(id, updateEmployeeDto);
+      return await this.employeeService.updateEmployee(
+        id,
+        updateEmployeeDto,
+        req_mail,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   @UseGuards(AuthGuard)
-
   @Delete(':id')
-  @ApiCreatedResponse({
-    description: 'Employee Deleted Successfully',
-
-  })
-  async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
+  async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    const req_mail = req.user.email;
     try {
-      await this.employeeService.deleteEmployee(id);
-      return 'Employee Deleted Successfully'
+      await this.employeeService.deleteEmployee(id, req_mail);
+      return 'Employee Deleted Successfully';
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
- 
+
   // @UseGuards(AuthGuard)
 
   // @Delete('/department/:id')
@@ -77,25 +105,27 @@ export class EmployeeController {
   //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
   //   }
   // }
- 
 
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
-
   @Get(':id')
+  @ApiCreatedResponse({
+    description:'Get employee by id',
+    type:Employee
+  })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
       return await this.employeeService.showProfile(id);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
   @UseGuards(AuthGuard)
   @Get()
   @ApiCreatedResponse({
-    description: 'get list of all the employees',
-    type: Employee,
+    description:'All employees List',
+    type:[Employee]
   })
   showEmployeeList() {
     return this.employeeService.findEmployees();
