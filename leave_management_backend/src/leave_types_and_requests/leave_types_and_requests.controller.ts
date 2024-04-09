@@ -21,7 +21,8 @@ import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_requ
 // import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 
 
 @ApiTags('Leave Request')
@@ -74,6 +75,9 @@ export class LeaveTypesAndRequestsController {
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
     description: 'leave status updated successfully'
+  })
+  @ApiBody({
+    type:UpdateLeaveStatus
   })
   async updateStatus(
     @Param('leave_request_id') leave_request_id: number,

@@ -28,8 +28,8 @@ export class UpdateLeaveTypesAndRequestDto {
       })
       reason: string;
     
-      @ApiProperty({
-        description:'status of leave request'
-      })
-      status: string;
+      // @ApiProperty({
+      //   description:'status of leave request'
+      // })
+      // status: string;
 }
