@@ -62,7 +62,7 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
-    description:'employee updated successfully',
+    description:'Employee with given ID will be updated as response',
     type:Employee
   })
   async updateEmployee(
@@ -84,6 +84,10 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
+  @ApiCreatedResponse({
+    description:'Employee with given ID will be deleted as response'
+
+  })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.email;
     try {

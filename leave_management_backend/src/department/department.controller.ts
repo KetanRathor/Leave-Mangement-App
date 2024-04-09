@@ -41,6 +41,9 @@ export class DepartmentController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
+  @ApiCreatedResponse({
+    description: 'department will be deleted as response'
+  })
   async deleteDepartment(@Param('id', ParseIntPipe) id: number,@Request() req) {
     const req_mail=req.user.email;
     try {

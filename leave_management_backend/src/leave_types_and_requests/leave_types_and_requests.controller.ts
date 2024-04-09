@@ -63,7 +63,7 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get(':leave_request_id')
   @ApiCreatedResponse({
-    description: 'Get leave requests with id',
+    description: 'Get leave requests of employee with given id',
     type: LeaveRequest
   })
   findOne(@Param('leave_request_id') leave_request_id: number) {
@@ -74,7 +74,7 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
-    description: 'leave status updated successfully'
+    description: 'leave request status will be updated as response'
   })
   @ApiBody({
     type:UpdateLeaveStatus
@@ -82,7 +82,6 @@ export class LeaveTypesAndRequestsController {
   async updateStatus(
     @Param('leave_request_id') leave_request_id: number,
     @Body() body: { status: string },
-    @Body() CreateLeaveTypesAndRequestDto :CreateLeaveTypesAndRequestDto ,
     @Request() req,
   ): Promise<LeaveRequest> {
     const req_mail = req.user.email;
@@ -114,7 +113,7 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
   @ApiCreatedResponse({
-    description:'Get pending Requests'
+    description:'Get employee list whose leave request status is pending'
   })
   async getEmployeesWithPendingRequests() {
     try {
@@ -176,7 +175,7 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get(':emp_id/remaining-leave/:leave_type_name')
   @ApiCreatedResponse({
-    description:'leave balance of employee as per leave type'
+    description:'Get leave balance of employee as per leave type'
   })
   async getRemainingLeaveByType(
     @Param('emp_id') emp_id: number,
