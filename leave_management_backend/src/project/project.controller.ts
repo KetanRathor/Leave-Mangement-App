@@ -4,10 +4,14 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateInventoryDto } from 'src/inventory/dto/update-inventory.dto';
+import { EmployeeService } from 'src/employee/employee.service';
+import { Project } from './entities/project.entity';
 
 @Controller('project')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService,
+              // private readonly employeeService: EmployeeService
+  ) {}
 
   @UseGuards(AuthGuard)
   @Post()
@@ -51,9 +55,25 @@ export class ProjectController {
     
   }
 
+  // @Post(':id/projects/assign-by-name')
+  // async assignProjectByName(
+  //   @Param('id') employeeId: number,
+  //   @Body('projectName') projectName: string,
+  // ): Promise<Project | undefined> {
+  //   try {
+  //     return await this.employeeService.assignProjectByName(employeeId, projectName);
+  //   } catch (error) {
+  //     if (error instanceof HttpException) {
+  //       throw error;
+  //     }
+  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
 
-  
+
+
+
 
 
   
