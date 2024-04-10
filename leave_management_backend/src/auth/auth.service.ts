@@ -130,20 +130,49 @@ export class AuthService {
         return OTP;
       }
 
+
+    //   async forgotPassword(email: string) {
+    //     const user = await this.userCredentialsRepository.findOne({
+    //       where: { email },
+    //     });
+    //     console.log("user",user);
+    //     if (!user) {
+    //         const otp = this.generateOTP();
+    //         await this.mailService.sendOTPEmail(email, otp);
+            
+        
+    //         return { message: 'OTP sent to your email address' };
+                   
+    //             //   return new HttpException('Email not found', 404);
+    //             }
+    //             else{
+    //          return { message: 'Email not found' };
+               
+        
+    //     }
+        
+    //   }
+
     
       async forgotPassword(email: string) {
         const user = await this.userCredentialsRepository.findOne({
           where: { email },
         });
+        console.log("user",user);
     
         if (!user) {
+            // return { message: 'Email not found' };
           return new HttpException('Email not found', 404);
         }
+        else{
     
         const otp = this.generateOTP();
         await this.mailService.sendOTPEmail(email, otp);
+        
     
         return { message: 'OTP sent to your email address' };
+        }
+        
       }
 
       async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string){

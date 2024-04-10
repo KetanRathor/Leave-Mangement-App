@@ -66,8 +66,8 @@ export class LeaveTypesAndRequestsController {
     description: 'Get leave requests of employee with given id',
     type: LeaveRequest
   })
-  findOne(@Param('leave_request_id') leave_request_id: number) {
-    return this.leaveTypesAndRequestsService.findOne(+leave_request_id);
+  findOne(@Param('leave_request_id',ParseIntPipe) leave_request_id: number) {
+    return this.leaveTypesAndRequestsService.findOne(leave_request_id);
   }
 
   @UseGuards(AuthGuard)
@@ -93,21 +93,6 @@ export class LeaveTypesAndRequestsController {
       req_mail
     );
   }
-
-  // @Get('/leaveRequest/:id')
-  // getLeaveRequest(@Param('id', ParseIntPipe) id: number) {
-  //   return this.leaveTypesAndRequestsService.getLeaveRequest(id);
-  // }
-
-  // @Patch(':id/accept')
-  // async acceptLeaveRequest(@Param('id', ParseIntPipe) requestId: number) {
-  //   return this.leaveTypesAndRequestsService.acceptLeaveRequest(requestId);
-  // }
-
-  // @Patch(':id/reject')
-  // async rejectLeaveRequest(@Body('id') requestId: number) {
-  //   return await this.leaveTypesAndRequestsService.rejectLeaveRequest(requestId);
-  // }
 
   @UseGuards(AuthGuard)
   @Get('employees/pending-requests')

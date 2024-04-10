@@ -37,17 +37,6 @@ export class AuthController {
     }
 
     
-    // @UseGuards(AuthGuard)
-    // @Get('profile')
-    // getProfile(@Request() req){
-    //     return req.user;
-    // }
-
-//     @UseGuards(AuthGuard)
-//     @Get('EmployeeList')
-//   showEmployeeList(@Request() req) {
-//     return req.user;
-//   }
 @Post('forgotpassword')
 async forgotPassword(@Body('email') email: string) {
     try {
