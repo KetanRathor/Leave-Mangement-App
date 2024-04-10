@@ -3,6 +3,7 @@ import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { Project } from 'src/project/entities/project.entity';
 
 @Entity('employee')
 export class Employee {
@@ -125,4 +126,7 @@ export class Employee {
 
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
+
+  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  projects: Inventory[]
 }
