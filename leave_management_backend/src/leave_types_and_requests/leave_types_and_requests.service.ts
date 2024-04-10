@@ -7,15 +7,12 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 // import { LeaveType } from './entities/LeaveType.entity';
 import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
+import { leaveTypes } from 'src/constantData/leaveTypeConstantData';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
 
-  private readonly leaveTypes = [
-    { leave_type_id: 1, leave_type_name: 'Full day', default_balance: 21 },
-    { leave_type_id: 2, leave_type_name: 'Half day', default_balance: 10 },
-    { leave_type_id: 3, leave_type_name: 'work from home', default_balance: 10 },
-  ];
+  
   // updateStatus(leave_request_id: number, status: string): any {
   //   throw new Error('Method not implemented.');
   // }
@@ -38,7 +35,7 @@ export class LeaveTypesAndRequestsService {
       throw new BadRequestException('Leave Type Id is required');
     }
 
-    // newRequest.emp_id = createLeaveDto.emp_id;
+    newRequest.emp_id = createLeaveDto.emp_id;
 
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     return await this.leaveRequestRepository.save(newLeaveRequest);
@@ -104,7 +101,7 @@ export class LeaveTypesAndRequestsService {
   //   return pendingRequests.map(request => ({ id: request.emp_id, status: request.status }));
   // }
   async getBalanceLeaves(emp_id: number, leave_type_id: number): Promise<number> {
-  const leaveType = this.leaveTypes.find(type => type.leave_type_id === leave_type_id);
+  const leaveType = leaveTypes.find(type => type.leave_type_id === leave_type_id);
   if (!leaveType) {
     throw new Error('Invalid leave type');
   }

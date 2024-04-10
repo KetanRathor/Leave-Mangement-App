@@ -13,6 +13,7 @@ import { MailService } from './mail/mail.service';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
 // import { MyRedisModule } from './redis/redis.module';
+import { InventoryModule } from './inventory/inventory.module';
 
 
 
@@ -28,6 +29,7 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     DepartmentModule,
     MailModule,
+    InventoryModule,
     // MyRedisModule.register({
     //   host: 'localhost', // Redis host
     //   port: 6379, // Redis port

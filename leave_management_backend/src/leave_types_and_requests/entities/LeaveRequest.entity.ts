@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 // import { LeaveType } from './LeaveType.entity';
+import { leaveTypes } from 'src/constantData/leaveTypeConstantData';
 
 @Entity('leave_request')
 export class LeaveRequest {
@@ -35,8 +36,8 @@ export class LeaveRequest {
     @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
-    @Column({ type: 'varchar', default: 'Not Sent', nullable : true })
-    mail_status: string;
+    // @Column({ type: 'varchar', default: 'Not Sent', nullable : true })
+    // mail_status: string;
 
     // @ManyToOne(() => LeaveType, (leaveType) => leaveType.leaveRequests)
     // @JoinColumn({ name: 'leave_type_id' })

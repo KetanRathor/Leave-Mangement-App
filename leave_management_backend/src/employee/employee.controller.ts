@@ -9,7 +9,7 @@ import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
 
   @Post()
   // @ApiCreatedResponse({
@@ -20,24 +20,20 @@ export class EmployeeController {
   //   description:'User cannot register. Try Again'
   // })
   async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto,@Request() req) {
-    const req_mail=req.user.email;
+    @Body() createEmployeeDto: CreateEmployeeDto
+    // ,@Request() req
+  ) {
+    // const req_mail=req.user.email;
       try {
-      return await this.employeeService.createEmployee(createEmployeeDto,req_mail);
+      return await this.employeeService.createEmployee(createEmployeeDto,
+        // req_mail
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
   
-  // @UseGuards(AuthGuard)
-  // @Post('/department')
-  // async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
-  //   try {
-  //     return await this.employeeService.createDepartment(createDepartmentDto);
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+ 
 
   @UseGuards(AuthGuard)
   @Put(':id')

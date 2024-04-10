@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
+import { Inventory } from 'src/inventory/entities/inventory.entity';
 // import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('employee')
@@ -43,14 +44,16 @@ export class Employee {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @Column({ default: ''})
+  @Column({ default: '' })
   updated_by: string;
 
 
-  @Column({ type: 'timestamp', nullable:true })
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
-  @Column({ default: ''})
+
+
+  @Column({ default: '' })
   deleted_by: string;
 
   // @Column({ nullable: false })
@@ -81,6 +84,13 @@ export class Employee {
   role: string;
 
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  @JoinColumn({ name: 'leave_request_id'})
+  @JoinColumn({ name: 'leave_request_id' })
   leaveRequests: LeaveRequest[];
+
+  // @OneToMany(() => Inventory, (inventory) => inventory.employee)
+  // @JoinColumn({ name: 'invertory_id'})
+  // inventories: Inventory[];
+
+  @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
+  inventories: Inventory[]
 }

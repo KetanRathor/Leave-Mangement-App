@@ -24,9 +24,11 @@ export class EmployeeService {
     ) { }
 
     //Create employee
-    async createEmployee(createEmployeeDto: CreateEmployeeDto,req_mail:any): Promise<Employee> {
+    async createEmployee(createEmployeeDto: CreateEmployeeDto,
+        // req_mail:any
+    ): Promise<Employee> {
         const newEmployee = this.employeeRepository.create(createEmployeeDto);
-      newEmployee.created_by=req_mail;
+    //   newEmployee.created_by=req_mail;
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if (!emailRegex.test(createEmployeeDto.email)) {
           throw new Error('Invalid email format. Please enter a valid email address.');
@@ -104,13 +106,7 @@ export class EmployeeService {
 
     //Show Employee List
     async findEmployees(){
-        // try 
-        // {
-        //     return await this.employeeRepository.find()
-        // }
-        // catch(error){
-        //     throw new HttpException('Unable to find employee.',HttpStatus.BAD_REQUEST)
-        // }
+        
         return await this.employeeRepository.find({where:{deleted_at:IsNull()}})
     }
 }
