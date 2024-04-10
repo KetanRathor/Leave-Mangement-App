@@ -17,7 +17,7 @@ export class InventoryService {
   ) { }
 
   async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-    const newInventory = this.inventoryRepository.create(createInventoryDto);
+    const newInventory =  this.inventoryRepository.create(createInventoryDto);
     newInventory.created_by = req_mail;
 
     return this.inventoryRepository.save(newInventory);

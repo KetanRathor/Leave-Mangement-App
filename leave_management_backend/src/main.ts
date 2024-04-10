@@ -6,7 +6,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,
+    {
+      rawBody:true,
+      cors:true,
+      bodyParser:true,
+    }
+  );
   const config = new DocumentBuilder()
   .addBearerAuth()
   .setTitle('Leave Management API')
