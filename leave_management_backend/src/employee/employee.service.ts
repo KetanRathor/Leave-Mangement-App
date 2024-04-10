@@ -1,6 +1,12 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+// import { IsNull, Repository } from 'typeorm';
 import { Employee } from './entities/Employee.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -25,7 +31,7 @@ export class EmployeeService {
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto,
-        // req_mail:any
+        req_mail:any
     ): Promise<Employee> {
         const newEmployee = this.employeeRepository.create(createEmployeeDto);
     //   newEmployee.created_by=req_mail;
@@ -71,8 +77,8 @@ export class EmployeeService {
         }
         employee.updated_by=req_mail;
 
-        return await this.employeeRepository.save(employee);
-    }
+    return await this.employeeRepository.save(employee);
+  }
 
     //Delete employee using id
     async deleteEmployee(id: number,req_mail:string) {

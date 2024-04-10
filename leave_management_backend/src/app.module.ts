@@ -8,6 +8,8 @@ import { LeaveTypesAndRequestsModule } from './leave_types_and_requests/leave_ty
 import { AuthModule } from './auth/auth.module';
 // import { DepartmentController } from './department/department.controller';
 // import { DepartmentService } from './department/department.service';
+// import { DepartmentController } from './department/department.controller';
+// import { DepartmentService } from './department/department.service';
 import { DepartmentModule } from './department/department.module';
 import { MailService } from './mail/mail.service';
 import { MailController } from './mail/mail.controller';
