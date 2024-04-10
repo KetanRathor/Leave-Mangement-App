@@ -17,10 +17,10 @@ export class InventoryController {
 
   @UseGuards(AuthGuard)
   @Post()
-  async create(@Body() createInventoryDto: CreateInventoryDto, @Request() req) {
+  async createInventory(@Body() createInventoryDto: CreateInventoryDto, @Request() req) {
     const req_mail = req.user.email;
     try {
-      return await this.inventoryService.create(createInventoryDto, req_mail);
+      return await this.inventoryService.createInventory(createInventoryDto, req_mail);
     }
     catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -74,7 +74,7 @@ async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('em
       return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId });
     }
 
-    const createdInventory = await this.inventoryService.create(createInventoryDto, req_mail);
+    const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
     return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
   } catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

@@ -17,8 +17,9 @@ import {
     Request,
     UseGuards
 } from '@nestjs/common';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
-// @ApiTags('auth')
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
 
@@ -26,6 +27,9 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
+    @ApiCreatedResponse({
+        description:'Get Authentication Token'
+    })
     login(@Body() authPayload: AuthPayloadDto) {
         const token = this.authService.validateUser(authPayload);
         if (!token) throw new HttpException('Invalid Credentials', 401);
@@ -33,17 +37,6 @@ export class AuthController {
     }
 
     
-    // @UseGuards(AuthGuard)
-    // @Get('profile')
-    // getProfile(@Request() req){
-    //     return req.user;
-    // }
-
-//     @UseGuards(AuthGuard)
-//     @Get('EmployeeList')
-//   showEmployeeList(@Request() req) {
-//     return req.user;
-//   }
 @Post('forgotpassword')
 async forgotPassword(@Body('email') email: string) {
     try {
