@@ -17,17 +17,14 @@ import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class EmployeeService {
-    constructor(
-        @InjectRepository(Employee)
-        private readonly employeeRepository: Repository<Employee>,
-        // @InjectRepository(Department)
-        // private readonly departmentRepository: Repository<Department>,
-        @InjectRepository(UserCredentials)
-        private readonly userCredentialRepository: Repository<UserCredentials>,
-        private readonly authService : AuthService,
-        private readonly mailService  : MailService
-
-    ) { }
+  constructor(
+    @InjectRepository(Employee)
+    private readonly employeeRepository: Repository<Employee>,
+    @InjectRepository(UserCredentials)
+    private readonly userCredentialRepository: Repository<UserCredentials>,
+    private readonly authService: AuthService,
+    private readonly mailService: MailService,
+  ) {}
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto,

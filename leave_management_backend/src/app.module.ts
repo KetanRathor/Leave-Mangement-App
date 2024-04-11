@@ -18,6 +18,8 @@ import { MailModule } from './mail/mail.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { ProjectModule } from './project/project.module';
 // import { HolidaysModule } from './holidays/holidays.module';
+// import { ProjectModule } from './project/project.module';
+import { HolidaysModule } from './holidays/holidays.module';
 
 
 
@@ -36,6 +38,8 @@ import { ProjectModule } from './project/project.module';
     InventoryModule,
     ProjectModule,
     // HolidaysModule
+    // ProjectModule,
+    HolidaysModule
     // MyRedisModule.register({
     //   host: 'localhost', // Redis host
     //   port: 6379, // Redis port
