@@ -4,7 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 
 @ApiTags('Employees')
@@ -58,7 +58,7 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
 
   })
@@ -87,7 +87,7 @@ export class EmployeeController {
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
   @Get(':id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Get employee by id',
     type:Employee
   })
@@ -101,7 +101,7 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Get()
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'All employees List',
     type:[Employee]
   })

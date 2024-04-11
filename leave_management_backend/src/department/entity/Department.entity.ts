@@ -4,15 +4,15 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('department')
 export class Department {
-  // @ApiProperty({
-  //   description:'The department id '
-  // })
+  @ApiProperty({
+    description:'The department id '
+  })
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @ApiProperty({
-  //   description:'The department name '
-  // })
+  @ApiProperty({
+    description:'The department name '
+  })
   @Column({ nullable: false })
   department_name: string;
 

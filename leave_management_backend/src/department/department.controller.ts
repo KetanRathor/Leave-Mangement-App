@@ -13,7 +13,7 @@ import {
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Department } from './entity/Department.entity';
 
 @ApiTags('Department')
@@ -41,7 +41,7 @@ export class DepartmentController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'department will be deleted as response'
   })
   async deleteDepartment(@Param('id', ParseIntPipe) id: number,@Request() req) {

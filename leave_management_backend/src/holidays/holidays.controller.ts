@@ -11,9 +11,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
-import { MulterFile } from 'multer';
+// import { MulterFile } from 'multer';
+import { Multer } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 
@@ -29,12 +30,12 @@ export class HolidaysController {
   @ApiBody({
     type:Holidays
   })
-  @ApiConflictResponse({
+  @ApiCreatedResponse({
     description:'create holiday object ',
     type:Holidays
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file: MulterFile, @Body() body: any) {
+  async uploadImage(@UploadedFile() file, @Body() body: any) {
   
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
@@ -54,7 +55,7 @@ export class HolidaysController {
 
   @UseGuards(AuthGuard)
   @Get()
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Get all Holidays',
     type:[Holidays]
   })
