@@ -47,7 +47,8 @@ export class InventoryService {
   }
 
   async findOneInventory(id: number) {
-    const inventory = await this.inventoryRepository.findOne({ where: { id, deleted_at: IsNull() } });
+    const inventory = await this.inventoryRepository.findOne({ where: { id}, relations: ['employee']  });
+    // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
 
     if (!inventory) {
       return { message: `Inventory with ID ${id} not found`, inventory };
