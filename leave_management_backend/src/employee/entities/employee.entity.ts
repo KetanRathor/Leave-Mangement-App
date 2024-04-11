@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -127,6 +127,5 @@ export class Employee {
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
 
-  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
-  projects: Inventory[]
+  
 }

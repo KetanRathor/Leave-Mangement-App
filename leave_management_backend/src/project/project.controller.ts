@@ -6,12 +6,14 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateInventoryDto } from 'src/inventory/dto/update-inventory.dto';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
+import { AssignProjectDto } from './dto/assign-project.dto';
+import { Employee } from 'src/employee/entities/Employee.entity';
 
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService,
-              // private readonly employeeService: EmployeeService
-  ) {}
+    // private readonly employeeService: EmployeeService
+  ) { }
 
   @UseGuards(AuthGuard)
   @Post()
@@ -25,7 +27,7 @@ export class ProjectController {
     }
   }
 
- 
+
 
 
 
@@ -42,9 +44,8 @@ export class ProjectController {
   }
 
   @UseGuards(AuthGuard)
-
   @Patch(':id')
-  async updateProject(@Param('id',ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
+  async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
     const req_mail = req.user.email
     try {
       return await this.projectService.updateProject(id, updateProjectDto, req_mail);
@@ -52,23 +53,26 @@ export class ProjectController {
 
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-    
   }
 
-  // @Post(':id/projects/assign-by-name')
-  // async assignProjectByName(
-  //   @Param('id') employeeId: number,
-  //   @Body('projectName') projectName: string,
-  // ): Promise<Project | undefined> {
-  //   try {
-  //     return await this.employeeService.assignProjectByName(employeeId, projectName);
-  //   } catch (error) {
-  //     if (error instanceof HttpException) {
-  //       throw error;
-  //     }
-  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
+  // @UseGuards(AuthGuard)
+  @Post(':adminId')
+  async assignProject(@Param('adminId', ParseIntPipe) adminId: number, @Body() { employeeId, projectId }: AssignProjectDto,
+  //  @Request() req
+  ) {
+    // const req_mail = req.user.email;
+
+    try {
+      return await this.projectService.assignProject({ adminId, employeeId, projectId });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':projectId/assigned-employees')
+async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
+  return await this.projectService.getAssignedEmployees(projectId);
+}
 
 
 
@@ -76,11 +80,6 @@ export class ProjectController {
 
 
 
-  
 
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.projectService.remove(+id);
-  // }
 }

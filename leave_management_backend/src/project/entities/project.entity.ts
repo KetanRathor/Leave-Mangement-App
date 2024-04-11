@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 @Entity('projects')
 export class Project {
@@ -42,6 +42,9 @@ export class Project {
   @Column({ default: '' })
   deleted_by: string;
 
-  @ManyToOne(() => Employee, (employee) => employee.projects)
-  employee?: Employee; 
+  @ManyToMany(() => Employee)
+    @JoinTable({name:'employee_project'})
+    projects: Employee[]
+
+
 }

@@ -5,30 +5,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { IsNull, Repository } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { access } from 'fs';
 
 @Injectable()
 export class ProjectService {
-constructor
-(
-  
-  @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
+  constructor
+    (
+      @InjectRepository(Project)
+      private projectRepository: Repository<Project>,
 
-  @InjectRepository(Employee)
-    private employeeRepository: Repository<Employee>,
-  
-  ){}
+      @InjectRepository(Employee)
+      private employeeRepository: Repository<Employee>,
+    ) { }
 
-  addProject(createProjectDto: CreateProjectDto,req_mail: any) {
+  addProject(createProjectDto: CreateProjectDto, req_mail: any) {
     const newProject = this.projectRepository.create(createProjectDto);
     newProject.created_by = req_mail;
 
     return this.projectRepository.save(newProject)
   }
-
-  
-
-
 
   async showAllProjects() {
     return await this.projectRepository.find({ where: { deleted_at: IsNull() } });
@@ -43,12 +38,6 @@ constructor
 
     return project;
   }
-
-  // updateProject(id: number, updateProjectDto: UpdateProjectDto,req_mail: any) {
-  //   return `This action updates a #${id} project`;
-  // }
-
-
 
   async updateProject(id: number, updatedProjectDetails: UpdateProjectDto, req_mail: any): Promise<Project> {
     const project = await this.projectRepository.findOneBy({ id });
@@ -68,73 +57,91 @@ constructor
     return await this.projectRepository.save(project);
   }
 
+  async assignProject({ adminId, employeeId, projectId }): Promise<string> {
+    try {
+      const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} project`;
+      if (admin.role !== "Admin") {
+        throw new NotFoundException("Current user doesn't have admin access");
+      }
+      console.log("Admin", admin)
+
+      const [project, employee] = await Promise.all([
+        this.projectRepository.findOne(
+          {
+            relations: {
+                projects: true,
+            },
+            where: { id: projectId }
+        }),
+        this.employeeRepository.findOne({ where: { id: employeeId } }),
+      ]);
+
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
+      }
+
+      console.log("project", project)
+      // project.projects = [employee]
+      // console.log("project111", project.projects)
+      project.projects.push(employee);
+      // project.projects = [...project.projects, employee];
+
+      await this.projectRepository.save(project);
+
+      return `${project.name} assigned sucessfully to the ${employee.name}.`;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  // async getEmployeesOnProject(id: number){
+
+  // }
+  async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
+    try {
+      const project = await this.projectRepository.findOne({
+        where:{id: projectsId},
+        relations: ['projects'], 
+      });
+  
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
+  
+      return project.projects; 
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
+  // async getAssignedProjects(employeeId: number): Promise<{ assignedProjects: Project[]; projectCount: number }> {
+  //   try {
+  //     const employee = await this.employeeRepository.findOne({where:{
+  //       id: employeeId},
+  //       relations: ['projects'], 
+  //     });
+
+  //     if (!employee) {
+  //       throw new NotFoundException('Employee not found');
+  //     }
+
+  //     return {
+  //       assignedProjects: employee.projects, 
+  //       projectCount: employee.projects.length, 
+  //     };
+  //   } catch (error) {
+  //     throw error;
+  //   }
   // }
 
-  // async assignProjectByName(employeeId: number, projectName: string): Promise<Project | undefined> {
-  //   const employee = await this.employeeRepository.findOne({
-  //     where: { id: employeeId },
-  //   });
-
-  //   if (!employee) {
-  //     throw new NotFoundException('Employee not found');
-  //   }
-
-  //   const project = await this.projectRepository.findOne({
-  //     where: { name: projectName },
-  //   });
-
-  //   if (!project) {
-  //     throw new NotFoundException('Project not found');
-  //   }
-
-    
-  //   const existingAssignment = await this.projectRepository.findOne({
-  //     where: { id: project.id, employeeId: Not(employeeId) }, 
-  //   });
-
-  //   if (existingAssignment) {
-  //     throw new HttpException('Project already assigned to another employee', HttpStatus.BAD_REQUEST);
-  //   }
-
-  //   project.employeeId = employeeId; 
-  //   await this.projectRepository.save(project);
-
-  //   return project; 
-  // }
-
-  // async assignProjectByName(employeeId: number, projectName: string): Promise<Project | undefined> {
-  //   const employee = await this.employeeRepository.findOne({
-  //     where: { id: employeeId },
-  //   });
-
-  //   if (!employee) {
-  //     throw new NotFoundException('Employee not found');
-  //   }
-
-  //   const project = await this.projectRepository.findOne({
-  //     where: { name: projectName }, // Find project by name
-  //   });
-
-  //   if (!project) {
-  //     throw new NotFoundException('Project not found');
-  //   }
-
-  //   const existingAssignment = await this.projectRepository.findOne({
-  //     where: { id: project.id, employeeId: Not(employeeId) }, 
-  //   });
-
-  //   if (existingAssignment) {
-  //     throw new HttpException('Project already assigned to another employee', HttpStatus.BAD_REQUEST);
-  //   }
-
-  //   project.employeeId = employeeId; 
-  //   await this.projectRepository.save(project);
-
-  //   return project; 
-  // }
 
 
 }
