@@ -4,7 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 
 @ApiTags('Employees')
@@ -13,7 +13,7 @@ import { Employee } from './entities/Employee.entity';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
@@ -22,13 +22,13 @@ export class EmployeeController {
 
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    @Request() req,
+    // @Request() req,
   ) {
-    const req_mail = req.user.email;
+    // const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        req_mail,
+        // req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -58,7 +58,7 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
 
   })
@@ -87,7 +87,7 @@ export class EmployeeController {
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
   @Get(':id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Get employee by id',
     type:Employee
   })
@@ -101,7 +101,7 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Get()
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'All employees List',
     type:[Employee]
   })

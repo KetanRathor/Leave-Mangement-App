@@ -21,7 +21,7 @@ import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_requ
 // import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 
 
@@ -52,7 +52,7 @@ export class LeaveTypesAndRequestsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Get all leave requests',
     type: [LeaveRequest]
   })
@@ -62,7 +62,7 @@ export class LeaveTypesAndRequestsController {
 
   @UseGuards(AuthGuard)
   @Get(':leave_request_id')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Get leave requests of employee with given id',
     type: LeaveRequest
   })
@@ -96,7 +96,7 @@ export class LeaveTypesAndRequestsController {
 
   @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Get employee list whose leave request status is pending'
   })
   async getEmployeesWithPendingRequests() {
@@ -116,7 +116,7 @@ export class LeaveTypesAndRequestsController {
 
   @UseGuards(AuthGuard)
   @Get(':emp_id/remaining-leave/:leave_type_name')
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description:'Get leave balance of employee as per leave type'
   })
   async getRemainingLeaveByType(
