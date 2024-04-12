@@ -38,9 +38,15 @@ export class CreateEmployeeDto {
     })
     dob: Date;
 
+    // @ApiProperty({
+    //     description:"The gender of the employee",
+    //     example:"female",
+    // })
+    // gender: string;
+
     @ApiProperty({
-        description:"The gender of the employee",
-        example:"female",
+        description:"The gender of the employee (Male/Female/Other)",
+        example:"Female",
     })
     gender: string;
     

@@ -5,10 +5,12 @@ import { Inventory } from './entities/inventory.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { Category } from './entities/inventoryCategory.entity';
+// import { Category } from 'src/category/entities/category.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Inventory,Employee]),
+    TypeOrmModule.forFeature([Inventory,Employee,Category]),
     // EmployeeModule,
   ],
   controllers: [InventoryController],

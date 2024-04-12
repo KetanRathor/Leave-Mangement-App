@@ -162,6 +162,7 @@ export class AuthService {
     
         if (!user) {
             // return { message: 'Email not found' };
+            console.log("hiii")
           return new HttpException('Email not found', 404);
         }
         else{
