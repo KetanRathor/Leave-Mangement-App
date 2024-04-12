@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  Get
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
@@ -22,7 +23,7 @@ import { Department } from './entity/Department.entity';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
 
   @Post()
   @ApiCreatedResponse({
@@ -30,14 +31,25 @@ export class DepartmentController {
     type: Department,
   })
   
-  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto,@Request() req) {
-    const req_mail=req.user.email;
+  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto
+  // ,@Request() req
+) {
+    // const req_mail=req.user.email;
     try {
-      return await this.departmentService.createDepartment(createDepartmentDto,req_mail);
+      return await this.departmentService.createDepartment(createDepartmentDto,
+        // req_mail
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Get()
+  async showDepartmentList() {
+    // console.log("first..............")
+    return await this.departmentService.findDepartmentList();
+  }
+
 
   @UseGuards(AuthGuard)
   @Delete(':id')

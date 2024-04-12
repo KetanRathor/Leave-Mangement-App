@@ -104,12 +104,20 @@ export class EmployeeService {
 
     //Show Employe Profile
     async showProfile(id: number) {
-        return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
+        return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
+             relations: ['manager','department','inventories','project'] });
     }
+
+    
 
     //Show Employee List
     async findEmployees() {
 
         return await this.employeeRepository.find({ where: { deleted_at: IsNull() } })
     }
+
+    async findManagerList(){
+        return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
+    }
+    
 }

@@ -86,7 +86,7 @@ export class EmployeeController {
 
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('employee/:id')
   @ApiOkResponse({
     description:'Get employee by id',
     type:Employee
@@ -99,6 +99,8 @@ export class EmployeeController {
     }
   }
 
+  
+
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
@@ -108,4 +110,13 @@ export class EmployeeController {
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
+
+  @Get('/manager')
+  async showManagerList() {
+    console.log("first..............")
+    return await this.employeeService.findManagerList();
+  }
+
+  
+
 }

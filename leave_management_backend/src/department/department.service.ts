@@ -13,10 +13,10 @@ export class DepartmentService {
   // Create Department
   async createDepartment(
     departmentName: CreateDepartmentDto,
-    req_mail: string,
+    // req_mail: string,
   ) {
     const dept = this.departmentRepository.create(departmentName);
-    dept.created_by = req_mail;
+    // dept.created_by = req_mail;
     return await this.departmentRepository.save(dept);
   }
 
@@ -29,5 +29,11 @@ export class DepartmentService {
     }
     department.deleted_by = req_mail;
     return await this.departmentRepository.remove(department);
+  }
+
+
+  async findDepartmentList(){
+    return await this.departmentRepository.find()
+
   }
 }
