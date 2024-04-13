@@ -8,7 +8,7 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nest
 import { Employee } from './entities/Employee.entity';
 
 @ApiTags('Employees')
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}

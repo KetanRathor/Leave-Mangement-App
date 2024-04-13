@@ -26,7 +26,7 @@ export class ProjectService {
   }
 
   async showAllProjects() {
-    return await this.projectRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee'] });
   }
 
   async findOneProject(id: number) {

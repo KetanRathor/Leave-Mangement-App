@@ -8,6 +8,7 @@ import {
   Res,
   Body,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
@@ -67,6 +68,21 @@ export class HolidaysController {
     };
   }
 
+
+  @UseGuards(AuthGuard)
+  @Put(':id')
+  @ApiBody({ type: Holidays })
+  @ApiOkResponse({ description: 'Holiday updated successfully' })
+  @ApiConflictResponse({ description: 'Conflict during update' })
+  async updateHoliday(@Param('id') id: number, @Body() body: Holidays) {
+    const updatedHoliday = await this.holidaysService.updateHoliday(id, body);
+    if (!updatedHoliday) {
+      return { message: 'Holiday update failed' };
+    }
+    return { message: 'Holiday updated successfully', holiday: updatedHoliday };
+  }
+
+
   //   @Get('images/:id')
   //   async getHolidayImage(@Param('id') id: number, @Res() res: Response) {
   //     try {
@@ -85,4 +101,6 @@ export class HolidaysController {
   //       res.status(500).send({ message: 'Internal server error' });
   //     }
   //   }
+
+
 }

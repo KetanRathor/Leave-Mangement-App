@@ -16,22 +16,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class LeaveTypesAndRequestsService {
   private readonly leaveTypes = [
-    { leave_type_id: 1, leave_type_name: 'full', default_balance: 21 },
-    {
-      leave_type_id: 2,
-      leave_type_name: 'first half',
-      default_balance: 10,
-    },
-    {
-      leave_type_id: 3,
-      leave_type_name: 'second half',
-      default_balance: 10,
-    },
-    {
-      leave_type_id: 4,
-      leave_type_name: 'work from home',
-      default_balance: 10,
-    },
+    { leave_type_id: 1, leave_type_name: 'full', default_balance: 21},
+    {leave_type_id: 2, leave_type_name: 'first half', default_balance: 10},
+    {leave_type_id: 3, leave_type_name: 'second half', default_balance: 10},
+    { leave_type_id: 4, leave_type_name: 'work from home', default_balance: 10},
   ];
   // updateStatus(leave_request_id: number, status: string): any {
   //   throw new Error('Method not implemented.');
@@ -159,6 +147,36 @@ export class LeaveTypesAndRequestsService {
 
   //   return leaveType.default_balance - totalDaysTaken;
   // }
+
+
+  // async calculateLeaveBalance(emp_id: number, leaveTypes: any[]) {
+  //   const leaveBalances = [];
+  
+  //   for (const leaveType of leaveTypes) {
+  //     let totalDaysTaken = 0;
+  
+  //     // Simulate fetching approved leave requests (replace with actual data source if needed)
+  //     const approvedRequests = [
+  //       // Example data: replace with actual data from your system
+  //       { leave_type_id: leaveType.leave_type_id, duration: 0.5 }, // First half day
+  //       { leave_type_id: leaveType.leave_type_id, duration: 1 }, // Full day
+  //     ];
+  
+  //     for (const request of approvedRequests) {
+  //       totalDaysTaken += request.duration;
+  //     }
+  
+  //     const remainingBalance = leaveType.default_balance - totalDaysTaken;
+  
+  //     leaveBalances.push({
+  //       leaveTypeName: leaveType.leave_type_name,
+  //       remainingBalance: remainingBalance > 0 ? remainingBalance : 0,
+  //     });
+  //   }
+  
+  //   return leaveBalances;
+  // }
+  
 
   async getEmployeesWithPendingLeaveRequests(): Promise<
     { employeeId: number; employeeName: string }[]

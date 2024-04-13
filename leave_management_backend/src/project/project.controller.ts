@@ -33,7 +33,7 @@ export class ProjectController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAllInventories() {
+  findAllProject() {
     return this.projectService.showAllProjects();
   }
 

@@ -32,6 +32,22 @@ export class HolidaysService {
     return await this.holidaysRepository.find();
   }
 
+
+
+  async updateHoliday(id: number, holidayData: Holidays): Promise<Holidays | null> {
+    const existingHoliday = await this.holidaysRepository.findOneBy({ id });
+    if (!existingHoliday) {
+      return null;
+    }
+  
+    existingHoliday.date = holidayData.date;
+    existingHoliday.day = holidayData.day;
+    existingHoliday.occasion = holidayData.occasion;
+    existingHoliday.image = holidayData.image; 
+  
+    return await this.holidaysRepository.save(existingHoliday);
+  }
+
 //   async getImagePathById(id: number): Promise<string | null> {
 //     // Assuming HolidaysService has a method to get image path by ID
 //     const holiday = await this.holidaysService.getHolidayById(id);
@@ -42,4 +58,6 @@ export class HolidaysService {
 
 //     return holiday.image; // Assuming 'image' is the property in the Holiday entity that stores the image filename or path
 //   }
+
+
 }

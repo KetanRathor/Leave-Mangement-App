@@ -29,6 +29,6 @@ export class Category {
 
 
   @OneToMany(() => Inventory, (inventory) => inventory.category)
-  @JoinColumn({ name: 'category_id' })
+  // @JoinColumn({ name: 'category_id' })
   inventories: Inventory[];
 }

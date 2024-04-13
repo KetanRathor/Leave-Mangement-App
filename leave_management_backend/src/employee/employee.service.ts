@@ -113,7 +113,7 @@ export class EmployeeService {
     //Show Employee List
     async findEmployees() {
 
-        return await this.employeeRepository.find({ where: { deleted_at: IsNull() } })
+        return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project'] })
     }
 
     async findManagerList(){
