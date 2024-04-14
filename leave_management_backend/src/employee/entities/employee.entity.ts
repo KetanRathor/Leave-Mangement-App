@@ -136,6 +136,12 @@ export class Employee {
   })
   role: string;
 
+  @Column('longblob', { nullable: true })
+  @ApiProperty({
+    description:'occasion image'
+  })
+  image: Buffer;
+
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];

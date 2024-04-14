@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, HttpException, HttpStatus, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, HttpException, HttpStatus, ParseIntPipe, BadRequestException, Put } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -8,6 +8,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
 import { AssignProjectDto } from './dto/assign-project.dto';
 import { Employee } from 'src/employee/entities/Employee.entity';
+// import { Project } from './entities/project.entity';
 
 @Controller('project')
 export class ProjectController {
@@ -15,7 +16,7 @@ export class ProjectController {
     // private readonly employeeService: EmployeeService
   ) { }
 
-  @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
   @Post()
   async addProject(@Body() createProjectDto: CreateProjectDto, @Request() req) {
     const req_mail = req.user.email;
@@ -33,7 +34,7 @@ export class ProjectController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAllInventories() {
+  findAllProject() {
     return this.projectService.showAllProjects();
   }
 
@@ -69,9 +70,19 @@ export class ProjectController {
     }
   }
 
-  @Get(':projectId/assigned-employees')
+@Get(':projectId/assigned-employees')
 async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
   return await this.projectService.getAssignedEmployees(projectId);
+}
+
+@UseGuards(AuthGuard)
+@Put('/status/:project_id')
+async updateProjectStatus( @Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
+const req_mail = req.user.email;
+if (!body.status) {
+  throw new BadRequestException('Status is required');
+}   
+return this.projectService.updateProjectStatus(project_id, body, req_mail);
 }
 
 

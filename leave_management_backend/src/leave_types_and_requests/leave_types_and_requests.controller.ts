@@ -14,6 +14,7 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  
 } from '@nestjs/common';
 import { LeaveTypesAndRequestsService } from './leave_types_and_requests.service';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
@@ -23,6 +24,7 @@ import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
+import { Res } from '@nestjs/common';
 
 
 @ApiTags('Leave Request')
@@ -86,7 +88,7 @@ export class LeaveTypesAndRequestsController {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
-    }
+    }   
     return this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
@@ -115,19 +117,17 @@ export class LeaveTypesAndRequestsController {
 
 
   @UseGuards(AuthGuard)
-  @Get(':emp_id/remaining-leave/:leave_type_name')
+  @Get(':emp_id/remaining-leave')
   @ApiOkResponse({
     description:'Get leave balance of employee as per leave type'
   })
-  async getRemainingLeaveByType(
+  async getRemainingLeave(
     @Param('emp_id') emp_id: number,
-    @Param('leave_type_name') leave_type_name: string,
-  ): Promise<number> {
+  ){
     try {
       const remainingLeave =
-        await this.leaveTypesAndRequestsService.getRemainingLeaveByType(
+        await this.leaveTypesAndRequestsService.getRemainingLeave(
           emp_id,
-          leave_type_name,
         );
       return remainingLeave;
     } catch (error) {
@@ -138,4 +138,31 @@ export class LeaveTypesAndRequestsController {
       );
     }
   }
+
+
+  // @Get('balance/:empId')
+  // async getLeaveBalance(@Param('empId') empId: number, @Res() res: Response) {
+  //   try {
+  //     const leaveBalances = await this.leaveTypesAndRequestsService.calculateLeaveBalance(empId,leaveTypes);
+  //     return res.status(HttpStatus.OK).json(leaveBalances);
+  //   } catch (error) {
+  //     console.error('Error calculating leave balance:', error);
+  //     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+  //       message: 'Internal server error occurred',
+  //     });
+  //   }
+  // }
+
+  // @Get('balance/:empId')
+  // async getLeaveBalance(@Param('empId') empId: number, @Res({ passthrough: true }) res: Response) {
+  //   try {
+  //     const leaveBalances = await this.leaveTypesAndRequestsService.calculateLeaveBalance(empId,leaveTypes);
+  //     return res.status(HttpStatus.OK).json(leaveBalances);
+  //   } catch (error) {
+  //     console.error('Error calculating leave balance:', error);
+  //     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+  //       message: 'Internal server error occurred',
+  //     });
+  //   }
+  // }
 }

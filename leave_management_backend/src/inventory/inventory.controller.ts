@@ -78,7 +78,7 @@ async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('em
     const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
 
     if (existingInventory) {
-      return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId });
+      return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
     }
     else{
       return {message:"Inventory not available"}

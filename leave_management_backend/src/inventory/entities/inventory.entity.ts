@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn, JoinTable } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { Category } from './inventoryCategory.entity';
 
@@ -41,6 +41,6 @@ export class Inventory {
     employee: Employee
 
     @ManyToOne(() => Category, (category) => category.inventories)
-    @JoinColumn({ name: 'category_id' })
+    // @JoinColumn({ name: 'category_id' })
     category: Category;
 }

@@ -22,23 +22,47 @@ export class InventoryService {
   ) { }
 
   // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-  //   // const newInventory =  this.inventoryRepository.create(createInventoryDto);
-  //   // newInventory.created_by = req_mail;
+  //   const newInventory =  this.inventoryRepository.create(createInventoryDto);
+  //   newInventory.created_by = req_mail;
+  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
 
-  //   // return this.inventoryRepository.save(newInventory);
-  //   return this.inventoryRepository.save({ ...createInventoryDto, category_id : createInventoryDto.category_id, created_by: req_mail });
+  //   return this.inventoryRepository.save(newInventory,category);
+  // //   return this.inventoryRepository.save({ ...createInventoryDto, category_id : createInventoryDto.category_id, created_by: req_mail });
   // }
+
+  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
+  //   try {
+  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
+  //     const newInventory = await this.inventoryRepository.save({ ...createInventoryDto, category, created_by: req_mail });
+  //     console.log('New inventory saved:', newInventory);
+  //     return newInventory;
+  //   } catch (error) {
+  //     console.error('Error saving inventory:', error);
+  //     throw error; // Rethrow the error to propagate it to the caller
+  //   }
+  // }
+
 
   async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
     try {
-        const newInventory = await this.inventoryRepository.save({ ...createInventoryDto, category_id: createInventoryDto.category_id, created_by: req_mail });
-        console.log('New inventory saved:', newInventory);
-        return newInventory;
+
+      const newInventory = this.inventoryRepository.create(createInventoryDto);
+
+      newInventory.created_by = req_mail;
+
+      const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } });
+
+
+      newInventory.category = category;
+      const savedInventory = await this.inventoryRepository.save(newInventory);
+
+      console.log('New inventory saved:', savedInventory);
+      return savedInventory;
     } catch (error) {
-        console.error('Error saving inventory:', error);
-        throw error; // Rethrow the error to propagate it to the caller
+      console.error('Error saving inventory:', error);
+      throw error;
     }
-}
+  }
 
   async updateInventory(id: number, updatedInventoryDetails: UpdateInventoryDto, req_mail: any): Promise<Inventory> {
     const inventory = await this.inventoryRepository.findOneBy({ id });
@@ -60,7 +84,7 @@ export class InventoryService {
 
 
   async showAllInventories() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } , relations: ['category']});
   }
 
   async findOneInventory(id: number) {
@@ -102,11 +126,12 @@ export class InventoryService {
     }
   }
 
-  async assignInventory({ inventoryId, employeeId }: { inventoryId: number, employeeId: number }) {
+  async assignInventory({ inventoryId, employeeId, categoryId }: { inventoryId: number, employeeId: number, categoryId: number }) {
     try {
-      const [inventory, employee] = await Promise.all([
+      const [inventory, employee, category] = await Promise.all([
         this.inventoryRepository.findOne({ where: { id: inventoryId } }),
         this.employeeRepository.findOne({ where: { id: employeeId } }),
+        this.categoryRepository.findOne({ where: { id: categoryId } })
       ]);
 
       if (!inventory) {
@@ -117,8 +142,12 @@ export class InventoryService {
         throw new NotFoundException('Employee not found');
       }
 
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
       const existingAssignment = await this.inventoryRepository.findOne({
-        where: { id: inventoryId }, relations: ['employee'],
+        where: { id: inventoryId }, relations: ['employee', 'category'],
       });
 
       if (existingAssignment && existingAssignment.employee) {
@@ -126,6 +155,7 @@ export class InventoryService {
       }
 
       inventory.employee = employee;
+      inventory.category = category;
       const updatedInventory = await this.inventoryRepository.save(inventory);
 
       return updatedInventory;

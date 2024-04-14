@@ -5,5 +5,5 @@ export class CreateProjectDto {
     startDate: Date;
     endDate?: Date;
     status: 'active' | 'inactive';
-    managerName?: string; 
+    // manager_name?: string; 
   }
