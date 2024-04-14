@@ -144,6 +144,33 @@ export class ProjectService {
 
 
 
+// async updateProjectStatus(
+//   project_id: number,
+//   status: string,
+//   req_mail:string,
+// ): Promise<Project> {
+//   const project = await this.findOne(project_id);
+//   project.status = status;
+//   project.updated_by=req_mail;
+//   return this.projectRepository.save(project);
+// }
+
+async updateProjectStatus(
+  projectId: number,
+  body : any,
+  req_mail: string
+): Promise<Project> {
+  
+  const project = await this.projectRepository.findOne({ where: { id: projectId, deleted_at: IsNull() } });
+  if (!project) {
+    throw new NotFoundException('Project not found');
+  }
+  project.status = body.status;
+  project.updated_by = req_mail;
+  
+  return await this.projectRepository.save(project);
+}
+
 }
 
 

@@ -88,7 +88,7 @@ export class LeaveTypesAndRequestsController {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
-    }
+    }   
     return this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
@@ -117,19 +117,17 @@ export class LeaveTypesAndRequestsController {
 
 
   @UseGuards(AuthGuard)
-  @Get(':emp_id/remaining-leave/:leave_type_name')
+  @Get(':emp_id/remaining-leave')
   @ApiOkResponse({
     description:'Get leave balance of employee as per leave type'
   })
-  async getRemainingLeaveByType(
+  async getRemainingLeave(
     @Param('emp_id') emp_id: number,
-    @Param('leave_type_name') leave_type_name: string,
-  ): Promise<number> {
+  ){
     try {
       const remainingLeave =
-        await this.leaveTypesAndRequestsService.getRemainingLeaveByType(
+        await this.leaveTypesAndRequestsService.getRemainingLeave(
           emp_id,
-          leave_type_name,
         );
       return remainingLeave;
     } catch (error) {

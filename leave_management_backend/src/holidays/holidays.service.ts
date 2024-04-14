@@ -25,6 +25,8 @@ export class HolidaysService {
       image: image,
     });
 
+    console.log("newHoliday...........",newHoliday)
+
     return await this.holidaysRepository.save(newHoliday);
   }
 
@@ -32,21 +34,49 @@ export class HolidaysService {
     return await this.holidaysRepository.find();
   }
 
+  async getHolidaysCount(): Promise<number> {
+    const count = await this.holidaysRepository.count();
+    return count;
+  }
 
 
-  async updateHoliday(id: number, holidayData: Holidays): Promise<Holidays | null> {
-    const existingHoliday = await this.holidaysRepository.findOneBy({ id });
+
+  // async updateHoliday(id: number, holidayData: Holidays): Promise<Holidays | null> {
+  //   const existingHoliday = await this.holidaysRepository.findOneBy({ id });
+  //   console.log("==========================",existingHoliday)
+  //   if (!existingHoliday) {
+  //     return null;
+  //   }
+  
+  //   existingHoliday.date = holidayData.date;
+  //   existingHoliday.day = holidayData.day;
+  //   existingHoliday.occasion = holidayData.occasion;
+  //   existingHoliday.image = holidayData.image; 
+  
+  //   return await this.holidaysRepository.save(existingHoliday);
+  // }
+  async updateHoliday(id: number, holidayData: Partial<Holidays>): Promise<Holidays | null> {
+    const existingHoliday = await this.holidaysRepository.findOneBy({id});
+    // console.log("==========================", existingHoliday);
     if (!existingHoliday) {
-      return null;
+      return null; // Return null if holiday with the given id is not found
     }
   
-    existingHoliday.date = holidayData.date;
-    existingHoliday.day = holidayData.day;
-    existingHoliday.occasion = holidayData.occasion;
-    existingHoliday.image = holidayData.image; 
+    // Update only the provided properties of the existing holiday
+    Object.assign(existingHoliday, holidayData);
+
+    console.log("holidayData",holidayData)
+    console.log("existingHoliday",existingHoliday)
   
-    return await this.holidaysRepository.save(existingHoliday);
+    try {
+      // Save the updated holiday entity
+      return await this.holidaysRepository.save(existingHoliday);
+    } catch (error) {
+      console.error("Error updating holiday:", error);
+      return null; // Return null if an error occurs during saving
+    }
   }
+  
 
 //   async getImagePathById(id: number): Promise<string | null> {
 //     // Assuming HolidaysService has a method to get image path by ID
