@@ -25,20 +25,16 @@ export class EmployeeService {
     private readonly mailService: MailService,
   ) {}
 
-  //Create employee
-  async createEmployee(
-    createEmployeeDto: CreateEmployeeDto,
-    // req_mail:any
-  ): Promise<Employee> {
-    const newEmployee = this.employeeRepository.create(createEmployeeDto);
-    // newEmployee.created_by=req_mail;
-    const emailRegex =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (!emailRegex.test(createEmployeeDto.email)) {
-      throw new Error(
-        'Invalid email format. Please enter a valid email address.',
-      );
-    }
+    //Create employee
+    async createEmployee(createEmployeeDto: CreateEmployeeDto,
+        req_mail:any
+    ): Promise<Employee> {
+        const newEmployee = this.employeeRepository.create(createEmployeeDto);
+        newEmployee.created_by=req_mail;
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if (!emailRegex.test(createEmployeeDto.email)) {
+            throw new Error('Invalid email format. Please enter a valid email address.');
+        }
 
     const mobileRegex = /^\d{10}$/;
     if (!mobileRegex.test(createEmployeeDto.mobile_number)) {

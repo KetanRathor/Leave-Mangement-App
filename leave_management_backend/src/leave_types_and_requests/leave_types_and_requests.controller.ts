@@ -16,21 +16,24 @@ import {
   Request,
   
 } from '@nestjs/common';
+
+
 import { LeaveTypesAndRequestsService } from './leave_types_and_requests.service';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 // import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 // import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 import { Res } from '@nestjs/common';
 
 
 @ApiTags('Leave Request')
-@ApiBearerAuth()
+@ApiBearerAuth("JWT-auth")
 @Controller('leave')
 export class LeaveTypesAndRequestsController {
+  leaveService: any;
   constructor(
     private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
   ) {}
@@ -115,54 +118,48 @@ export class LeaveTypesAndRequestsController {
     }
   }
 
-
-  @UseGuards(AuthGuard)
-  @Get(':emp_id/remaining-leave')
-  @ApiOkResponse({
-    description:'Get leave balance of employee as per leave type'
-  })
-  async getRemainingLeave(
-    @Param('emp_id') emp_id: number,
-  ){
-    try {
-      const remainingLeave =
-        await this.leaveTypesAndRequestsService.getRemainingLeave(
-          emp_id,
-        );
-      return remainingLeave;
-    } catch (error) {
-      console.error('Error getting employee remaining leave:', error);
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+  @Get('remaining-balance/:empId')
+  @ApiParam({ name: 'empId', description: 'Employee ID' })
+  async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
+    if (!id || isNaN(id)) {
+      throw new BadRequestException('Invalid employee ID');
     }
+    return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
+  
 
+  @Get('remaining-balance/work-from-home/:empId')
+  @ApiParam({ name: 'empId', description: 'Employee ID' })
+  async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {
+    if (!id || isNaN(id)) {
+      throw new BadRequestException('Invalid employee ID');
+    }
+    return this.leaveTypesAndRequestsService.getRemainingLeaveBalanceforworkfromhome(id);
+  }
+  
 
-  // @Get('balance/:empId')
-  // async getLeaveBalance(@Param('empId') empId: number, @Res() res: Response) {
+  // @UseGuards(AuthGuard)
+  // @Get(':emp_id/remaining-leave/:leave_type_name')
+  // @ApiOkResponse({
+  //   description:'Get leave balance of employee as per leave type'
+  // })
+  // async getRemainingLeaveByType(
+  //   @Param('emp_id') emp_id: number,
+  //   @Param('leave_type_name') leave_type_name: string,
+  // ): Promise<number> {
   //   try {
-  //     const leaveBalances = await this.leaveTypesAndRequestsService.calculateLeaveBalance(empId,leaveTypes);
-  //     return res.status(HttpStatus.OK).json(leaveBalances);
+  //     const remainingLeave =
+  //       await this.leaveTypesAndRequestsService.getRemainingLeaveByType(
+  //         emp_id,
+  //         leave_type_name,
+  //       );
+  //     return remainingLeave;
   //   } catch (error) {
-  //     console.error('Error calculating leave balance:', error);
-  //     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-  //       message: 'Internal server error occurred',
-  //     });
-  //   }
-  // }
-
-  // @Get('balance/:empId')
-  // async getLeaveBalance(@Param('empId') empId: number, @Res({ passthrough: true }) res: Response) {
-  //   try {
-  //     const leaveBalances = await this.leaveTypesAndRequestsService.calculateLeaveBalance(empId,leaveTypes);
-  //     return res.status(HttpStatus.OK).json(leaveBalances);
-  //   } catch (error) {
-  //     console.error('Error calculating leave balance:', error);
-  //     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-  //       message: 'Internal server error occurred',
-  //     });
+  //     console.error('Error getting employee remaining leave:', error);
+  //     throw new HttpException(
+  //       'Internal server error',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
   //   }
   // }
 }
