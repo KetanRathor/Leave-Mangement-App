@@ -6,9 +6,11 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import * as crypto from 'crypto'
 import { text } from 'stream/consumers';
 import { Inventory } from './entities/inventory.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 
-
+@ApiTags('Inventory')
+@ApiBearerAuth("JWT-auth")
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService,

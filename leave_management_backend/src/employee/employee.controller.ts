@@ -4,11 +4,11 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 
 @ApiTags('Employees')
-@ApiBearerAuth()
+@ApiBearerAuth("JWT-auth")
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
@@ -71,18 +71,6 @@ export class EmployeeController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-  // @UseGuards(AuthGuard)
-
-  // @Delete('/department/:id')
-  // async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
-  //   try {
-  //     await this.employeeService.deleteDepartment(id);
-  //     return 'Department Deleted Successfully'
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
-  //   }
-  // }
 
   //Show Profile or display employee details
   @UseGuards(AuthGuard)

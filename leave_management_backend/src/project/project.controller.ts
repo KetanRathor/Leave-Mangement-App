@@ -8,7 +8,10 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
 import { AssignProjectDto } from './dto/assign-project.dto';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Project')
+@ApiBearerAuth("JWT-auth")
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService,

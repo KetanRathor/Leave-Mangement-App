@@ -8,17 +8,21 @@ import {
   Res,
   Body,
   UseGuards,
+  Delete,
+  ParseIntPipe,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 
-@ApiBearerAuth()
+@ApiBearerAuth("JWT-auth")
 @ApiTags('Holidays')
 @Controller('holidays')
 export class HolidaysController {
@@ -67,22 +71,53 @@ export class HolidaysController {
     };
   }
 
-  //   @Get('images/:id')
-  //   async getHolidayImage(@Param('id') id: number, @Res() res: Response) {
-  //     try {
-  //       const imagePath = await this.imageService.getImagePathById(id);
+  @Get('upcoming')
+  @ApiOkResponse({
+    description: 'Get upcoming Holidays',
+    type: [Holidays],
+  })
+  async getUpcomingHolidays() {
+    const currentDate = new Date();
+    const upcomingHolidays = await this.holidaysService.getUpcomingHolidays(currentDate);
+    return {
+      message: 'Upcoming holidays retrieved successfully',
+      holidays: upcomingHolidays,
+    };
+  }
 
-  //       if (!imagePath) {
-  //         return res.status(404).send({ message: 'Image not found' });
-  //       }
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  @ApiOkResponse({
+    description:'Employee with given ID will be deleted as response'
 
-  //       const imageFullPath = join('uploads', imagePath); // Assuming images are stored in 'uploads' folder
-  //       const imageBuffer = await asyncReadFile(imageFullPath);
+  })
+  async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.holidaysService.deleteHolidays(id);
+      return 'Holiday Deleted Successfully'
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+  
+  @Get('remaining-holidays')
+  @ApiOkResponse({
+    description: 'Get remaining holidays',
+  })
+  async getRemainingHolidays(): Promise<{ remainingHolidays: number }> {
+    try {
+      const remainingHolidays = await this.holidaysService.getRemainingHolidays();
+      return { remainingHolidays };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
-  //       res.setHeader('Content-Type', 'image/jpeg'); // Adjust content type based on your image type
-  //       res.end(imageBuffer);
-  //     } catch (error) {
-  //       res.status(500).send({ message: 'Internal server error' });
-  //     }
+  // @Get('remaining-balance')
+  // async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
+  //   if (!id || isNaN(id)) {
+  //     throw new BadRequestException('Invalid employee ID');
   //   }
+  //   return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
+  // }
 }

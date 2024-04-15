@@ -96,6 +96,7 @@ export class Employee {
   })
   manager_id: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Employee)
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
@@ -107,6 +108,7 @@ export class Employee {
   })
   department_id: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Department, (department) => department.employees)
   @JoinColumn({ name: 'department_id' })
   department: Department;
@@ -120,12 +122,13 @@ export class Employee {
   })
   role: string;
 
+  @ApiProperty()
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
 
+  @ApiProperty()
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
 
-  
 }
