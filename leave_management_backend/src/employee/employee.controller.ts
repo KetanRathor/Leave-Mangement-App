@@ -1,74 +1,57 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpException,
-  HttpStatus,
-  Put,
-  Param,
-  ParseIntPipe,
-  Delete,
-  Get,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiTags('Employees')
+// @ApiBearerAuth()
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
-  @UseGuards(AuthGuard)
+
+  // @UseGuards(AuthGuard)
   @Post()
-  // @ApiCreatedResponse({
-  //   description: 'created user object as response',
-  //   type: Employee,
-  // })
-  // @ApiBadRequestResponse({
-  //   description: 'User cannot register. Try Again',
- 
+  @ApiCreatedResponse({
+    description: 'created user object as response',
+    type: Employee,
+  })
+
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    @Request() req,
+    // @Request() req,
   ) {
-    const req_email = req.user.email;
+    // const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        req_email,
+        // req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-  // @UseGuards(AuthGuard)
-  // @Post('/department')
-  // async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
-  //   try {
-  //     return await this.employeeService.createDepartment(createDepartmentDto);
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+  
+ 
 
   @UseGuards(AuthGuard)
   @Put(':id')
+  @ApiCreatedResponse({
+    description:'Employee with given ID will be updated as response',
+    type:Employee
+  })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
     @Request() req,
   ) {
-    const req_email = req.user.email;
+    const req_mail = req.user.email;
     try {
-      return await this.employeeService.updateEmployee(
-        id,
-        updateEmployeeDto,
-        req_email,
-      );
+      return await this.employeeService.updateEmployee(id, updateEmployeeDto,req_mail);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -76,11 +59,15 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Delete(':id')
+  @ApiOkResponse({
+    description:'Employee with given ID will be deleted as response'
+
+  })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    const req_email = req.user.email;
+    const req_mail = req.user.email;
     try {
-      await this.employeeService.deleteEmployee(id, req_email);
-      return 'Employee Deleted Successfully';
+      await this.employeeService.deleteEmployee(id,req_mail);
+      return 'Employee Deleted Successfully'
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -100,7 +87,11 @@ export class EmployeeController {
 
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('employee/:id')
+  @ApiOkResponse({
+    description:'Get employee by id',
+    type:Employee
+  })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
       return await this.employeeService.showProfile(id);
@@ -109,17 +100,15 @@ export class EmployeeController {
     }
   }
 
+  
+
   @UseGuards(AuthGuard)
   @Get()
+  @ApiOkResponse({
+    description:'All employees List',
+    type:[Employee]
+  })
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
 }
-// function ApiBadRequestResponse(arg0: { description: string; }): (target: EmployeeController, propertyKey: "createEmployee", descriptor: TypedPropertyDescriptor<(createEmployeeDto: CreateEmployeeDto, req: any) => Promise<import("./entities/Employee.entity").Employee>>) => void | TypedPropertyDescriptor<...> {
-//   throw new Error('Function not implemented.');
-// }
-
-// function ApiCreatedResponse(arg0: { description: string; type: any; }): (target: EmployeeController, propertyKey: "createEmployee", descriptor: TypedPropertyDescriptor<(createEmployeeDto: CreateEmployeeDto, req: any) => Promise<import("./entities/Employee.entity").Employee>>) => void | TypedPropertyDescriptor<...> {
-//   throw new Error('Function not implemented.');
-// }
-

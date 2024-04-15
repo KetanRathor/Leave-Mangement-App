@@ -7,48 +7,59 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  Request,
   UseGuards,
-  Get,
+  Request,
+  Get
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Department } from './entity/Department.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-// @ApiTags('department')
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Department } from './entity/Department.entity';
+
+@ApiTags('Department')
+@ApiBearerAuth()
 @Controller('department')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
-  // @ApiCreatedResponse({
-  //   description: 'created department object as response',
-  //   type: Department,
-  // })
-  // @ApiBadRequestResponse({
-  //   description: 'cannot create Department. Try Again',
-  // })
+
   // @UseGuards(AuthGuard)
+
   @Post()
-  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
-    // const req_email = req.user.email;
+  @ApiCreatedResponse({
+    description: 'created department object as response',
+    type: Department,
+  })
+  
+  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto
+  // ,@Request() req
+) {
+    // const req_mail=req.user.email;
     try {
-      return await this.departmentService.createDepartment(
-        createDepartmentDto,
-        // req_email,
+      return await this.departmentService.createDepartment(createDepartmentDto,
+        // req_mail
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  // @UseGuards(AuthGuard)
+
+  @Get()
+  async showDepartmentList() {
+    // console.log("first..............")
+    return await this.departmentService.findDepartmentList();
+  }
+
+
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
+  @ApiOkResponse({
+    description: 'department will be deleted as response'
+  })
+  async deleteDepartment(@Param('id', ParseIntPipe) id: number,@Request() req) {
+    const req_mail=req.user.email;
     try {
-      await this.departmentService.deleteDepartment(id);
+      await this.departmentService.deleteDepartment(id,req_mail);
       return 'Department Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
