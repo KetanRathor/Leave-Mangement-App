@@ -8,6 +8,9 @@ export class Project {
   @Column()
   name: string;
 
+  @Column()
+  manager_name: string;
+
   @Column({ nullable: true })
   description?: string;
 
@@ -44,7 +47,7 @@ export class Project {
 
   @ManyToMany(() => Employee)
     @JoinTable({name:'employee_project'})
-    projects: Employee[]
+    employee: Employee[]
 
 
 }

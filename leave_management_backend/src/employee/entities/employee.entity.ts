@@ -41,7 +41,23 @@ export class Employee {
   })
   dob: Date;
 
-  @Column({ nullable: false })
+  // @Column({ nullable: false })
+  // @ApiProperty({
+  //   description:'The gender of Employee'
+  // })
+  // gender: string;
+  // @Column({
+  //   type: 'enum',
+  //   enum: ['Male', 'Female', 'Other'],
+  //   default: 'Male',
+  // })
+  // gender: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['Male', 'Female', 'Other'],
+    default: 'Male',
+  })
   @ApiProperty({
     description:'The gender of Employee'
   })
@@ -122,7 +138,12 @@ export class Employee {
   })
   role: string;
 
-  @ApiProperty()
+  @Column('longblob', { nullable: true })
+  @ApiProperty({
+    description:'occasion image'
+  })
+  image: Buffer;
+
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
@@ -131,4 +152,8 @@ export class Employee {
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
 
+  @ManyToMany(() => Project)
+    @JoinTable({name:"employee_project"})
+    project: Project[]
+  
 }

@@ -104,12 +104,33 @@ export class EmployeeService {
 
     //Show Employe Profile
     async showProfile(id: number) {
-        return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
+        return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
+             relations: ['manager','department','inventories','project'] });
     }
+
+    
 
     //Show Employee List
     async findEmployees() {
 
-        return await this.employeeRepository.find({ where: { deleted_at: IsNull() } })
+        return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project'] })
     }
+
+    async findManagerList(){
+        return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
+    }
+
+
+    async uploadImage(employeeId: number, imageData: Buffer) {
+        const employee = await this.employeeRepository.findOneBy({id:employeeId});
+        if (!employee) {
+          throw new Error(`Employee with ID ${employeeId} not found`);
+        }
+        employee.image = imageData;
+        return await this.employeeRepository.save(employee);
+      }
+
+
 }
+    
+

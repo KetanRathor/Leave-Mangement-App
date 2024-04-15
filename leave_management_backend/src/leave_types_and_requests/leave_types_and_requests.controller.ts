@@ -14,6 +14,7 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  
 } from '@nestjs/common';
 
 
@@ -25,6 +26,7 @@ import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
+import { Res } from '@nestjs/common';
 
 
 @ApiTags('Leave Request')
@@ -89,7 +91,7 @@ export class LeaveTypesAndRequestsController {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
-    }
+    }   
     return this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,

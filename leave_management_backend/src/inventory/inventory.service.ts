@@ -6,6 +6,9 @@ import { DataSource, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { triggerAsyncId } from 'async_hooks';
+// import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
+import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
+import { Category } from './entities/inventoryCategory.entity';
 
 @Injectable()
 export class InventoryService {
@@ -14,13 +17,51 @@ export class InventoryService {
     private inventoryRepository: Repository<Inventory>,
     @InjectRepository(Employee)
     private employeeRepository: Repository<Employee>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) { }
 
-  async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-    const newInventory =  this.inventoryRepository.create(createInventoryDto);
-    newInventory.created_by = req_mail;
+  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
+  //   const newInventory =  this.inventoryRepository.create(createInventoryDto);
+  //   newInventory.created_by = req_mail;
+  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
 
-    return this.inventoryRepository.save(newInventory);
+  //   return this.inventoryRepository.save(newInventory,category);
+  // //   return this.inventoryRepository.save({ ...createInventoryDto, category_id : createInventoryDto.category_id, created_by: req_mail });
+  // }
+
+  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
+  //   try {
+  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
+  //     const newInventory = await this.inventoryRepository.save({ ...createInventoryDto, category, created_by: req_mail });
+  //     console.log('New inventory saved:', newInventory);
+  //     return newInventory;
+  //   } catch (error) {
+  //     console.error('Error saving inventory:', error);
+  //     throw error; // Rethrow the error to propagate it to the caller
+  //   }
+  // }
+
+
+  async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
+    try {
+
+      const newInventory = this.inventoryRepository.create(createInventoryDto);
+
+      newInventory.created_by = req_mail;
+
+      const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } });
+
+
+      newInventory.category = category;
+      const savedInventory = await this.inventoryRepository.save(newInventory);
+
+      console.log('New inventory saved:', savedInventory);
+      return savedInventory;
+    } catch (error) {
+      console.error('Error saving inventory:', error);
+      throw error;
+    }
   }
 
   async updateInventory(id: number, updatedInventoryDetails: UpdateInventoryDto, req_mail: any): Promise<Inventory> {
@@ -43,12 +84,13 @@ export class InventoryService {
 
 
   async showAllInventories() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } , relations: ['category']});
   }
 
   async findOneInventory(id: number) {
-    const inventory = await this.inventoryRepository.findOne({ where: { id}, relations: ['employee']  });
+    const inventory = await this.inventoryRepository.findOne({ where: { id, deleted_at: IsNull() }, relations: ['employee'] });
     // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
+
 
     if (!inventory) {
       return { message: `Inventory with ID ${id} not found`, inventory };
@@ -84,32 +126,38 @@ export class InventoryService {
     }
   }
 
-  async assignInventory({ inventoryId, employeeId }: { inventoryId: number, employeeId: number }) {
+  async assignInventory({ inventoryId, employeeId, categoryId }: { inventoryId: number, employeeId: number, categoryId: number }) {
     try {
-      const [inventory, employee] = await Promise.all([
+      const [inventory, employee, category] = await Promise.all([
         this.inventoryRepository.findOne({ where: { id: inventoryId } }),
         this.employeeRepository.findOne({ where: { id: employeeId } }),
+        this.categoryRepository.findOne({ where: { id: categoryId } })
       ]);
-  
+
       if (!inventory) {
         throw new NotFoundException('Inventory not found');
       }
-  
+
       if (!employee) {
         throw new NotFoundException('Employee not found');
       }
 
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
       const existingAssignment = await this.inventoryRepository.findOne({
-        where: { id: inventoryId},relations: ['employee'],
+        where: { id: inventoryId }, relations: ['employee', 'category'],
       });
-  
+
       if (existingAssignment && existingAssignment.employee) {
         throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
       }
-  
+
       inventory.employee = employee;
+      inventory.category = category;
       const updatedInventory = await this.inventoryRepository.save(inventory);
-  
+
       return updatedInventory;
     } catch (error) {
       throw error;
@@ -117,12 +165,12 @@ export class InventoryService {
 
   }
 
-  
+
 
   async getAssignedInventory(employeeId: number): Promise<Inventory[]> {
     try {
       const assignedInventory = await this.inventoryRepository.find({
-        where: { employee: { id: employeeId } }, 
+        where: { employee: { id: employeeId } },
         select: ['id', 'name'],
         relations: ['employee'],
       });
@@ -132,9 +180,20 @@ export class InventoryService {
     }
   }
 
-  
+  async createCategory(createCategoryDto: CreateInvetoryCategoryDto, req_mail: any) {
+    const newCategory = this.categoryRepository.create(createCategoryDto);
+    newCategory.created_by = req_mail;
+
+    return this.categoryRepository.save(newCategory);
+  }
 
 
-  
+  async showAllCategory() {
+    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } });
+  }
+
+
+
+
 
 }

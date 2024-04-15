@@ -40,8 +40,8 @@ export class AuthController {
 @Post('forgotpassword')
 async forgotPassword(@Body('email') email: string) {
     try {
-        await this.authService.forgotPassword(email);
-        return { message: 'OTP sent to your email address' };
+        const result = await this.authService.forgotPassword(email);
+        return result;
     } catch (error) {
         
         return { error: error.message };

@@ -10,7 +10,7 @@ export class HolidaysService {
   constructor(
     @InjectRepository(Holidays)
     private readonly holidaysRepository: Repository<Holidays>,
-  ) {}
+  ) { }
 
   async uploadImage(
     date: Date,
@@ -25,6 +25,8 @@ export class HolidaysService {
       occasion: occasion,
       image: image,
     });
+
+    console.log("newHoliday...........", newHoliday)
 
     return await this.holidaysRepository.save(newHoliday);
   }

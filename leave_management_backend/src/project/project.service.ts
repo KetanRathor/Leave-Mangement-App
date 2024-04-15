@@ -26,11 +26,11 @@ export class ProjectService {
   }
 
   async showAllProjects() {
-    return await this.projectRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee'] });
   }
 
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() } });
+    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee'] });
 
     if (!project) {
       return { message: `Inventory with ID ${id} not found`, project };
@@ -70,7 +70,7 @@ export class ProjectService {
         this.projectRepository.findOne(
           {
             relations: {
-                projects: true,
+                employee: true,
             },
             where: { id: projectId }
         }),
@@ -88,7 +88,7 @@ export class ProjectService {
       console.log("project", project)
       // project.projects = [employee]
       // console.log("project111", project.projects)
-      project.projects.push(employee);
+      project.employee.push(employee);
       // project.projects = [...project.projects, employee];
 
       await this.projectRepository.save(project);
@@ -114,7 +114,7 @@ export class ProjectService {
         throw new NotFoundException('Project not found');
       }
   
-      return project.projects; 
+      return project.employee; 
     } catch (error) {
       throw error;
     }
@@ -143,6 +143,33 @@ export class ProjectService {
   // }
 
 
+
+// async updateProjectStatus(
+//   project_id: number,
+//   status: string,
+//   req_mail:string,
+// ): Promise<Project> {
+//   const project = await this.findOne(project_id);
+//   project.status = status;
+//   project.updated_by=req_mail;
+//   return this.projectRepository.save(project);
+// }
+
+async updateProjectStatus(
+  projectId: number,
+  body : any,
+  req_mail: string
+): Promise<Project> {
+  
+  const project = await this.projectRepository.findOne({ where: { id: projectId, deleted_at: IsNull() } });
+  if (!project) {
+    throw new NotFoundException('Project not found');
+  }
+  project.status = body.status;
+  project.updated_by = req_mail;
+  
+  return await this.projectRepository.save(project);
+}
 
 }
 

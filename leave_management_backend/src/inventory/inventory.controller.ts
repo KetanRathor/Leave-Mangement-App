@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import * as crypto from 'crypto'
 import { text } from 'stream/consumers';
 import { Inventory } from './entities/inventory.entity';
+import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 
@@ -14,8 +15,14 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService,
+              // private readonly categoryService: CategoryService,
     
   ) { }
+
+  
+
+
+ 
 
   @UseGuards(AuthGuard)
   @Post()
@@ -37,7 +44,7 @@ export class InventoryController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('oneInventory/:id')
   async findOneInventory(@Param('id', ParseIntPipe) id: number) {
     return await this.inventoryService.findOneInventory(id);
   }
@@ -65,7 +72,7 @@ export class InventoryController {
 
 
   @UseGuards(AuthGuard)
-@Post(':employeeId')
+@Post('assign/:employeeId')
 async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
   const req_mail = req.user.email;
 
@@ -73,11 +80,14 @@ async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('em
     const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
 
     if (existingInventory) {
-      return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId });
+      return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
+    }
+    else{
+      return {message:"Inventory not available"}
     }
 
-    const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
-    return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
+    // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
+    // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
   } catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
@@ -97,7 +107,26 @@ async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inv
   }
 }
 
+@UseGuards(AuthGuard)
+@Post("/category")
+async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDto, @Request() req) {
+  const req_mail = req.user.email;
+  try {
+    console.log("..................................");
+    
+    return await this.inventoryService.createCategory(createInvetoryCategoryDto, req_mail);
+  }
+  catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
 
+
+// @UseGuards(AuthGuard)
+  @Get('allCategory')
+  findAllCategory() {
+    return this.inventoryService.showAllCategory();
+  }
 
 
 

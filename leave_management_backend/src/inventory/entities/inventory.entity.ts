@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, ManyToOne, JoinColumn, JoinTable } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { Category } from './inventoryCategory.entity';
 import { ApiProperty } from '@nestjs/swagger';
+
 
 @Entity('inventories')
 export class Inventory {
@@ -49,4 +51,8 @@ export class Inventory {
     @ApiProperty()
     @ManyToOne(() => Employee, (employee) => employee.inventories)
     employee: Employee
+
+    @ManyToOne(() => Category, (category) => category.inventories)
+    // @JoinColumn({ name: 'category_id' })
+    category: Category;
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
 @ApiBearerAuth("JWT-auth")
@@ -74,7 +75,7 @@ export class EmployeeController {
 
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('employee/:id')
   @ApiOkResponse({
     description:'Get employee by id',
     type:Employee
@@ -87,6 +88,8 @@ export class EmployeeController {
     }
   }
 
+  
+
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
@@ -96,4 +99,28 @@ export class EmployeeController {
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
+
+  @Get('/manager')
+  async showManagerList() {
+    console.log("first..............")
+    return await this.employeeService.findManagerList();
+  }
+
+  
+
+  @Post('upload-image/:id')
+@UseInterceptors(FileInterceptor('image'))
+async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+  
+  if (!image) {
+    throw new Error('No image uploaded');
+  }
+
+  const employee = await this.employeeService.uploadImage(id, image.buffer);
+
+  return employee;
+}
+
+  
+
 }

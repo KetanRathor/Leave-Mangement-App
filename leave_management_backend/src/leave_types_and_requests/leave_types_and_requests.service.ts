@@ -62,17 +62,17 @@ export class LeaveTypesAndRequestsService {
   }
 
   findAll() {
-    return this.leaveRequestRepository.find();
+    return this.leaveRequestRepository.find({ relations: ['employee'] });
   }
 
   async updateStatus(
     leave_request_id: number,
     status: string,
-    req_mail:string,
+    req_mail: string,
   ): Promise<LeaveRequest> {
     const leaveRequest = await this.findOne(leave_request_id);
     leaveRequest.status = status;
-    leaveRequest.updated_by=req_mail;
+    leaveRequest.updated_by = req_mail;
     return this.leaveRequestRepository.save(leaveRequest);
   }
   async getLeaveRequest(id: number): Promise<LeaveRequest> {
@@ -172,3 +172,4 @@ async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
 }
 
 }
+

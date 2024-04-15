@@ -11,5 +11,6 @@ export class CreateInventoryDto {
         description:'serial no. of inventory'
     })
     serial_number:string;
+    category_id:number;
 
 }
