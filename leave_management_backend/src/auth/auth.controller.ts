@@ -59,5 +59,14 @@ async forgotPassword(@Body('email') email: string) {
         }
     }
 
+//     @Post('logout')
+//   async logout(@Request() req: Request) {
+//     try {
+//       await req.session.destroy();
+//       return { message: 'Logged out successfully' };
+//     } catch (error) {
+//       throw new HttpException('Logout failed', HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+//   }
 
 }
