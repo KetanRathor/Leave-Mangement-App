@@ -18,13 +18,13 @@ export class Department {
   department_name: string;
 
   @ApiProperty({
-    description:'the date on which department created'
+    description: 'the date on which department created',
   })
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   @ApiProperty({
-    description:'department created by'
+    description: 'department created by',
   })
   @Column({ default: '' })
   created_by: string;
@@ -36,30 +36,29 @@ export class Department {
   // updated_by: string;
 
   @ApiProperty({
-    description:'The date on which department deleted'
+    description: 'The date on which department deleted',
   })
-  @Column({ type: 'timestamp', nullable:true })
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
   @ApiProperty({
-    description:'department deleted by'
+    description: 'department deleted by',
   })
-  @Column({ default: ''})
+  @Column({ default: '' })
   deleted_by: string;
 
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
 
-  @Column({ type: 'timestamp', nullable: true })
-  deleted_at: Date;
+  // @Column({ type: 'timestamp', nullable: true })
+  // deleted_at: Date;
 
-  @Column({ default: 'system' })
-  deleted_by: string;
+  // @Column({ default: 'system' })
+  // deleted_by: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  // created_at: Date;
 
-  @Column({ default: 'system' })
-  created_by: string;
-
+  // @Column({ default: 'system' })
+  // created_by: string;
 }
