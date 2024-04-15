@@ -8,9 +8,7 @@ export class UserCredentials {
 
   
 
-  // @OneToOne(() => Employee, { onDelete: 'CASCADE' })
-  // @JoinColumn({ name: 'emp_id' })
-  // employee: Employee;
+  
 
 
   @Column({ nullable: false, unique: true })

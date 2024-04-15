@@ -188,9 +188,10 @@ export class LeaveTypesAndRequestsService {
       }
     ];
 
-    const oneYearHoliday = holidays.total_holidays + fullLeaveType.default_balance;
-    const holidayOver = holidays.recent_holidays + remainingFullBalance;
-
+    // const oneYearHoliday = holidays.total_holidays + fullLeaveType.default_balance;
+    // const holidayOver = (holidays.total_holidays-holidays.recent_holidays) + remainingFullBalance;
+    const oneYearHoliday = holidays.total_holidays;
+    const holidayOver = holidays.total_holidays-holidays.recent_holidays;
 
     const holidayCount = {
       leave_type_name: 'Annual Leave',
