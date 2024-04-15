@@ -46,6 +46,7 @@ export class Department {
   @Column({ default: ''})
   deleted_by: string;
 
+  @ApiProperty()
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
 }

@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { Holidays } from './entities/holidays.entity';
 
 @Injectable()
 export class HolidaysService {
   holidaysService: any;
+  leaveRequestRepository: any;
   constructor(
     @InjectRepository(Holidays)
     private readonly holidaysRepository: Repository<Holidays>,
@@ -34,109 +35,45 @@ export class HolidaysService {
     return await this.holidaysRepository.find();
   }
 
-  async total_holidays(): Promise<number> {
-    const today = new Date();
-    const currentYear = today.getFullYear();
+  async getUpcomingHolidays(currentDate: Date): Promise<{ date: Date, day: string, occasion: string ,image:Buffer}[]> {
+    try {
+      const upcomingHolidays = await this.holidaysRepository
+        .createQueryBuilder('holiday')
+        .select(['holiday.date', 'holiday.day', 'holiday.occasion','holiday.image'])
+        .where('holiday.date >= :currentDate', { currentDate })
+        .orderBy('holiday.date', 'ASC')
+        .getRawMany();
 
-    const startDate = new Date(currentYear, 3, 1);
-    if (today.getMonth() < 3) {
-      startDate.setFullYear(currentYear - 1);
+      return upcomingHolidays;
+    } catch (error) {
+      throw new Error('Failed to fetch upcoming holidays');
     }
+  }
 
-    const nextYear = currentYear + 1;
-    const upcomingApril1st = new Date(nextYear, 3, 1);
+  async deleteHolidays(id: number) {
+    const holiday = await this.holidaysRepository.findOneBy({ id })
+    if (!holiday) {
+        throw new NotFoundException('Holiday not found.');
+    }
+     await this.holidaysRepository.remove(holiday);
+    return 'Holoday deleted successfully.';
+}
 
-    const holidaysCount = await this.holidaysRepository.count({
+
+
+async getRemainingHolidays(): Promise<number> {
+  try {
+    const currentDate = new Date();
+    const holidaysUntilCurrentDate = await this.holidaysRepository.count({
       where: {
-        date: Between(startDate, upcomingApril1st),
+        date: LessThanOrEqual(currentDate),
       },
     });
-    return holidaysCount;
+    const defaultHolidays = 10; 
+
+    return defaultHolidays - holidaysUntilCurrentDate;
+  } catch (error) {
+    throw new Error('Failed to calculate remaining holidays');
   }
-
-  async holidaysCount(): Promise<number> {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-
-    const startDate = new Date(currentYear, 3, 1);
-    if (today.getMonth() < 3) {
-      startDate.setFullYear(currentYear - 1);
-    }
-
-    const endDate = today;
-
-    return await this.holidaysRepository.count({
-      where: {
-        date: Between(startDate, endDate),
-      },
-    });
-  }
-
-
-  async getHolidayCounts() {
-
-    const total_holidays = await this.total_holidays();
-    const holidaysCount = await this.holidaysCount();
-
-    console.log(`List of holidays from recent April 1st to upcoming April 1st: `, total_holidays);
-
-    console.log(`Count of holidays from recent April 1st to today: ${holidaysCount}`);
-
-    return { total_holidays: total_holidays, recent_holidays: holidaysCount };
-  }
-
-
-
-  async updateHoliday(holidayData: Holidays): Promise<Holidays | null> {
-    const existingHoliday = await this.holidaysRepository.findOne({ where: { id: holidayData.id } });
-    // console.log("==========================",existingHoliday)
-    if (!existingHoliday) {
-      console.log("==========================", existingHoliday)
-      return null;
-    }
-
-    existingHoliday.date = holidayData.date;
-    existingHoliday.day = holidayData.day;
-    existingHoliday.occasion = holidayData.occasion;
-    existingHoliday.image = holidayData.image;
-
-
-    console.log(holidayData.date, "1111111111111", holidayData.day, "22222222222", holidayData.occasion, "33333333333333", holidayData.image)
-    return await this.holidaysRepository.save(existingHoliday);
-  }
-  // async updateHoliday(id: number, holidayData: Partial<Holidays>): Promise<Holidays | null> {
-  //   const existingHoliday = await this.holidaysRepository.findOneBy({ id });
-  //   // console.log("==========================", existingHoliday);
-  //   if (!existingHoliday) {
-  //     return null; // Return null if holiday with the given id is not found
-  //   }
-
-  //   // Update only the provided properties of the existing holiday
-  //   Object.assign(existingHoliday, holidayData);
-
-  //   console.log("holidayData", holidayData)
-  //   console.log("existingHoliday", existingHoliday)
-
-  //   try {
-  //     // Save the updated holiday entity
-  //     return await this.holidaysRepository.save(existingHoliday);
-  //   } catch (error) {
-  //     console.error("Error updating holiday:", error);
-  //     return null; // Return null if an error occurs during saving
-  //   }
-  // }
-
-
-  //   async getImagePathById(id: number): Promise<string | null> {
-  //     // Assuming HolidaysService has a method to get image path by ID
-  //     const holiday = await this.holidaysService.getHolidayById(id);
-
-  //     if (!holiday || !holiday.image) {
-  //       return null;
-  //     }
-
-  //     return holiday.image; // Assuming 'image' is the property in the Holiday entity that stores the image filename or path
-  //   }
-
-
+} 
 }
