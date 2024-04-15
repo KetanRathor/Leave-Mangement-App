@@ -56,10 +56,48 @@ export class LeaveTypesAndRequestsService {
     newLeaveRequest.created_by = req_mail;
     return await this.leaveRequestRepository.save(newLeaveRequest);
   }
+
+
+
   findOne(id: number): Promise<LeaveRequest> {
     console.log(id);
     return this.leaveRequestRepository.findOneBy({ id });
   }
+
+
+  async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
+    return await this.leaveRequestRepository.find({
+      where: { emp_id }, // Filter by employeeId
+      relations: ['employee'], // Include related employee information (optional)
+    });
+  }
+
+
+//  async findOne(id: number): Promise<LeaveRequest> {
+//     console.log(id);
+//     const rrr= await this.leaveRequestRepository.find({where:{id}, relations: ['employee']});
+//     return rrr;
+//   }
+
+// async findOne(id: number): Promise<LeaveRequest | undefined> {
+//   try {
+//     const request = await this.leaveRequestRepository.findOne({
+//       where: { id }, // Clear object property syntax
+//       relations: ['employee'], // Include related employee information if needed
+//     });
+
+//     if (!request) { // Handle case where request is not found
+//       return undefined;
+//     }
+
+//     return request;
+//   } catch (error) {
+//     console.error('Error fetching leave request:', error);
+//     // Handle the error appropriately (e.g., throw, log)
+//   }
+// }
+
+
 
   findAll() {
     return this.leaveRequestRepository.find({ relations: ['employee'] });

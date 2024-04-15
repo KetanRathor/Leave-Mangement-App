@@ -162,4 +162,9 @@ export class LeaveTypesAndRequestsController {
   //     );
   //   }
   // }
+
+  @Get(':employeeId/requests')
+  async findAllByEmployeeId(@Param('employeeId') employeeId: number): Promise<LeaveRequest[]> {
+    return await this.leaveTypesAndRequestsService.findAllByEmployeeId(employeeId);
+  }
 }
