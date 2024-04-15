@@ -15,7 +15,14 @@ import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 
@@ -24,20 +31,19 @@ import { Holidays } from './entities/holidays.entity';
 @Controller('holidays')
 export class HolidaysController {
   imageService: any;
-  constructor(private readonly holidaysService: HolidaysService) { }
+  constructor(private readonly holidaysService: HolidaysService) {}
 
   @UseGuards(AuthGuard)
   @Post('upload')
   @ApiBody({
-    type: Holidays
+    type: Holidays,
   })
   @ApiCreatedResponse({
     description: 'create holiday object ',
-    type: Holidays
+    type: Holidays,
   })
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file, @Body() body: any) {
-
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
@@ -58,7 +64,7 @@ export class HolidaysController {
   @Get()
   @ApiOkResponse({
     description: 'Get all Holidays',
-    type: [Holidays]
+    type: [Holidays],
   })
   async getAllHolidays() {
     const holidays = await this.holidaysService.getAllHolidays();
@@ -77,14 +83,16 @@ export class HolidaysController {
   //   };
   // }
 
-
   @UseGuards(AuthGuard)
   @Put('update/upload/:id')
   @ApiBody({ type: Holidays })
   @ApiOkResponse({ description: 'Holiday updated successfully' })
   @ApiConflictResponse({ description: 'Conflict during update' })
   @UseInterceptors(FileInterceptor('file'))
-  async updateHoliday(@Param('id') id: number, @UploadedFile() file: Express.Multer.File) {
+  async updateHoliday(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     // const inputData = body.data1;
     // const { date, day, occasion } = body
     // const createHolidayDto: CreateHolidaysDto = JSON.parse({ date, day, occasion });
@@ -95,7 +103,7 @@ export class HolidaysController {
     //   createHolidayDto.occasion,
     //   file.buffer,
     // );
-    console.log("body......", file)
+    console.log('body......', file);
     // const updatedHoliday = await this.holidaysService.updateHoliday({ id: id, date: date, day: day, occasion: occasion, image: file.buffer });
     // // console.log("___________________________", updatedHoliday)
     // if (!updatedHoliday) {
@@ -103,7 +111,6 @@ export class HolidaysController {
     // }
     // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
   }
-
 
   //   @Get('images/:id')
   //   async getHolidayImage(@Param('id') id: number, @Res() res: Response) {
@@ -123,8 +130,4 @@ export class HolidaysController {
   //       res.status(500).send({ message: 'Internal server error' });
   //     }
   //   }
-
-
-
-
 }

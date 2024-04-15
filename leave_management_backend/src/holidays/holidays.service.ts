@@ -9,7 +9,7 @@ export class HolidaysService {
   constructor(
     @InjectRepository(Holidays)
     private readonly holidaysRepository: Repository<Holidays>,
-  ) { }
+  ) {}
 
   async uploadImage(
     date: Date,
@@ -17,7 +17,6 @@ export class HolidaysService {
     occasion: string,
     image: Buffer,
   ): Promise<Holidays> {
-
     const newHoliday = this.holidaysRepository.create({
       date: date,
       day: day,
@@ -25,7 +24,7 @@ export class HolidaysService {
       image: image,
     });
 
-    console.log("newHoliday...........", newHoliday)
+    console.log('newHoliday...........', newHoliday);
 
     return await this.holidaysRepository.save(newHoliday);
   }
@@ -72,26 +71,29 @@ export class HolidaysService {
     });
   }
 
-
   async getHolidayCounts() {
-
     const total_holidays = await this.total_holidays();
     const holidaysCount = await this.holidaysCount();
 
-    console.log(`List of holidays from recent April 1st to upcoming April 1st: `, total_holidays);
+    console.log(
+      `List of holidays from recent April 1st to upcoming April 1st: `,
+      total_holidays,
+    );
 
-    console.log(`Count of holidays from recent April 1st to today: ${holidaysCount}`);
+    console.log(
+      `Count of holidays from recent April 1st to today: ${holidaysCount}`,
+    );
 
     return { total_holidays: total_holidays, recent_holidays: holidaysCount };
   }
 
-
-
   async updateHoliday(holidayData: Holidays): Promise<Holidays | null> {
-    const existingHoliday = await this.holidaysRepository.findOne({ where: { id: holidayData.id } });
+    const existingHoliday = await this.holidaysRepository.findOne({
+      where: { id: holidayData.id },
+    });
     // console.log("==========================",existingHoliday)
     if (!existingHoliday) {
-      console.log("==========================", existingHoliday)
+      console.log('==========================', existingHoliday);
       return null;
     }
 
@@ -100,8 +102,15 @@ export class HolidaysService {
     existingHoliday.occasion = holidayData.occasion;
     existingHoliday.image = holidayData.image;
 
-
-    console.log(holidayData.date, "1111111111111", holidayData.day, "22222222222", holidayData.occasion, "33333333333333", holidayData.image)
+    console.log(
+      holidayData.date,
+      '1111111111111',
+      holidayData.day,
+      '22222222222',
+      holidayData.occasion,
+      '33333333333333',
+      holidayData.image,
+    );
     return await this.holidaysRepository.save(existingHoliday);
   }
   // async updateHoliday(id: number, holidayData: Partial<Holidays>): Promise<Holidays | null> {
@@ -126,7 +135,6 @@ export class HolidaysService {
   //   }
   // }
 
-
   //   async getImagePathById(id: number): Promise<string | null> {
   //     // Assuming HolidaysService has a method to get image path by ID
   //     const holiday = await this.holidaysService.getHolidayById(id);
@@ -137,6 +145,4 @@ export class HolidaysService {
 
   //     return holiday.image; // Assuming 'image' is the property in the Holiday entity that stores the image filename or path
   //   }
-
-
 }
