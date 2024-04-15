@@ -12,15 +12,17 @@ import {
   ParseIntPipe,
   HttpException,
   HttpStatus,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
-import { Multer } from 'multer';
+import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
 import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
+import { extname } from 'path';
 
 @ApiBearerAuth("JWT-auth")
 @ApiTags('Holidays')
@@ -56,6 +58,7 @@ export class HolidaysController {
       holiday: newHoliday,
     };
   }
+
 
   @UseGuards(AuthGuard)
   @Get()
@@ -113,11 +116,4 @@ export class HolidaysController {
     }
   }
 
-  // @Get('remaining-balance')
-  // async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
-  //   if (!id || isNaN(id)) {
-  //     throw new BadRequestException('Invalid employee ID');
-  //   }
-  //   return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
-  // }
 }

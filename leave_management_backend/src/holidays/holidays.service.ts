@@ -33,11 +33,11 @@ export class HolidaysService {
     return await this.holidaysRepository.find();
   }
 
-  async getUpcomingHolidays(currentDate: Date): Promise<{ date: Date, day: string, occasion: string }[]> {
+  async getUpcomingHolidays(currentDate: Date): Promise<{ date: Date, day: string, occasion: string ,image:Buffer}[]> {
     try {
       const upcomingHolidays = await this.holidaysRepository
         .createQueryBuilder('holiday')
-        .select(['holiday.date', 'holiday.day', 'holiday.occasion'])
+        .select(['holiday.date', 'holiday.day', 'holiday.occasion','holiday.image'])
         .where('holiday.date >= :currentDate', { currentDate })
         .orderBy('holiday.date', 'ASC')
         .getRawMany();
