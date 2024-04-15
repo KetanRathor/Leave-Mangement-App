@@ -60,35 +60,6 @@ export class HolidaysService {
 }
 
 
-async getRemainingLeaveBalance(id: number): Promise<number> {
-  try {
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id, 
-        status: 'approved',
-      },
-    });
-    let remainingBalance = 21;
-    
-    approvedRequests.forEach((request) => {
-      switch (request.leave_type) {
-        case 'full':
-          remainingBalance -= 1;
-          break;
-        case 'first half':
-        case 'second half':
-          remainingBalance -= 0.5;
-          break;
-        
-      }
-    });
-
-    return remainingBalance;
-
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
-  }
-}
 
 async getRemainingHolidays(): Promise<number> {
   try {
