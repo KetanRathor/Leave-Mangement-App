@@ -1,3 +1,5 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class CreateProjectDto {
     name: string;
     manager_name:string;

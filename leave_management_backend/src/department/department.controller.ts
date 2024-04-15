@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nest
 import { Department } from './entity/Department.entity';
 
 @ApiTags('Department')
-@ApiBearerAuth()
+@ApiBearerAuth("JWT-auth")
 @Controller('department')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}

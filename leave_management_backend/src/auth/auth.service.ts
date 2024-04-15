@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Post, Request } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -224,4 +224,14 @@ export class AuthService {
 
     //     return bcrypt.compare(plainPassword, hashedPassword);
     // }
+
+//     @Post('logout')
+//   async logout(@Request() req: Request) {
+//     try {
+//       await req.session.destroy();
+//       return { message: 'Logged out successfully' };
+//     } catch (error) {
+//       throw new HttpException('Logout failed', HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+//   }
 }
