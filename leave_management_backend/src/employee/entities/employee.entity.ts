@@ -85,6 +85,7 @@ export class Employee {
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
+  @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     description: 'When employee was Updated',
   })
@@ -123,7 +124,6 @@ export class Employee {
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
-  // @Column({ nullable: false })
   @Column({ default: null })
   @ApiProperty({
     description: 'The department id of Employee',

@@ -84,6 +84,30 @@ export class EmployeeService {
       }
     }
     employee.updated_by = req_mail;
+    const oldEmail = employee.email;
+    console.log('oldEmail', oldEmail);
+    for (const key in updatedEmployeeDetails) {
+      if (updatedEmployeeDetails[key] !== undefined) {
+        employee[key] = updatedEmployeeDetails[key];
+      }
+    }
+    employee.updated_by = req_mail;
+
+    // if (updatedEmployeeDetails.email && updatedEmployeeDetails.email !== oldEmail) {
+    //     // console.log("updatedEmployeeDetails.email",updatedEmployeeDetails.email)
+    //     // Update the email in the user credentials table
+    //     await this.userCredentialRepository.update({ email: oldEmail }, { email: updatedEmployeeDetails.email });
+    //     // console.log("email",updatedEmployeeDetails.email)
+
+    // }
+
+    const userCredential = await this.userCredentialRepository.findOneBy({
+      email: oldEmail,
+    });
+    if (userCredential) {
+      userCredential.email = updatedEmployeeDetails.email;
+      await this.userCredentialRepository.save(userCredential);
+    }
 
     return await this.employeeRepository.save(employee);
   }

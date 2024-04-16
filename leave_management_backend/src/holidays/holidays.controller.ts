@@ -14,6 +14,7 @@ import {
   HttpStatus,
   UploadedFiles,
   Put,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
@@ -35,6 +36,8 @@ import { extname } from 'path';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('Holidays')
+@ApiBearerAuth('JWT-auth')
+@ApiTags('holidays')
 @Controller('holidays')
 export class HolidaysController {
   imageService: any;
@@ -54,16 +57,19 @@ export class HolidaysController {
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
+    const req_mail = req.user.email;
     const newHoliday = await this.holidaysService.uploadImage(
       createHolidayDto.date,
       createHolidayDto.day,
       createHolidayDto.occasion,
       file.buffer,
+      req_mail,
     );
 
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
+      req_mail,
     };
   }
 

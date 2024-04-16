@@ -56,4 +56,19 @@ export class AuthController {
       return { error: error.message };
     }
   }
+  @Post('reset-password')
+  async resetPasswordWithOTP(@Body() resetPasswordDto: ResetPasswordDto) {
+    try {
+      const { email, otp, newPassword, confirmPassword } = resetPasswordDto;
+      await this.authService.resetPasswordWithOTP(
+        email,
+        otp,
+        newPassword,
+        confirmPassword,
+      );
+      return { message: 'Password reset successfully' };
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
 }

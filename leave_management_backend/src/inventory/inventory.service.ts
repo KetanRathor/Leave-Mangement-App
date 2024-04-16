@@ -95,6 +95,10 @@ export class InventoryService {
       where: { deleted_at: IsNull() },
       relations: ['category'],
     });
+    return await this.inventoryRepository.find({
+      where: { deleted_at: IsNull(), employee: IsNull() },
+      relations: ['category'],
+    });
   }
 
   async findOneInventory(id: number) {

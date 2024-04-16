@@ -21,6 +21,7 @@ export class HolidaysService {
     day: string,
     occasion: string,
     image: Buffer,
+    req_mail:string
   ): Promise<Holidays> {
     const newHoliday = this.holidaysRepository.create({
       date: date,
@@ -31,7 +32,11 @@ export class HolidaysService {
 
     console.log('newHoliday...........', newHoliday);
 
+    console.log("newHoliday...........", newHoliday)
+    newHoliday.created_by=req_mail;
     return await this.holidaysRepository.save(newHoliday);
+   
+    
   }
 
   async getAllHolidays(): Promise<Holidays[]> {
@@ -78,6 +83,15 @@ export class HolidaysService {
         },
       });
       const defaultHolidays = 10; // Default value for total holidays
+async getRemainingHolidays(): Promise<number> {
+  try {
+    const currentDate = new Date();
+    const holidaysUntilCurrentDate = await this.holidaysRepository.count({
+      where: {
+        date: LessThanOrEqual(currentDate),
+      },
+    });
+    const defaultHolidays = 10; 
 
       return defaultHolidays - holidaysUntilCurrentDate;
     } catch (error) {

@@ -6,6 +6,11 @@ export class CreateLeaveTypesAndRequestDto {
     example: '1',
   })
   emp_id: number;
+  // @ApiProperty({
+  //   description:'id of employee',
+  //   example:'1'
+  // })
+  // emp_id: number;
 
   @ApiProperty({
     description: 'the type of leave',

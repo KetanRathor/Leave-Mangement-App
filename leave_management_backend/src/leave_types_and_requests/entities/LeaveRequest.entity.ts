@@ -17,7 +17,7 @@ export class LeaveRequest {
   })
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false,default: 0  })
   @ApiProperty({
     description: 'the id of employee',
   })
