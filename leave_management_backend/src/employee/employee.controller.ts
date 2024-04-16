@@ -100,11 +100,11 @@ export class EmployeeController {
     return this.employeeService.findEmployees();
   }
 
-  @Get('/manager')
-  async showManagerList() {
-    console.log("first..............")
-    return await this.employeeService.findManagerList();
-  }
+  // @Get('/manager')
+  // async showManagerList() {
+  //   console.log("first..............")
+  //   return await this.employeeService.findManagerList();
+  // }
 
   
 
