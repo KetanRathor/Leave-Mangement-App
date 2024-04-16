@@ -125,14 +125,14 @@ export class Employee {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @Column({
-    type: 'enum',
-    enum: ['Employee', 'Manager', 'Admin'],
-  })
-  @ApiProperty({
-    description:'The role of employee'
-  })
-  role: string;
+  // @Column({
+  //   type: 'enum',
+  //   enum: ['Employee', 'Manager', 'Admin'],
+  // })
+  // @ApiProperty({
+  //   description:'The role of employee'
+  // })
+  // role: string;
 
   @Column('longblob', { nullable: true })
   @ApiProperty({

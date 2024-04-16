@@ -82,6 +82,7 @@ export class LeaveTypesAndRequestsService {
       if (!managerEmail) {
         console.warn('Manager email not found for employee:', employee.id);
       } else {
+        console.log("req_mail",req_mail,"managerEmail",managerEmail)
         await this.mailService.sendLeaveRequestEmail(req_mail, managerEmail, createLeaveDto.reason);
       }
     return savedLeaveRequest;

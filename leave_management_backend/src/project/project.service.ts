@@ -57,14 +57,14 @@ export class ProjectService {
     return await this.projectRepository.save(project);
   }
 
-  async assignProject({ adminId, employeeId, projectId }): Promise<string> {
+  async assignProject({employeeId, projectId }): Promise<string> {
     try {
-      const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
+      // const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
 
-      if (admin.role !== "Admin") {
-        throw new NotFoundException("Current user doesn't have admin access");
-      }
-      console.log("Admin", admin)
+      // if (admin.role !== "Admin") {
+      //   throw new NotFoundException("Current user doesn't have admin access");
+      // }
+      // console.log("Admin", admin)
 
       const [project, employee] = await Promise.all([
         this.projectRepository.findOne(
