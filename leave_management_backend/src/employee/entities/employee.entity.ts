@@ -76,8 +76,7 @@ export class Employee {
   })
   created_by: string;
 
-  
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', nullable: true,onUpdate: 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     description:'When employee was Updated'
   })
@@ -102,10 +101,7 @@ export class Employee {
   })
   deleted_by: string;
 
-  // @Column({ nullable: false })
-  // @Column()
-  // manager_id: number;
-  
+
   @Column({ default: null })
   @ApiProperty({
     description:'The manager id of Employee'
@@ -117,7 +113,7 @@ export class Employee {
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
-  // @Column({ nullable: false })
+  
   @Column({ default: null })
   @ApiProperty({
     description:'The department id of Employee'

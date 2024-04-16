@@ -28,8 +28,8 @@ export class Inventory {
     created_by: string;
 
     @ApiProperty()
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-    updated_at: Date;
+    @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP'})
+  updated_at: Date;
 
     @ApiProperty()
     @Column({ default: '' })

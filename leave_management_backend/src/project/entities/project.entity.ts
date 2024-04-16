@@ -33,7 +33,7 @@ export class Project {
   @Column({ default: '' })
   created_by: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP'})
   updated_at: Date;
 
   @Column({ default: '' })
