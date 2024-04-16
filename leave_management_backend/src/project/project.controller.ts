@@ -33,13 +33,13 @@ export class ProjectController {
   constructor(
     private readonly projectService: ProjectService,
     // private readonly employeeService: EmployeeService
-  ) {}
+  ) { }
 
   @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
-    description:'Project will be added as response',
-    type:Project
+    description: 'Project will be added as response',
+    type: Project
   })
   async addProject(@Body() createProjectDto: CreateProjectDto, @Request() req) {
     const req_mail = req.user.email;
@@ -54,8 +54,8 @@ export class ProjectController {
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
-    description:'All project List',
-    type:[Project]
+    description: 'All project List',
+    type: [Project]
   })
   findAllProject() {
     return this.projectService.showAllProjects();
@@ -64,8 +64,8 @@ export class ProjectController {
   @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOkResponse({
-    description:'The project with given ID',
-    type:Project
+    description: 'The project with given ID',
+    type: Project
   })
   async findOneProject(@Param('id', ParseIntPipe) id: number) {
     return await this.projectService.findOneProject(id);
@@ -79,89 +79,89 @@ export class ProjectController {
     @Request() req,
   ) {
     const req_mail = req.user.email;
-  @ApiCreatedResponse({
-    description:'project will be updated as response',
-    type:Project
-  })
-  async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
-    const req_mail = req.user.email
-    try {
-      return await this.projectService.updateProject(
-        id,
-        updateProjectDto,
-        req_mail,
-      );
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    @ApiCreatedResponse({
+      description: 'project will be updated as response',
+      type: Project
+    })
+    async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
+      const req_mail = req.user.email
+      try {
+        return await this.projectService.updateProject(
+          id,
+          updateProjectDto,
+          req_mail,
+        );
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
     }
-  }
 
-  // @UseGuards(AuthGuard)
-  @Post(':adminId')
-  async assignProject(
-    @Param('adminId', ParseIntPipe) adminId: number,
-    @Body() { employeeId, projectId }: AssignProjectDto,
-    //  @Request() req
-  @ApiCreatedResponse({
-    description:'project will be assigned to employee',
-    type:Project
-  })
-  async assignProject(@Param('adminId', ParseIntPipe) adminId: number, @Body() { employeeId, projectId }: AssignProjectDto,
-  //  @Request() req
-  ) {
-    // const req_mail = req.user.email;
+    // @UseGuards(AuthGuard)
+    @Post(':adminId')
+    async assignProject(
+      @Param('adminId', ParseIntPipe) adminId: number,
+      @Body() { employeeId, projectId }: AssignProjectDto,
+      //  @Request() req
+      @ApiCreatedResponse({
+        description: 'project will be assigned to employee',
+        type: Project
+      })
+      async assignProject(@Param('adminId', ParseIntPipe) adminId: number, @Body() { employeeId, projectId }: AssignProjectDto,
+        //  @Request() req
+      ) {
+      // const req_mail = req.user.email;
 
-    try {
-      return await this.projectService.assignProject({
-        adminId,
-        employeeId,
-        projectId,
-      });
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      try {
+        return await this.projectService.assignProject({
+          adminId,
+          employeeId,
+          projectId,
+        });
+      } catch(error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
     }
-  }
 
   @Get(':projectId/assigned-employees')
-  async getAssignedEmployees(
-    @Param('projectId') projectId: number,
-  ): Promise<Employee[]> {
-    return await this.projectService.getAssignedEmployees(projectId);
-  }
+      async getAssignedEmployees(
+        @Param('projectId') projectId: number,
+      ): Promise < Employee[] > {
+        return await this.projectService.getAssignedEmployees(projectId);
+      }
 @Get(':projectId/assigned-employees')
-@ApiOkResponse({
-  description:'get list of employees who are assigned the project of given ID'
-})
-async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
-  return await this.projectService.getAssignedEmployees(projectId);
-}
+      @ApiOkResponse({
+        description: 'get list of employees who are assigned the project of given ID'
+      })
+      async getAssignedEmployees(@Param('projectId') projectId: number): Promise < Employee[] > {
+        return await this.projectService.getAssignedEmployees(projectId);
+      }
 
   @UseGuards(AuthGuard)
+      @Put('/status/:project_id')
+      async updateProjectStatus(
+        @Param('project_id') project_id: number,
+        @Body() body: { status: string },
+        @Request() req,
+      ): Promise < Project > {
+        const req_mail = req.user.email;
+        if(!body.status) {
+      throw new BadRequestException('Status is required');
+    }
+    return this.projectService.updateProjectStatus(project_id, body, req_mail);
+  }
+  @UseGuards(AuthGuard)
   @Put('/status/:project_id')
-  async updateProjectStatus(
-    @Param('project_id') project_id: number,
-    @Body() body: { status: string },
-    @Request() req,
-  ): Promise<Project> {
+  @ApiCreatedResponse({
+    description: 'status of the project will be updated as response',
+    type: Project
+  })
+  async updateProjectStatus(@Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
     }
     return this.projectService.updateProjectStatus(project_id, body, req_mail);
   }
-@UseGuards(AuthGuard)
-@Put('/status/:project_id')
-@ApiCreatedResponse({
-  description:'status of the project will be updated as response',
-  type:Project
-})
-async updateProjectStatus( @Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
-const req_mail = req.user.email;
-if (!body.status) {
-  throw new BadRequestException('Status is required');
-}   
-return this.projectService.updateProjectStatus(project_id, body, req_mail);
-}
 
 
 }
