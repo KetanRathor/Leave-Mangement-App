@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -7,37 +16,33 @@ import { Project } from 'src/project/entities/project.entity';
 
 @Entity('employee')
 export class Employee {
-  
   @PrimaryGeneratedColumn()
   @ApiProperty({
     description: 'The name of Employee',
   })
   id: number;
 
-  
   @Column({ nullable: false })
   @ApiProperty({
-    description:'The name of Employee'
+    description: 'The name of Employee',
   })
   name: string;
 
-  
   @Column({ nullable: false, unique: true })
   @ApiProperty({
     description: 'The email of Employee',
   })
   email: string;
 
-  
   @Column({ nullable: false })
   @ApiProperty({
     description: 'The mobile number of Employee',
   })
   mobile_number: string;
 
-  @Column({ type:'timestamp'})
+  @Column({ type: 'timestamp' })
   @ApiProperty({
-    description:'The date of birth of Employee'
+    description: 'The date of birth of Employee',
   })
   dob: Date;
 
@@ -59,53 +64,54 @@ export class Employee {
     default: 'Male',
   })
   @ApiProperty({
-    description:'The gender of Employee'
+    description: 'The gender of Employee',
   })
   gender: string;
-  
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
-    description:'When employee was Created'
+    description: 'When employee was Created',
   })
   created_at: Date;
 
-
   @Column({ default: '' })
   @ApiProperty({
-    description:'employee created by'
+    description: 'employee created by',
   })
   created_by: string;
 
-  
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   @ApiProperty({
-    description:'When employee was Updated'
+    description: 'When employee was Updated',
   })
   updated_at: Date;
 
-  @Column({ default: ''})
+  @Column({ default: '' })
   @ApiProperty({
-    description:'Employee Updated By'
+    description: 'Employee Updated By',
   })
   updated_by: string;
 
-
-  @Column({ type: 'timestamp', nullable:true })
+  @Column({ type: 'timestamp', nullable: true })
   @ApiProperty({
-    description:'The date at which employee deleted'
+    description: 'The date at which employee deleted',
   })
   deleted_at: Date;
 
-  @Column({ default: ''})
+  @Column({ default: '' })
   @ApiProperty({
-    description:'employee deleted by'
+    description: 'employee deleted by',
   })
   deleted_by: string;
 
   // @Column({ nullable: false })
   // @Column()
   // manager_id: number;
-  
+
   @Column({ default: null })
   @ApiProperty({
     description: 'The manager id of Employee',
@@ -120,7 +126,7 @@ export class Employee {
   // @Column({ nullable: false })
   @Column({ default: null })
   @ApiProperty({
-    description:'The department id of Employee'
+    description: 'The department id of Employee',
   })
   department_id: number | null;
 
@@ -134,13 +140,13 @@ export class Employee {
     enum: ['Employee', 'Manager', 'Admin'],
   })
   @ApiProperty({
-    description:'The role of employee'
+    description: 'The role of employee',
   })
   role: string;
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'occasion image'
+    description: 'occasion image',
   })
   image: Buffer;
 
@@ -149,11 +155,12 @@ export class Employee {
   leaveRequests: LeaveRequest[];
 
   @ApiProperty()
-  @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
-  inventories: Inventory[]
+  @OneToMany(() => Inventory, (inventory) => inventory.employee, {
+    cascade: true,
+  })
+  inventories: Inventory[];
 
   @ManyToMany(() => Project)
-    @JoinTable({name:"employee_project"})
-    project: Project[]
-  
+  @JoinTable({ name: 'employee_project' })
+  project: Project[];
 }

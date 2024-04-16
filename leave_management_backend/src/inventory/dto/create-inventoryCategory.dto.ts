@@ -1,3 +1,3 @@
 export class CreateInvetoryCategoryDto {
-    name: string;
+  name: string;
 }

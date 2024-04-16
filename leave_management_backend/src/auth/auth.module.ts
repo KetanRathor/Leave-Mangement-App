@@ -19,10 +19,10 @@ dotenv.config();
       secret: process.env.SECRET,
       signOptions: { expiresIn: '1d' },
     }),
-    MailModule
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -20,12 +20,20 @@ import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
 
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @ApiTags('Holidays')
 @Controller('holidays')
 export class HolidaysController {
@@ -58,7 +66,6 @@ export class HolidaysController {
       holiday: newHoliday,
     };
   }
-
 
   @UseGuards(AuthGuard)
   @Get()
@@ -119,7 +126,8 @@ export class HolidaysController {
   })
   async getUpcomingHolidays() {
     const currentDate = new Date();
-    const upcomingHolidays = await this.holidaysService.getUpcomingHolidays(currentDate);
+    const upcomingHolidays =
+      await this.holidaysService.getUpcomingHolidays(currentDate);
     return {
       message: 'Upcoming holidays retrieved successfully',
       holidays: upcomingHolidays,
@@ -129,29 +137,28 @@ export class HolidaysController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
-
+    description: 'Employee with given ID will be deleted as response',
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.holidaysService.deleteHolidays(id);
-      return 'Holiday Deleted Successfully'
+      return 'Holiday Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',
   })
   async getRemainingHolidays(): Promise<{ remainingHolidays: number }> {
     try {
-      const remainingHolidays = await this.holidaysService.getRemainingHolidays();
+      const remainingHolidays =
+        await this.holidaysService.getRemainingHolidays();
       return { remainingHolidays };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
 }

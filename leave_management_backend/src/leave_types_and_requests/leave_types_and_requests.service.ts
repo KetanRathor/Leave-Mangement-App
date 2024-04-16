@@ -11,7 +11,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { start } from 'repl';
 import { Console } from 'console';
 
-
 @Injectable()
 export class LeaveTypesAndRequestsService {
   // private readonly leaveTypes = [
@@ -34,7 +33,7 @@ export class LeaveTypesAndRequestsService {
   //     default_balance: 10,
   //   },
   // ];
-  
+
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
@@ -83,13 +82,15 @@ export class LeaveTypesAndRequestsService {
     return leaveRequest;
   }
 
- async getEmployeesWithPendingLeaveRequests(): Promise<{
-    employeeName: string;
-    start_date: Date;
-    end_date: Date;
-    leave_type: string;
-    reason: string;
-  }[]> {
+  async getEmployeesWithPendingLeaveRequests(): Promise<
+    {
+      employeeName: string;
+      start_date: Date;
+      end_date: Date;
+      leave_type: string;
+      reason: string;
+    }[]
+  > {
     try {
       const pendingRequests = await this.leaveRequestRepository.find({
         where: {
@@ -114,62 +115,59 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-async getRemainingLeaveBalance(id: number): Promise<number> {
-  try {
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id, 
-        status: 'approved',
-      },
-    });
-    let remainingBalance = 21;
-    
-    approvedRequests.forEach((request) => {
-      switch (request.leave_type) {
-        case 'full':
-          remainingBalance -= 1;
-          break;
-        case 'first half':
-        case 'second half':
-          remainingBalance -= 0.5;
-          break;
-        
-      }
-    });
+  async getRemainingLeaveBalance(id: number): Promise<number> {
+    try {
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
+      let remainingBalance = 21;
 
-    return remainingBalance;
-
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
-  }
-}
-
-
-//work-from-hme
-async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
-  try {
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id, 
-        status: 'approved',
-      },
-    });
-    let remainingworkfromhome= 3;
-
-    approvedRequests.forEach((request) => {
-      switch (request.leave_type) {
-          case 'work from home':
-            remainingworkfromhome -=1;
+      approvedRequests.forEach((request) => {
+        switch (request.leave_type) {
+          case 'full':
+            remainingBalance -= 1;
             break;
-        
-      }
-    });
-    return remainingworkfromhome;
+          case 'first half':
+          case 'second half':
+            remainingBalance -= 0.5;
+            break;
+        }
+      });
 
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
+      return remainingBalance;
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
+  }
+
+  //work-from-hme
+  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
+    try {
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
+      let remainingworkfromhome = 3;
+
+      approvedRequests.forEach((request) => {
+        switch (request.leave_type) {
+          case 'work from home':
+            remainingworkfromhome -= 1;
+            break;
+        }
+      });
+      return remainingworkfromhome;
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
   }
 }
-
-}
-

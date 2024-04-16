@@ -23,7 +23,7 @@ import {
 import { Department } from './entity/Department.entity';
 
 @ApiTags('Department')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @Controller('department')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
