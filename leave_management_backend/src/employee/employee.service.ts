@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { Any, IsNull, Repository } from 'typeorm';
 // import { IsNull, Repository } from 'typeorm';
 import { Employee } from './entities/Employee.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -40,15 +40,6 @@ export class EmployeeService {
       );
     }
     //Create employee
-    async createEmployee(createEmployeeDto: CreateEmployeeDto,
-        // req_mail:any
-    ): Promise<Employee> {
-        const newEmployee = this.employeeRepository.create(createEmployeeDto);
-        // newEmployee.created_by=req_mail;
-        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        if (!emailRegex.test(createEmployeeDto.email)) {
-            throw new Error('Invalid email format. Please enter a valid email address.');
-        }
 
     const mobileRegex = /^\d{10}$/;
     if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
@@ -96,14 +87,14 @@ export class EmployeeService {
       }
     }
     employee.updated_by = req_mail;
-        const oldEmail = employee.email;
-        console.log("oldEmail",oldEmail)
-        for (const key in updatedEmployeeDetails) {
-            if (updatedEmployeeDetails[key] !== undefined) {
-                employee[key] = updatedEmployeeDetails[key];
-            }
-        }
-        employee.updated_by = req_mail;
+    const oldEmail = employee.email;
+    console.log('oldEmail', oldEmail);
+    for (const key in updatedEmployeeDetails) {
+      if (updatedEmployeeDetails[key] !== undefined) {
+        employee[key] = updatedEmployeeDetails[key];
+      }
+    }
+    employee.updated_by = req_mail;
 
     // if (updatedEmployeeDetails.email && updatedEmployeeDetails.email !== oldEmail) {
     //     // console.log("updatedEmployeeDetails.email",updatedEmployeeDetails.email)
