@@ -51,11 +51,6 @@ export class InventoryService {
     try {
       const newInventory = this.inventoryRepository.create(createInventoryDto);
       newInventory.created_by = req_mail;
-
-      const category = await this.categoryRepository.findOne({
-        where: { id: createInventoryDto.category_id },
-      });
-
       if (!createInventoryDto.category_id) {
         throw new Error('Category ID is required to create inventory.');
       }
@@ -127,7 +122,6 @@ export class InventoryService {
     inventory.deleted_by = req_mail;
     inventory.deleted_at = new Date();
 
-    await this.inventoryRepository.save(inventory);
     await this.inventoryRepository.save(inventory);
 
     return `Inventory with ID ${id} deleted by ${req_mail}`;
@@ -219,9 +213,6 @@ export class InventoryService {
   }
 
   async showAllCategory() {
-    return await this.inventoryRepository.find({
-      where: { deleted_at: IsNull() },
-    });
     return await this.categoryRepository.find({
       where: { deleted_at: IsNull() },
     });

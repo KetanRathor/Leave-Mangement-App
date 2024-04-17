@@ -10,6 +10,7 @@ import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
@@ -31,7 +32,6 @@ export class AuthService {
 
   encrypt(text: string): string {
     console.log('tets', text);
-
     const cipher = crypto.createCipheriv(
       process.env.ALGORITHM,
       process.env.ENCRYPTION_KEY,

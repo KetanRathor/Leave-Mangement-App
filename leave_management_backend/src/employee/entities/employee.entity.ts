@@ -18,7 +18,7 @@ import { Project } from 'src/project/entities/project.entity';
 export class Employee {
   @PrimaryGeneratedColumn()
   @ApiProperty({
-    description: 'The name of Employee',
+    description: 'The id of Employee',
   })
   id: number;
 
@@ -80,11 +80,6 @@ export class Employee {
   })
   created_by: string;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
   @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     description: 'When employee was Updated',
@@ -109,10 +104,6 @@ export class Employee {
   })
   deleted_by: string;
 
-  // @Column({ nullable: false })
-  // @Column()
-  // manager_id: number;
-
   @Column({ default: null })
   @ApiProperty({
     description: 'The manager id of Employee',
@@ -135,14 +126,6 @@ export class Employee {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @Column({
-    type: 'enum',
-    enum: ['Employee', 'Manager', 'Admin'],
-  })
-  @ApiProperty({
-    description: 'The role of employee',
-  })
-  role: string;
   // @Column({
   //   type: 'enum',
   //   enum: ['Employee', 'Manager', 'Admin'],

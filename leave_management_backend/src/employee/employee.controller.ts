@@ -24,9 +24,11 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
 @ApiBearerAuth('JWT-auth')

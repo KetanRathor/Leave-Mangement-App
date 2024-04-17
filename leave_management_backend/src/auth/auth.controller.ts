@@ -8,10 +8,14 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
   HttpStatus,
+  Param,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
@@ -41,21 +45,6 @@ export class AuthController {
     }
   }
 
-  @Post('reset-password')
-  async resetPasswordWithOTP(@Body() resetPasswordDto: ResetPasswordDto) {
-    try {
-      const { email, otp, newPassword, confirmPassword } = resetPasswordDto;
-      await this.authService.resetPasswordWithOTP(
-        email,
-        otp,
-        newPassword,
-        confirmPassword,
-      );
-      return { message: 'Password reset successfully' };
-    } catch (error) {
-      return { error: error.message };
-    }
-  }
   @Post('reset-password')
   async resetPasswordWithOTP(@Body() resetPasswordDto: ResetPasswordDto) {
     try {

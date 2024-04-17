@@ -10,7 +10,6 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 // import { LeaveType } from './entities/LeaveType.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LeaveRequest, Holidays])],
   imports: [
     TypeOrmModule.forFeature([LeaveRequest, Holidays, Employee]),
     MailModule,

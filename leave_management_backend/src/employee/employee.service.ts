@@ -51,10 +51,6 @@ export class EmployeeService {
       createEmployeeDto.email,
     );
 
-    const userPassword = await this.authService.registerUser(
-      createEmployeeDto.email,
-    );
-
     // if (createEmployeeDto.role === "Admin") {
     //     newEmployee.manager_id = null;
     // } else {
@@ -125,7 +121,6 @@ export class EmployeeService {
     });
 
     if (userCredentials) {
-      // Remove the user credentials
       await this.userCredentialRepository.remove(userCredentials);
     }
 
@@ -152,12 +147,6 @@ export class EmployeeService {
     });
   }
 
-  async findManagerList() {
-    return await this.employeeRepository.find({
-      where: { role: 'Manager' },
-      relations: ['manager', 'department'],
-    });
-  }
   // async findManagerList(){
   //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
   // }

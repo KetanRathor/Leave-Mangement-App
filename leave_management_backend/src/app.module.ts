@@ -22,8 +22,6 @@ import { ProjectModule } from './project/project.module';
 import { HolidaysModule } from './holidays/holidays.module';
 // import { CategoryModule } from './category/category.module';
 
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({

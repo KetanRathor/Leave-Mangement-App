@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,28 +14,33 @@ import { access } from 'fs';
 
 @Injectable()
 export class ProjectService {
-  constructor
-    (
-      @InjectRepository(Project)
-      private projectRepository: Repository<Project>,
+  constructor(
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
 
-      @InjectRepository(Employee)
-      private employeeRepository: Repository<Employee>,
-    ) { }
+    @InjectRepository(Employee)
+    private employeeRepository: Repository<Employee>,
+  ) {}
 
   addProject(createProjectDto: CreateProjectDto, req_mail: any) {
     const newProject = this.projectRepository.create(createProjectDto);
     newProject.created_by = req_mail;
 
-    return this.projectRepository.save(newProject)
+    return this.projectRepository.save(newProject);
   }
 
   async showAllProjects() {
-    return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee'] });
+    return await this.projectRepository.find({
+      where: { deleted_at: IsNull() },
+      relations: ['employee'],
+    });
   }
 
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee'] });
+    const project = await this.projectRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+      relations: ['employee'],
+    });
 
     if (!project) {
       return { message: `Inventory with ID ${id} not found`, project };
@@ -39,7 +49,11 @@ export class ProjectService {
     return project;
   }
 
-  async updateProject(id: number, updatedProjectDetails: UpdateProjectDto, req_mail: any): Promise<Project> {
+  async updateProject(
+    id: number,
+    updatedProjectDetails: UpdateProjectDto,
+    req_mail: any,
+  ): Promise<Project> {
     const project = await this.projectRepository.findOneBy({ id });
 
     if (!project) {
@@ -57,7 +71,7 @@ export class ProjectService {
     return await this.projectRepository.save(project);
   }
 
-  async assignProject({employeeId, projectId }): Promise<string> {
+  async assignProject({ employeeId, projectId }): Promise<string> {
     try {
       // const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
 
@@ -67,12 +81,11 @@ export class ProjectService {
       // console.log("Admin", admin)
 
       const [project, employee] = await Promise.all([
-        this.projectRepository.findOne(
-          {
-            relations: {
-                employee: true,
-            },
-            where: { id: projectId }
+        this.projectRepository.findOne({
+          relations: {
+            employee: true,
+          },
+          where: { id: projectId },
         }),
         this.employeeRepository.findOne({ where: { id: employeeId } }),
       ]);
@@ -85,7 +98,7 @@ export class ProjectService {
         throw new NotFoundException('Employee not found');
       }
 
-      console.log("project", project)
+      console.log('project', project);
       // project.projects = [employee]
       // console.log("project111", project.projects)
       project.employee.push(employee);
@@ -99,34 +112,31 @@ export class ProjectService {
     }
   }
 
-
   // async getEmployeesOnProject(id: number){
 
   // }
   async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
     try {
       const project = await this.projectRepository.findOne({
-        where:{id: projectsId},
-        relations: ['projects'], 
+        where: { id: projectsId },
+        relations: ['projects'],
       });
-  
+
       if (!project) {
         throw new NotFoundException('Project not found');
       }
-  
-      return project.employee; 
+
+      return project.employee;
     } catch (error) {
       throw error;
     }
   }
 
-
-
   // async getAssignedProjects(employeeId: number): Promise<{ assignedProjects: Project[]; projectCount: number }> {
   //   try {
   //     const employee = await this.employeeRepository.findOne({where:{
   //       id: employeeId},
-  //       relations: ['projects'], 
+  //       relations: ['projects'],
   //     });
 
   //     if (!employee) {
@@ -134,43 +144,39 @@ export class ProjectService {
   //     }
 
   //     return {
-  //       assignedProjects: employee.projects, 
-  //       projectCount: employee.projects.length, 
+  //       assignedProjects: employee.projects,
+  //       projectCount: employee.projects.length,
   //     };
   //   } catch (error) {
   //     throw error;
   //   }
   // }
 
+  // async updateProjectStatus(
+  //   project_id: number,
+  //   status: string,
+  //   req_mail:string,
+  // ): Promise<Project> {
+  //   const project = await this.findOne(project_id);
+  //   project.status = status;
+  //   project.updated_by=req_mail;
+  //   return this.projectRepository.save(project);
+  // }
 
+  async updateProjectStatus(
+    projectId: number,
+    body: any,
+    req_mail: string,
+  ): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId, deleted_at: IsNull() },
+    });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    project.status = body.status;
+    project.updated_by = req_mail;
 
-// async updateProjectStatus(
-//   project_id: number,
-//   status: string,
-//   req_mail:string,
-// ): Promise<Project> {
-//   const project = await this.findOne(project_id);
-//   project.status = status;
-//   project.updated_by=req_mail;
-//   return this.projectRepository.save(project);
-// }
-
-async updateProjectStatus(
-  projectId: number,
-  body : any,
-  req_mail: string
-): Promise<Project> {
-  
-  const project = await this.projectRepository.findOne({ where: { id: projectId, deleted_at: IsNull() } });
-  if (!project) {
-    throw new NotFoundException('Project not found');
+    return await this.projectRepository.save(project);
   }
-  project.status = body.status;
-  project.updated_by = req_mail;
-  
-  return await this.projectRepository.save(project);
 }
-
-}
-
-
