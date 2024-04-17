@@ -111,7 +111,7 @@ export class InventoryService {
     inventory.deleted_by = req_mail;
     inventory.deleted_at = new Date()
 
-    await this.inventoryRepository.save(inventory)
+     await this.inventoryRepository.save(inventory)
 
     console.log(`Inventory with ID ${id} deleted by ${req_mail}`);
   }
@@ -189,7 +189,7 @@ export class InventoryService {
 
 
   async showAllCategory() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.categoryRepository.find({ where: { deleted_at: IsNull() } });
   }
 
 
