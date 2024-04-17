@@ -51,11 +51,15 @@ export class EmployeeService {
       createEmployeeDto.email,
     );
 
-    if (createEmployeeDto.role === 'Admin') {
-      newEmployee.manager_id = null;
-    } else {
-      newEmployee.manager_id = createEmployeeDto.manager_id;
-    }
+    const userPassword = await this.authService.registerUser(
+      createEmployeeDto.email,
+    );
+
+    // if (createEmployeeDto.role === "Admin") {
+    //     newEmployee.manager_id = null;
+    // } else {
+    //     newEmployee.manager_id = createEmployeeDto.manager_id;
+    // }
 
     const savedEmployee = await this.employeeRepository.save(newEmployee);
 
@@ -78,14 +82,8 @@ export class EmployeeService {
       throw new NotFoundException('Employee not found.');
     }
 
-    for (const key in updatedEmployeeDetails) {
-      if (updatedEmployeeDetails[key] !== undefined) {
-        employee[key] = updatedEmployeeDetails[key];
-      }
-    }
-    employee.updated_by = req_mail;
     const oldEmail = employee.email;
-    console.log('oldEmail', oldEmail);
+    // console.log("oldEmail",oldEmail)
     for (const key in updatedEmployeeDetails) {
       if (updatedEmployeeDetails[key] !== undefined) {
         employee[key] = updatedEmployeeDetails[key];
@@ -160,6 +158,9 @@ export class EmployeeService {
       relations: ['manager', 'department'],
     });
   }
+  // async findManagerList(){
+  //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
+  // }
 
   async uploadImage(employeeId: number, imageData: Buffer) {
     const employee = await this.employeeRepository.findOneBy({

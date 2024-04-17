@@ -117,4 +117,25 @@ export class EmployeeController {
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
+
+  // @Get('/manager')
+  // async showManagerList() {
+  //   console.log("first..............")
+  //   return await this.employeeService.findManagerList();
+  // }
+
+  @Post('upload-image/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @Param('id') id: number,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    if (!image) {
+      throw new Error('No image uploaded');
+    }
+
+    const employee = await this.employeeService.uploadImage(id, image.buffer);
+
+    return employee;
+  }
 }

@@ -50,20 +50,26 @@ export class InventoryService {
   async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
     try {
       const newInventory = this.inventoryRepository.create(createInventoryDto);
-
       newInventory.created_by = req_mail;
 
       const category = await this.categoryRepository.findOne({
         where: { id: createInventoryDto.category_id },
       });
 
-      newInventory.category = category;
-      const savedInventory = await this.inventoryRepository.save(newInventory);
+      if (!createInventoryDto.category_id) {
+        throw new Error('Category ID is required to create inventory.');
+      }
 
-      console.log('New inventory saved:', savedInventory);
+      const category = await this.categoryRepository.findOne({
+        where: { id: createInventoryDto.category_id },
+      });
+      newInventory.category = category;
+
+      const savedInventory = await this.inventoryRepository.save(newInventory);
+      // console.log('New inventory saved:', savedInventory);
       return savedInventory;
     } catch (error) {
-      console.error('Error saving inventory:', error);
+      // console.error('Error saving inventory:', error);
       throw error;
     }
   }
@@ -92,12 +98,8 @@ export class InventoryService {
 
   async showAllInventories() {
     return await this.inventoryRepository.find({
-      where: { deleted_at: IsNull() },
-      relations: ['category'],
-    });
-    return await this.inventoryRepository.find({
       where: { deleted_at: IsNull(), employee: IsNull() },
-      relations: ['category'],
+      relations: ['category', 'employee'],
     });
   }
 
@@ -115,7 +117,7 @@ export class InventoryService {
     return inventory;
   }
 
-  async deleteInventory(id: number, req_mail: any): Promise<void> {
+  async deleteInventory(id: number, req_mail: any) {
     const inventory = await this.inventoryRepository.findOneBy({ id });
 
     if (!inventory) {
@@ -126,8 +128,9 @@ export class InventoryService {
     inventory.deleted_at = new Date();
 
     await this.inventoryRepository.save(inventory);
+    await this.inventoryRepository.save(inventory);
 
-    console.log(`Inventory with ID ${id} deleted by ${req_mail}`);
+    return `Inventory with ID ${id} deleted by ${req_mail}`;
   }
 
   async findOneInventoryBySN(serial_number: string): Promise<any> | null {
@@ -217,6 +220,9 @@ export class InventoryService {
 
   async showAllCategory() {
     return await this.inventoryRepository.find({
+      where: { deleted_at: IsNull() },
+    });
+    return await this.categoryRepository.find({
       where: { deleted_at: IsNull() },
     });
   }

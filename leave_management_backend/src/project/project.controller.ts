@@ -96,31 +96,21 @@ export class ProjectController {
       }
     }
 
-    // @UseGuards(AuthGuard)
-    @Post(':adminId')
-    async assignProject(
-      @Param('adminId', ParseIntPipe) adminId: number,
-      @Body() { employeeId, projectId }: AssignProjectDto,
-      //  @Request() req
-      @ApiCreatedResponse({
-        description: 'project will be assigned to employee',
-        type: Project
-      })
-      async assignProject(@Param('adminId', ParseIntPipe) adminId: number, @Body() { employeeId, projectId }: AssignProjectDto,
-        //  @Request() req
-      ) {
-      // const req_mail = req.user.email;
+  // @UseGuards(AuthGuard)
+  @Post(':adminId')
+  async assignProject(
+    // @Param('adminId', ParseIntPipe) adminId: number, 
+    @Body() { employeeId, projectId }: AssignProjectDto,
+  //  @Request() req
+  ) {
+    // const req_mail = req.user.email;
 
-      try {
-        return await this.projectService.assignProject({
-          adminId,
-          employeeId,
-          projectId,
-        });
-      } catch(error) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      }
+    try {
+      return await this.projectService.assignProject({  employeeId, projectId });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
   @Get(':projectId/assigned-employees')
       async getAssignedEmployees(

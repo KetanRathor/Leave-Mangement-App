@@ -143,6 +143,14 @@ export class Employee {
     description: 'The role of employee',
   })
   role: string;
+  // @Column({
+  //   type: 'enum',
+  //   enum: ['Employee', 'Manager', 'Admin'],
+  // })
+  // @ApiProperty({
+  //   description:'The role of employee'
+  // })
+  // role: string;
 
   @Column('longblob', { nullable: true })
   @ApiProperty({

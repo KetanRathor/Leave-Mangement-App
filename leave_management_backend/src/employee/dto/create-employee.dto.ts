@@ -30,6 +30,17 @@ export class CreateEmployeeDto {
     example: 'employee',
   })
   role: string;
+  @ApiProperty({
+    description: 'The department id of the employee',
+    example: 1,
+  })
+  department_id: number;
+
+  // @ApiProperty({
+  //     description:"The role of the employee",
+  //     example:"employee",
+  // })
+  // role: string;
 
   @ApiProperty({
     description: 'The date of birth of employee',
