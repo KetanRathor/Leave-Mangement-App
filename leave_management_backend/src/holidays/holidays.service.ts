@@ -17,6 +17,7 @@ export class HolidaysService {
     day: string,
     occasion: string,
     image: Buffer,
+    req_mail:string
   ): Promise<Holidays> {
 
     const newHoliday = this.holidaysRepository.create({
@@ -27,8 +28,10 @@ export class HolidaysService {
     });
 
     console.log("newHoliday...........", newHoliday)
-
+    newHoliday.created_by=req_mail;
     return await this.holidaysRepository.save(newHoliday);
+   
+    
   }
 
   async getAllHolidays(): Promise<Holidays[]> {

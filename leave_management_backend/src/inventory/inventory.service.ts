@@ -83,7 +83,7 @@ export class InventoryService {
     inventory.deleted_by = req_mail;
     inventory.deleted_at = new Date()
 
-    await this.inventoryRepository.save(inventory)
+     await this.inventoryRepository.save(inventory)
 
     return (`Inventory with ID ${id} deleted by ${req_mail}`);
   }
