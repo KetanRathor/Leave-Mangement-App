@@ -45,11 +45,11 @@ export class EmployeeService {
 
         const userPassword = await this.authService.registerUser(createEmployeeDto.email)
 
-        if (createEmployeeDto.role === "Admin") {
-            newEmployee.manager_id = null;
-        } else {
-            newEmployee.manager_id = createEmployeeDto.manager_id;
-        }
+        // if (createEmployeeDto.role === "Admin") {
+        //     newEmployee.manager_id = null;
+        // } else {
+        //     newEmployee.manager_id = createEmployeeDto.manager_id;
+        // }
 
 
         const savedEmployee = await this.employeeRepository.save(newEmployee);
@@ -68,7 +68,7 @@ export class EmployeeService {
         }
 
         const oldEmail = employee.email;
-        console.log("oldEmail",oldEmail)
+        // console.log("oldEmail",oldEmail)
         for (const key in updatedEmployeeDetails) {
             if (updatedEmployeeDetails[key] !== undefined) {
                 employee[key] = updatedEmployeeDetails[key];
@@ -132,9 +132,9 @@ export class EmployeeService {
         return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project'] })
     }
 
-    async findManagerList(){
-        return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
-    }
+    // async findManagerList(){
+    //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
+    // }
 
 
     async uploadImage(employeeId: number, imageData: Buffer) {
