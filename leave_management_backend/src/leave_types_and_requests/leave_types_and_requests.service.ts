@@ -18,32 +18,12 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
-  // private readonly leaveTypes = [
-  //   { leave_type_id: 1,
-  //      leave_type_name: 'full',
-  //       default_balance: 21 },
-  //   {
-  //     leave_type_id: 2,
-  //     leave_type_name: 'first half',
-  //     default_balance: 10,
-  //   },
-  //   {
-  //     leave_type_id: 3,
-  //     leave_type_name: 'second half',
-  //     default_balance: 10,
-  //   },
-  //   {
-  //     leave_type_id: 4,
-  //     leave_type_name: 'work from home',
-  //     default_balance: 10,
-  //   },
-  // ];
   
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
-    private readonly mailService: MailService, // Inject MailService
-    @InjectRepository(Employee) // Inject Employee repository
+    private readonly mailService: MailService, 
+    @InjectRepository(Employee) 
     private readonly employeeRepository: Repository<Employee>,
   ) {}
 
@@ -104,7 +84,7 @@ export class LeaveTypesAndRequestsService {
   async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
     return await this.leaveRequestRepository.find({
       where: { emp_id }, // Filter by employeeId
-      relations: ['employee'], // Include related employee information (optional)
+      // relations: ['employee'], 
     });
   }
 

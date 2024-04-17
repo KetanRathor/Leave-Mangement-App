@@ -60,7 +60,7 @@ export class ProjectController {
   }
 
   // @UseGuards(AuthGuard)
-  @Post(':adminId')
+  @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
     @Body() { employeeId, projectId }: AssignProjectDto,
