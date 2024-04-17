@@ -51,14 +51,6 @@ export class LeaveTypesAndRequestsService {
     req_mail: string,
     emp_id: number,
   ): Promise<LeaveRequest> {
-    const newRequest = new LeaveRequest();
-
-    // if (!createLeaveDto.emp_id) {
-    //   throw new BadRequestException('Employee ID (emp_id) is required');
-    // }
-
-    // newRequest.emp_id = createLeaveDto.emp_id;
-
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     newLeaveRequest.created_by = req_mail;
     newLeaveRequest.emp_id = emp_id;
@@ -194,16 +186,39 @@ export class LeaveTypesAndRequestsService {
           status: 'approved',
         },
       });
-      let remainingBalance = 21;
 
+      let totalFullDays = 0;
+      let totalHalfDays = 0;
       approvedRequests.forEach((request) => {
+        const startDate = new Date(request.start_date);
+        const endDate = new Date(request.end_date);
+        const daysDifference = Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+
         switch (request.leave_type) {
           case 'full':
-            remainingBalance -= 1;
+            totalFullDays += daysDifference;
             break;
           case 'first half':
           case 'second half':
-            remainingBalance -= 0.5;
+            totalHalfDays += daysDifference;
+            break;
+          default:
+            break;
+        }
+      });
+
+      let remainingBalance = 21;
+      approvedRequests.forEach((request) => {
+        switch (request.leave_type) {
+          case 'full':
+            remainingBalance -= totalFullDays;
+            break;
+
+          case 'first half':
+          case 'second half':
+            remainingBalance -= totalHalfDays / 2;
             break;
         }
       });
@@ -217,24 +232,75 @@ export class LeaveTypesAndRequestsService {
   }
 
   //work-from-hme
+
+  // async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
+  //   try {
+  //     const approvedRequests = await this.leaveRequestRepository.find({
+  //       where: {
+  //         emp_id: id,
+  //         status: 'approved',
+  //         leave_type: 'work from home',
+  //       },
+  //     });
+
+  //     let totalWorkFromHomeDays = 0;
+  //     approvedRequests.forEach((request) => {
+  //       const startDate = new Date(request.start_date);
+  //       const endDate = new Date(request.end_date);
+  //       const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  //       totalWorkFromHomeDays += daysDifference;
+  //     });
+
+  //     const defaultBalance = 3;
+  //     let remainingWorkFromHomeBalance = defaultBalance - totalWorkFromHomeDays;
+
+  //     if (remainingWorkFromHomeBalance < 0) {
+  //       remainingWorkFromHomeBalance = 0;
+  //     }
+
+  //     return remainingWorkFromHomeBalance;
+  //   } catch (error) {
+  //     throw new BadRequestException('Failed to calculate remaining leave balance');
+  //   }
+  // }
+
   async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
     try {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+
       const approvedRequests = await this.leaveRequestRepository.find({
         where: {
           emp_id: id,
           status: 'approved',
+          leave_type: 'work from home',
         },
       });
-      let remainingworkfromhome = 3;
+
+      let totalWorkFromHomeDays = 0;
 
       approvedRequests.forEach((request) => {
-        switch (request.leave_type) {
-          case 'work from home':
-            remainingworkfromhome -= 1;
-            break;
+        const startDate = new Date(request.start_date);
+        const endDate = new Date(request.end_date);
+
+        const startMonth = startDate.getMonth();
+        const startYear = startDate.getFullYear();
+
+        if (startMonth === currentMonth && startYear === currentYear) {
+          const daysDifference = Math.ceil(
+            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+          );
+          totalWorkFromHomeDays += daysDifference;
         }
       });
-      return remainingworkfromhome;
+
+      const defaultBalance = 3;
+      let remainingWorkFromHomeBalance = defaultBalance - totalWorkFromHomeDays;
+
+      remainingWorkFromHomeBalance = Math.max(remainingWorkFromHomeBalance, 0);
+
+      return remainingWorkFromHomeBalance;
     } catch (error) {
       throw new BadRequestException(
         'Failed to calculate remaining leave balance',
