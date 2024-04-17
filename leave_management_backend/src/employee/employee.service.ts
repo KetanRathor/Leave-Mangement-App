@@ -28,10 +28,10 @@ export class EmployeeService {
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto,
-        req_mail:any
+        // req_mail:any
     ): Promise<Employee> {
         const newEmployee = this.employeeRepository.create(createEmployeeDto);
-        newEmployee.created_by=req_mail;
+        // newEmployee.created_by=req_mail;
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if (!emailRegex.test(createEmployeeDto.email)) {
             throw new Error('Invalid email format. Please enter a valid email address.');
@@ -68,7 +68,7 @@ export class EmployeeService {
         }
 
         const oldEmail = employee.email;
-        // console.log("oldEmail",oldEmail)
+        console.log("oldEmail",oldEmail)
         for (const key in updatedEmployeeDetails) {
             if (updatedEmployeeDetails[key] !== undefined) {
                 employee[key] = updatedEmployeeDetails[key];
