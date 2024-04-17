@@ -68,7 +68,7 @@ export class EmployeeService {
         }
 
         const oldEmail = employee.email;
-        // console.log("oldEmail",oldEmail)
+        console.log("oldEmail",oldEmail)
         for (const key in updatedEmployeeDetails) {
             if (updatedEmployeeDetails[key] !== undefined) {
                 employee[key] = updatedEmployeeDetails[key];

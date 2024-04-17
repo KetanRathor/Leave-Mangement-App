@@ -30,7 +30,7 @@ export class ProjectService {
   }
 
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee'] });
+    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee']});
 
     if (!project) {
       return { message: `Inventory with ID ${id} not found`, project };
