@@ -97,7 +97,7 @@ export class LeaveTypesAndRequestsService {
   async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
     return await this.leaveRequestRepository.find({
       where: { emp_id }, // Filter by employeeId
-      relations: ['employee'], // Include related employee information (optional)
+      // relations: ['employee'],
     });
   }
 
