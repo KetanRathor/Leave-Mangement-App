@@ -138,7 +138,7 @@ export class ProjectController {
 
   @UseGuards(AuthGuard)
       @Put('/status/:project_id')
-      async updateProjectStatus(
+      async this.updateProjectStatus(
         @Param('project_id') project_id: number,
         @Body() body: { status: string },
         @Request() req,
