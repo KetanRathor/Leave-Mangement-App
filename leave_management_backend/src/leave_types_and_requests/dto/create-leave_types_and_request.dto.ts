@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateLeaveTypesAndRequestDto {
   // @ApiProperty({
@@ -8,26 +8,26 @@ export class CreateLeaveTypesAndRequestDto {
   // emp_id: number;
 
   @ApiProperty({
-    description: 'the type of leave',
-    example: 'full',
+    description:'the type of leave',
+    'example':'full'
   })
   leave_type: string;
 
   @ApiProperty({
-    description: 'The start date of leave',
-    example: '2024-04-10',
+    description:'The start date of leave',
+   example:'2024-04-10'
   })
   start_date: Date;
 
   @ApiProperty({
-    description: 'The end date of leave',
-    example: '2024-04-11',
+    description:'The end date of leave',
+    example:'2024-04-11'
   })
   end_date: Date;
 
   @ApiProperty({
-    description: 'the reason for leave',
-    example: 'health issue',
+    description:'the reason for leave',
+    example:'health issue'
   })
   reason: string;
 
@@ -35,4 +35,6 @@ export class CreateLeaveTypesAndRequestDto {
   //   description:'status of leave request'
   // })
   // status: string;
+
+  
 }

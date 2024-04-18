@@ -1,11 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateProjectDto {
-  name: string;
-  manager_name: string;
-  description: string;
-  startDate: Date;
-  endDate?: Date;
-  status: 'active' | 'inactive';
-  // manager_name?: string;
-}
+    name: string;
+    manager_name:string;
+    description: string;
+    startDate: Date;
+    endDate?: Date;
+    status: 'active' | 'inactive';
+    // manager_name?: string; 
+  }

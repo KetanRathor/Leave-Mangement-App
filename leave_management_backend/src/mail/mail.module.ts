@@ -10,6 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   // imports:[AuthModule,TypeOrmModule.forFeature([UserCredentials])],
   controllers: [MailController],
   providers: [MailService],
-  exports: [MailService],
+  exports: [MailService]
 })
 export class MailModule {}

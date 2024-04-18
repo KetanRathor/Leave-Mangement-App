@@ -10,12 +10,9 @@ import { UserCredentials } from '../auth/entities/UserCredentials.entity';
 import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Employee, Department, UserCredentials]),
-    MailModule,
-  ],
+  imports : [TypeOrmModule.forFeature([Employee,Department,UserCredentials]),MailModule],
   controllers: [EmployeeController],
-  providers: [EmployeeService, AuthService],
-  exports: [EmployeeService],
+  providers: [EmployeeService,AuthService],
+  exports:[EmployeeService]
 })
 export class EmployeeModule {}

@@ -31,7 +31,9 @@ export class DepartmentService {
     return await this.departmentRepository.remove(department);
   }
 
-  async findDepartmentList() {
-    return await this.departmentRepository.find();
+
+  async findDepartmentList(){
+    return await this.departmentRepository.find()
+
   }
 }

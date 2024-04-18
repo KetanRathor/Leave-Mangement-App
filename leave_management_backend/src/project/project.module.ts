@@ -8,11 +8,11 @@ import { EmployeeService } from 'src/employee/employee.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Project, Employee]),
+    TypeOrmModule.forFeature([Project,Employee]),
     // EmployeeService
     // EmployeeModule,
   ],
-
+  
   controllers: [ProjectController],
   providers: [ProjectService],
 })
