@@ -29,7 +29,7 @@ export class Employee {
   email: string;
 
   
-  @Column({ nullable: false })
+  @Column({ nullable: false,unique: true })
   @ApiProperty({
     description:'The mobile number of Employee'
   })
@@ -134,9 +134,15 @@ export class Employee {
   // })
   // role: string;
 
+  @Column({ default: false })  
+  @ApiProperty({
+    description: 'Is the employee an admin?'
+  })
+  admin: boolean;
+
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'occasion image'
+    description:'employee image'
   })
   image: Buffer;
 
