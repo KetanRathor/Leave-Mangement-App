@@ -15,7 +15,6 @@ import { Console } from 'console';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
 
-
 @Injectable()
 export class LeaveTypesAndRequestsService {
   // private readonly leaveTypes = [
@@ -38,7 +37,7 @@ export class LeaveTypesAndRequestsService {
   //     default_balance: 10,
   //   },
   // ];
-  
+
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
@@ -50,8 +49,7 @@ export class LeaveTypesAndRequestsService {
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
     req_mail: string,
-    emp_id:number
-    
+    emp_id: number,
   ): Promise<LeaveRequest> {
     const newRequest = new LeaveRequest();
 
@@ -63,43 +61,43 @@ export class LeaveTypesAndRequestsService {
 
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     newLeaveRequest.created_by = req_mail;
-    newLeaveRequest.emp_id=emp_id
-    const savedLeaveRequest= await this.leaveRequestRepository.save(newLeaveRequest);
-    try{
-
+    newLeaveRequest.emp_id = emp_id;
+    const savedLeaveRequest =
+      await this.leaveRequestRepository.save(newLeaveRequest);
+    try {
       const employee = await this.employeeRepository.findOne({
-        where: { id: emp_id},
-        relations: ['manager'], 
+        where: { id: emp_id },
+        relations: ['manager'],
       });
-  
+
       if (!employee) {
         throw new NotFoundException('Employee not found');
       }
-  
-      const managerEmail = employee.manager?.email; 
-      console.log("managerEmail:",managerEmail)
-  
+
+      const managerEmail = employee.manager?.email;
+      console.log('managerEmail:', managerEmail);
+
       if (!managerEmail) {
         console.warn('Manager email not found for employee:', employee.id);
       } else {
-        console.log("req_mail",req_mail,"managerEmail",managerEmail)
-        await this.mailService.sendLeaveRequestEmail(req_mail, managerEmail, createLeaveDto.reason);
+        console.log('req_mail', req_mail, 'managerEmail', managerEmail);
+        await this.mailService.sendLeaveRequestEmail(
+          req_mail,
+          managerEmail,
+          createLeaveDto.reason,
+        );
       }
-    return savedLeaveRequest;
-  } catch (error) {
-    console.error('Error creating leave request:', error);
-    throw new InternalServerErrorException('Error creating leave request');
+      return savedLeaveRequest;
+    } catch (error) {
+      console.error('Error creating leave request:', error);
+      throw new InternalServerErrorException('Error creating leave request');
+    }
   }
-} 
-  
-
-
 
   findOne(id: number): Promise<LeaveRequest> {
     console.log(id);
     return this.leaveRequestRepository.findOneBy({ id });
   }
-
 
   async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
     return await this.leaveRequestRepository.find({
@@ -108,32 +106,29 @@ export class LeaveTypesAndRequestsService {
     });
   }
 
+  //  async findOne(id: number): Promise<LeaveRequest> {
+  //     console.log(id);
+  //     const rrr= await this.leaveRequestRepository.find({where:{id}, relations: ['employee']});
+  //     return rrr;
+  //   }
 
-//  async findOne(id: number): Promise<LeaveRequest> {
-//     console.log(id);
-//     const rrr= await this.leaveRequestRepository.find({where:{id}, relations: ['employee']});
-//     return rrr;
-//   }
+  // async findOne(id: number): Promise<LeaveRequest | undefined> {
+  //   try {
+  //     const request = await this.leaveRequestRepository.findOne({
+  //       where: { id }, // Clear object property syntax
+  //       relations: ['employee'], // Include related employee information if needed
+  //     });
 
-// async findOne(id: number): Promise<LeaveRequest | undefined> {
-//   try {
-//     const request = await this.leaveRequestRepository.findOne({
-//       where: { id }, // Clear object property syntax
-//       relations: ['employee'], // Include related employee information if needed
-//     });
+  //     if (!request) { // Handle case where request is not found
+  //       return undefined;
+  //     }
 
-//     if (!request) { // Handle case where request is not found
-//       return undefined;
-//     }
-
-//     return request;
-//   } catch (error) {
-//     console.error('Error fetching leave request:', error);
-//     // Handle the error appropriately (e.g., throw, log)
-//   }
-// }
-
-
+  //     return request;
+  //   } catch (error) {
+  //     console.error('Error fetching leave request:', error);
+  //     // Handle the error appropriately (e.g., throw, log)
+  //   }
+  // }
 
   findAll() {
     return this.leaveRequestRepository.find({ relations: ['employee'] });
@@ -158,13 +153,15 @@ export class LeaveTypesAndRequestsService {
     return leaveRequest;
   }
 
- async getEmployeesWithPendingLeaveRequests(): Promise<{
-    employeeName: string;
-    start_date: Date;
-    end_date: Date;
-    leave_type: string;
-    reason: string;
-  }[]> {
+  async getEmployeesWithPendingLeaveRequests(): Promise<
+    {
+      employeeName: string;
+      start_date: Date;
+      end_date: Date;
+      leave_type: string;
+      reason: string;
+    }[]
+  > {
     try {
       const pendingRequests = await this.leaveRequestRepository.find({
         where: {
@@ -189,62 +186,59 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-async getRemainingLeaveBalance(id: number): Promise<number> {
-  try {
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id, 
-        status: 'approved',
-      },
-    });
-    let remainingBalance = 21;
-    
-    approvedRequests.forEach((request) => {
-      switch (request.leave_type) {
-        case 'full':
-          remainingBalance -= 1;
-          break;
-        case 'first half':
-        case 'second half':
-          remainingBalance -= 0.5;
-          break;
-        
-      }
-    });
+  async getRemainingLeaveBalance(id: number): Promise<number> {
+    try {
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
+      let remainingBalance = 21;
 
-    return remainingBalance;
-
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
-  }
-}
-
-
-//work-from-hme
-async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
-  try {
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id, 
-        status: 'approved',
-      },
-    });
-    let remainingworkfromhome= 3;
-
-    approvedRequests.forEach((request) => {
-      switch (request.leave_type) {
-          case 'work from home':
-            remainingworkfromhome -=1;
+      approvedRequests.forEach((request) => {
+        switch (request.leave_type) {
+          case 'full':
+            remainingBalance -= 1;
             break;
-        
-      }
-    });
-    return remainingworkfromhome;
+          case 'first half':
+          case 'second half':
+            remainingBalance -= 0.5;
+            break;
+        }
+      });
 
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
+      return remainingBalance;
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
+  }
+
+  //work-from-hme
+  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
+    try {
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
+      let remainingworkfromhome = 3;
+
+      approvedRequests.forEach((request) => {
+        switch (request.leave_type) {
+          case 'work from home':
+            remainingworkfromhome -= 1;
+            break;
+        }
+      });
+      return remainingworkfromhome;
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
   }
 }
-
-}
-
