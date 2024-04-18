@@ -98,11 +98,8 @@ export class ProjectController {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Post(':adminId')
-  @ApiOkResponse({
-    description: 'project will be assigned to the employee',
-  })
+  // @UseGuards(AuthGuard)
+  @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number,
     @Body() { employeeId, projectId }: AssignProjectDto,

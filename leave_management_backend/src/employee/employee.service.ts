@@ -148,13 +148,11 @@ export class EmployeeService {
     });
   }
 
-  //Show Employee List
-  async findEmployees() {
-    return await this.employeeRepository.find({
-      where: { deleted_at: IsNull() },
-      relations: ['manager', 'department', 'project'],
-    });
-  }
+    //Show Employee List
+    async findEmployees() {
+
+        return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project','inventories'] })
+    }
 
   // async findManagerList(){
   //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})

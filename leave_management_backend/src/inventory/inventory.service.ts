@@ -26,26 +26,6 @@ export class InventoryService {
     private categoryRepository: Repository<Category>,
   ) {}
 
-  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-  //   const newInventory =  this.inventoryRepository.create(createInventoryDto);
-  //   newInventory.created_by = req_mail;
-  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
-
-  //   return this.inventoryRepository.save(newInventory,category);
-  // //   return this.inventoryRepository.save({ ...createInventoryDto, category_id : createInventoryDto.category_id, created_by: req_mail });
-  // }
-
-  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-  //   try {
-  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
-  //     const newInventory = await this.inventoryRepository.save({ ...createInventoryDto, category, created_by: req_mail });
-  //     console.log('New inventory saved:', newInventory);
-  //     return newInventory;
-  //   } catch (error) {
-  //     console.error('Error saving inventory:', error);
-  //     throw error; // Rethrow the error to propagate it to the caller
-  //   }
-  // }
 
   async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
     try {
@@ -61,10 +41,8 @@ export class InventoryService {
       newInventory.category = category;
 
       const savedInventory = await this.inventoryRepository.save(newInventory);
-      // console.log('New inventory saved:', savedInventory);
       return savedInventory;
     } catch (error) {
-      // console.error('Error saving inventory:', error);
       throw error;
     }
   }
@@ -104,13 +82,12 @@ export class InventoryService {
       relations: ['employee'],
     });
     // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
-
     if (!inventory) {
       return { message: `Inventory with ID ${id} not found`, inventory };
     }
-
     return inventory;
   }
+
 
   async deleteInventory(id: number, req_mail: any) {
     const inventory = await this.inventoryRepository.findOneBy({ id });
