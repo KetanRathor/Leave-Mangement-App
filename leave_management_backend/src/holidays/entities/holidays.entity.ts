@@ -33,7 +33,9 @@ export class Holidays {
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'occasion image'
+    description:'occasion image',
+    type:'string',
+    format:'binary'
   })
   image: Buffer;
 

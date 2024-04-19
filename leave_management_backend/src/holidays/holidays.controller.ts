@@ -21,7 +21,7 @@ import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
@@ -35,19 +35,45 @@ export class HolidaysController {
 
   @UseGuards(AuthGuard)
   @Post('upload')
-  @ApiBody({
-    type: Holidays
-  })
+  // @ApiBody({
+  //   type: CreateHolidaysDto
+  // })
   @ApiCreatedResponse({
     description: 'create holiday object ',
     type: Holidays
   })
-  @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FileInterceptor('file'))
+@ApiConsumes('multipart/form-data')
+@UseInterceptors(FileInterceptor('file'))
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      // date: { type: 'Date' },
+      // day: { type: 'string' },
+      // occasion: { type: 'string' },
+      data1:{
+        type:'string',
+        example:{"date":"2020-01-01","day":"tuesday","occasion":"new year"}
+      },
+     
+      file: {
+        type: 'string',
+        format: 'binary',
+      },
+    },
+  },
+})
   async uploadImage(@UploadedFile() file, @Body() body: any,
   @Request() req,) {
 
+    
+
     const inputData = body.data1;
-    const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
+if (!inputData) {
+  throw new HttpException('Data1 field is missing', HttpStatus.BAD_REQUEST);
+}
+const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
     const req_mail = req.user.email;
     const newHoliday = await this.holidaysService.uploadImage(
@@ -57,7 +83,7 @@ export class HolidaysController {
       file.buffer,
       req_mail,
     );
-    
+ 
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
