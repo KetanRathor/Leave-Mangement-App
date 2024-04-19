@@ -4,7 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -108,15 +108,34 @@ export class EmployeeController {
 
   
 
-  @Post('upload-image/:id')
-  @ApiConsumes('multipart/form-data')
-@UseInterceptors(FileInterceptor('image'))
-async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+//   @Post('upload-image/:id')
+// @UseInterceptors(FileInterceptor('image'))
+
+// async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
   
+//   if (!image) {
+//     throw new Error('No image uploaded');
+//   }
+@Post('upload-image/:id')
+@ApiConsumes('multipart/form-data')
+@UseInterceptors(FileInterceptor('image'))
+@ApiBody({
+  description: 'Image upload',
+  type: 'multipart/form-data',
+  schema: {
+    type: 'object',
+    properties: {
+      image: {
+        type: 'string',
+        format: 'binary',
+      },
+    },
+  },
+})
+async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
   if (!image) {
     throw new Error('No image uploaded');
   }
-
   const employee = await this.employeeService.uploadImage(id, image.buffer);
 
   return employee;
