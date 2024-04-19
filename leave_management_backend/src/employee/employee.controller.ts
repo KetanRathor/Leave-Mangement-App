@@ -15,6 +15,7 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -125,6 +126,13 @@ export class EmployeeController {
   //   console.log("first..............")
   //   return await this.employeeService.findManagerList();
   // }
+  @Get('/manager')
+  async showManagerList() {
+    console.log("first..............")
+    return await this.employeeService.getManagerIds();
+  }
+
+  
 
   @Post('upload-image/:id')
   @UseInterceptors(FileInterceptor('image'))
@@ -141,3 +149,59 @@ export class EmployeeController {
     return employee;
   }
 }
+  return employee;
+}
+
+
+
+// @Get('/managers')
+//   async findManagersAndAdmins() {
+//     try {
+//       const managerAndAdminEmployees = await this.employeeService.findManagers();
+//       return managerAndAdminEmployees;
+//     } catch (error) {
+//       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+//   }
+
+async determineRole(employee, employeeService) {
+  
+  const hasManager = await employeeService.findById(employee.manager_id);
+  console.log("hasManager",hasManager)
+  if (employee.admin) {
+    return 'Admin';
+  } else if (hasManager) {
+    return 'Employee'; 
+  } else {
+    return 'Manager'; 
+  }
+}
+
+@Get('/managers')
+  async getEmployeeList() {
+    try {
+      const employees = await this.employeeService.findAll();
+
+      const employeeList = employees.map(employee => {
+        const role =  this.determineRole(employee, this.employeeService); 
+        console.log("role",role);
+        return {
+          id: employee.id,
+          name: employee.name,
+          email: employee.email,
+          role,
+        };
+      });
+
+      return employeeList; 
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+}
+
+  
+
+  
+

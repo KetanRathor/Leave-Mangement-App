@@ -132,19 +132,80 @@ export class EmployeeService {
   }
 
   //Show Employe Profile
-  async showProfile(id: number) {
-    return this.employeeRepository.findOne({
-      where: { id, deleted_at: IsNull() },
-      relations: ['manager', 'department', 'inventories', 'project'],
-    });
+  // async showProfile(id: number) {
+  //     return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
+  //          relations: ['manager','department','inventories','project'] });
+
+  // }
+  async showProfile(id: number): Promise<any> {
+    try {
+      // Retrieve employee data with related entities (optimized)
+      const employee = await this.employeeRepository.findOne({
+        where: { id, deleted_at: IsNull() },
+        relations: ['manager', 'department', 'inventories', 'project'],
+      });
+      const managerIDs = await this.employeeRepository.find({
+        where: { deleted_at: IsNull() },
+        select: ['manager_id'],
+        // relations: ['manager'],
+      });
+      if (employee) {
+        let role;
+        if (employee.admin) {
+          role = 'Admin';
+        } else if (
+          managerIDs.some((manager) => manager.manager_id === employee.id)
+        ) {
+          role = 'Manager';
+        } else {
+          role = 'Employee';
+        }
+
+        return { ...employee, role };
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
-  //Show Employe pe List
+  //Show Employee List
+  // async findEmployees() {
+
+  //     return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project','inventories'] })
+  // }
+
   async findEmployees() {
-    return await this.employeeRepository.find({
-      where: { deleted_at: IsNull() },
-      relations: ['manager', 'department', 'project', 'inventories'],
-    });
+    try {
+      const employees = await this.employeeRepository.find({
+        where: { deleted_at: IsNull() },
+        relations: ['manager', 'department', 'project', 'inventories'],
+      });
+
+      const managerIds = employees.map((employee) => {
+        if (employee.manager_id) return employee.manager_id;
+      });
+      const employeesWithRoles = employees.map((employee) => {
+        let role;
+
+        if (employee.admin) {
+          role = 'Admin';
+        } else if (managerIds.includes(employee.id)) {
+          role = 'Manager';
+        } else {
+          role = 'Employee';
+        }
+
+        return { ...employee, role };
+      });
+
+      return employeesWithRoles;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   // async findManagerList(){
@@ -160,5 +221,42 @@ export class EmployeeService {
     }
     employee.image = imageData;
     return await this.employeeRepository.save(employee);
+  }
+  async uploadImage(employeeId: number, imageData: Buffer) {
+    const employee = await this.employeeRepository.findOneBy({
+      id: employeeId,
+    });
+    if (!employee) {
+      throw new Error(`Employee with ID ${employeeId} not found`);
+    }
+    employee.image = imageData;
+    return await this.employeeRepository.save(employee);
+  }
+
+  // async findManagers() {
+
+  //   const managerEmployees = await this.employeeRepository.find({
+  //     where: [
+  //       { manager_id: IsNull(), deleted_at: IsNull() },
+  //       { admin: true, deleted_at: IsNull() },
+  //     ],
+  //   });
+
+  //   return managerEmployees;
+  // }
+  async findAll(): Promise<Employee[]> {
+    return await this.employeeRepository.find();
+  }
+
+  async findById(id: number): Promise<Employee | null> {
+    return await this.employeeRepository.findOneBy({ id });
+  }
+
+  async getManagerIds(): Promise<any[]> {
+    return await this.employeeRepository.find({
+      where: { deleted_at: IsNull() },
+      select: ['manager_id'],
+      relations: ['manager'],
+    });
   }
 }
