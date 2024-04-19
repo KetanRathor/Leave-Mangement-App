@@ -126,7 +126,6 @@ export class EmployeeService {
     // }
     async showProfile(id: number): Promise<any> {
         try {
-          // Retrieve employee data with related entities (optimized)
           const employee = await this.employeeRepository.findOne({
             where: { id, deleted_at: IsNull() },
             relations: ['manager', 'department', 'inventories', 'project'],
