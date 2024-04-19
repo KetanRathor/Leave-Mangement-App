@@ -10,10 +10,10 @@ import { Category } from './entities/inventoryCategory.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Inventory,Employee,Category]),
+    TypeOrmModule.forFeature([Inventory, Employee, Category]),
     // EmployeeModule,
   ],
   controllers: [InventoryController],
   providers: [InventoryService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

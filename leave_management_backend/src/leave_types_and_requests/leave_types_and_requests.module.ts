@@ -10,8 +10,11 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 // import { LeaveType } from './entities/LeaveType.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LeaveRequest,Holidays,Employee]),MailModule],
+  imports: [
+    TypeOrmModule.forFeature([LeaveRequest, Holidays, Employee]),
+    MailModule,
+  ],
   controllers: [LeaveTypesAndRequestsController],
-  providers: [LeaveTypesAndRequestsService,HolidaysService],
+  providers: [LeaveTypesAndRequestsService, HolidaysService],
 })
 export class LeaveTypesAndRequestsModule {}

@@ -1,6 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateEmployeeDto } from './create-employee.dto';
-import { ApiProperty } from '@nestjs/swagger';
 
 // export class UpdateEmployeeDto  {
 //     @ApiProperty({
@@ -27,7 +26,6 @@ import { ApiProperty } from '@nestjs/swagger';
 //     })
 //     department_id: number;
 
-   
 //     @ApiProperty({
 //         description:"The role of the employee",
 //         example:"employee",

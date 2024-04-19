@@ -3,7 +3,6 @@
 // // @Module({})
 // // export class RedisModule {}
 
-
 // import { Module } from '@nestjs/common';
 // import { RedisModule } from 'nestjs-redis';
 
@@ -20,4 +19,3 @@
 //   ],
 // })
 // export class MyRedisModule {}
-
