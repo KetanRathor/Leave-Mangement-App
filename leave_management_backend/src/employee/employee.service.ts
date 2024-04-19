@@ -119,48 +119,43 @@ export class EmployeeService {
     }
 
     //Show Employe Profile
-    async showProfile(id: number) {
-        return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
-             relations: ['manager','department','inventories','project'] });
+    // async showProfile(id: number) {
+    //     return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
+    //          relations: ['manager','department','inventories','project'] });
              
-    }
-//     async showProfile(id: number): Promise<any> {
-//         try {
-//           // Retrieve employee data with related entities (optimized)
-//           const employee = await this.employeeRepository.findOne({
-//             where: { id, deleted_at: IsNull() },
-//             relations: ['manager', 'department', 'inventories', 'project'],
-//           });
-//           console.log("employee",employee)
-// const managerIDs =  await this.employeeRepository.find({
-//     where: { deleted_at:IsNull() },
-//     select: ['manager_id'],
-//     // relations: ['manager'], 
-
-    
-// });
-
-      
-//           if (employee) {
-//             let role;
-//             if (employee.admin) {
-//               role = 'Admin';
-//             } else if ( managerIDs.includes(employee)) {
+    // }
+    async showProfile(id: number): Promise<any> {
+        try {
+          // Retrieve employee data with related entities (optimized)
+          const employee = await this.employeeRepository.findOne({
+            where: { id, deleted_at: IsNull() },
+            relations: ['manager', 'department', 'inventories', 'project'],
+          });
+          const managerIDs =  await this.employeeRepository.find({
+          where: { deleted_at:IsNull() },
+          select: ['manager_id'],
+    // relations: ['manager'], 
+});
+        if (employee) {
+            let role;
+            if (employee.admin) {
+              role = 'Admin';
+            } else if (managerIDs.some(manager => manager.manager_id === employee.id)) {
              
-//               role = 'Manager';
-//             } else {
-//               role = 'Employee';
-//             }
+              role = 'Manager';
+            } else {
+              role = 'Employee';
+            }
       
-//             return { ...employee, role };
-//           } else {
-//             return null; 
-//           }
-//         } catch (error) {
-//           console.error(error);
-//           throw error; 
-//         }
-//       }
+            return { ...employee, role };
+          } else {
+            return null; 
+          }
+        } catch (error) {
+          console.error(error);
+          throw error; 
+        }
+      }
 
     
     
