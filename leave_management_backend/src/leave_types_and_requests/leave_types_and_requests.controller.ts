@@ -85,20 +85,36 @@ export class LeaveTypesAndRequestsController {
   @ApiBody({
     type:UpdateLeaveStatus
   })
+  // async updateStatus(
+  //   @Param('leave_request_id') leave_request_id: number,
+  //   @Body() body: { status: string },
+  //   @Request() req,
+  // ): Promise<LeaveRequest> {
+  //   const req_mail = req.user.email;
+  //   if (!body.status) {
+  //     throw new BadRequestException('Status is required');
+  //   }   
+  //   return this.leaveTypesAndRequestsService.updateStatus(
+  //     leave_request_id,
+  //     body.status,
+  //     req_mail
+  //   );
+  // }
   async updateStatus(
     @Param('leave_request_id') leave_request_id: number,
     @Body() body: { status: string },
     @Request() req,
-  ): Promise<LeaveRequest> {
+  ): Promise<{ leaveRequest: LeaveRequest, message: string }> {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
     }   
-    return this.leaveTypesAndRequestsService.updateStatus(
+    const { leaveRequest, message } = await this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
       req_mail
     );
+    return { leaveRequest, message };
   }
 
   @UseGuards(AuthGuard)
@@ -152,6 +168,7 @@ export class LeaveTypesAndRequestsController {
 // }
 
 @Get('/employees/employees-leave-on-today')
+
 async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
   try {
     console.log(".............................");

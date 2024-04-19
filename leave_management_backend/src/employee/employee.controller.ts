@@ -4,7 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
@@ -23,13 +23,13 @@ export class EmployeeController {
 
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    // @Request() req,
+    @Request() req,
   ) {
-    // const req_mail = req.user.email;
+    const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        // req_mail,
+        req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -109,6 +109,7 @@ export class EmployeeController {
   
 
   @Post('upload-image/:id')
+  @ApiConsumes('multipart/form-data')
 @UseInterceptors(FileInterceptor('image'))
 async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
   
