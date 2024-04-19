@@ -14,8 +14,8 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -37,7 +37,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
@@ -45,13 +45,13 @@ export class EmployeeController {
   })
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    @Request() req,
+    // @Request() req,
   ) {
-    const req_mail = req.user.email;
+    // const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        req_mail,
+        // req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -121,18 +121,11 @@ export class EmployeeController {
     return this.employeeService.findEmployees();
   }
 
-  // @Get('/manager')
-  // async showManagerList() {
-  //   console.log("first..............")
-  //   return await this.employeeService.findManagerList();
-  // }
   @Get('/manager')
   async showManagerList() {
-    console.log("first..............")
+    console.log('first..............');
     return await this.employeeService.getManagerIds();
   }
-
-  
 
   @Post('upload-image/:id')
   @UseInterceptors(FileInterceptor('image'))
@@ -148,43 +141,37 @@ export class EmployeeController {
 
     return employee;
   }
-}
-  return employee;
-}
 
+  // @Get('/managers')
+  //   async findManagersAndAdmins() {
+  //     try {
+  //       const managerAndAdminEmployees = await this.employeeService.findManagers();
+  //       return managerAndAdminEmployees;
+  //     } catch (error) {
+  //       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 
-
-// @Get('/managers')
-//   async findManagersAndAdmins() {
-//     try {
-//       const managerAndAdminEmployees = await this.employeeService.findManagers();
-//       return managerAndAdminEmployees;
-//     } catch (error) {
-//       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
-//     }
-//   }
-
-async determineRole(employee, employeeService) {
-  
-  const hasManager = await employeeService.findById(employee.manager_id);
-  console.log("hasManager",hasManager)
-  if (employee.admin) {
-    return 'Admin';
-  } else if (hasManager) {
-    return 'Employee'; 
-  } else {
-    return 'Manager'; 
+  async determineRole(employee, employeeService) {
+    const hasManager = await employeeService.findById(employee.manager_id);
+    console.log('hasManager', hasManager);
+    if (employee.admin) {
+      return 'Admin';
+    } else if (hasManager) {
+      return 'Employee';
+    } else {
+      return 'Manager';
+    }
   }
-}
 
-@Get('/managers')
+  @Get('/managers')
   async getEmployeeList() {
     try {
       const employees = await this.employeeService.findAll();
 
-      const employeeList = employees.map(employee => {
-        const role =  this.determineRole(employee, this.employeeService); 
-        console.log("role",role);
+      const employeeList = employees.map((employee) => {
+        const role = this.determineRole(employee, this.employeeService);
+        console.log('role', role);
         return {
           id: employee.id,
           name: employee.name,
@@ -193,15 +180,13 @@ async determineRole(employee, employeeService) {
         };
       });
 
-      return employeeList; 
+      return employeeList;
     } catch (error) {
       console.error(error);
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
-
-  
-
-  
-

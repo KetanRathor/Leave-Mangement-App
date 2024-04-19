@@ -28,10 +28,10 @@ export class EmployeeService {
   //Create employee
   async createEmployee(
     createEmployeeDto: CreateEmployeeDto,
-    req_mail: any,
+    // req_mail:any
   ): Promise<Employee> {
     const newEmployee = this.employeeRepository.create(createEmployeeDto);
-    newEmployee.created_by = req_mail;
+    // newEmployee.created_by=req_mail;
     const emailRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(createEmployeeDto.email)) {
@@ -79,7 +79,7 @@ export class EmployeeService {
     }
 
     const oldEmail = employee.email;
-    // console.log("oldEmail",oldEmail)
+    console.log('oldEmail', oldEmail);
     for (const key in updatedEmployeeDetails) {
       if (updatedEmployeeDetails[key] !== undefined) {
         employee[key] = updatedEmployeeDetails[key];
@@ -212,16 +212,6 @@ export class EmployeeService {
   //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
   // }
 
-  async uploadImage(employeeId: number, imageData: Buffer) {
-    const employee = await this.employeeRepository.findOneBy({
-      id: employeeId,
-    });
-    if (!employee) {
-      throw new Error(`Employee with ID ${employeeId} not found`);
-    }
-    employee.image = imageData;
-    return await this.employeeRepository.save(employee);
-  }
   async uploadImage(employeeId: number, imageData: Buffer) {
     const employee = await this.employeeRepository.findOneBy({
       id: employeeId,
