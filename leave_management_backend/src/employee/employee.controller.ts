@@ -158,41 +158,41 @@ async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer
 //     }
 //   }
 
-async determineRole(employee, employeeService) {
+// async determineRole(employee, employeeService) {
   
-  const hasManager = await employeeService.findById(employee.manager_id);
-  console.log("hasManager",hasManager)
-  if (employee.admin) {
-    return 'Admin';
-  } else if (hasManager) {
-    return 'Employee'; 
-  } else {
-    return 'Manager'; 
-  }
-}
+//   const hasManager = await employeeService.findById(employee.manager_id);
+//   console.log("hasManager",hasManager)
+//   if (employee.admin) {
+//     return 'Admin';
+//   } else if (hasManager) {
+//     return 'Employee'; 
+//   } else {
+//     return 'Manager'; 
+//   }
+// }
 
-@Get('/managers')
-  async getEmployeeList() {
-    try {
-      const employees = await this.employeeService.findAll();
+// @Get('/managers')
+//   async getEmployeeList() {
+//     try {
+//       const employees = await this.employeeService.findAll();
 
-      const employeeList = employees.map(employee => {
-        const role =  this.determineRole(employee, this.employeeService); 
-        console.log("role",role);
-        return {
-          id: employee.id,
-          name: employee.name,
-          email: employee.email,
-          role,
-        };
-      });
+//       const employeeList = employees.map(employee => {
+//         const role =  this.determineRole(employee, this.employeeService); 
+//         console.log("role",role);
+//         return {
+//           id: employee.id,
+//           name: employee.name,
+//           email: employee.email,
+//           role,
+//         };
+//       });
 
-      return employeeList; 
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+//       return employeeList; 
+//     } catch (error) {
+//       console.error(error);
+//       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+//   }
 }
 
   
