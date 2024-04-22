@@ -114,16 +114,7 @@ export class LeaveTypesAndRequestsService {
     });
   }
 
-  // async updateStatus(
-  //   leave_request_id: number,
-  //   status: string,
-  //   req_mail: string,
-  // ): Promise<LeaveRequest> {
-  //   const leaveRequest = await this.findOne(leave_request_id);
-  //   leaveRequest.status = status;
-  //   leaveRequest.updated_by = req_mail;
-  //   return this.leaveRequestRepository.save(leaveRequest);
-  // }
+ 
 
   async updateStatus(
     leave_request_id: number,
