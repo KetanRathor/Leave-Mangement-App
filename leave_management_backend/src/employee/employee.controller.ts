@@ -101,6 +101,11 @@ export class EmployeeController {
   }
 
   @Get('/manager')
+  @ApiCreatedResponse(
+    {
+      description:"Get manager's List"
+    }
+  )
   async showManagerList() {
     console.log("first..............")
     return await this.employeeService.getManagerIds();
