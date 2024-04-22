@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
@@ -23,13 +23,13 @@ export class EmployeeController {
 
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    @Request() req,
+    // @Request() req,
   ) {
-    const req_mail = req.user.email;
+    // const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        req_mail,
+        // req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

@@ -90,10 +90,10 @@ export class AuthService {
     }
 
     // async validateUser({ email, password }: AuthPayloadDto) {
-    //     // ... existing authentication logic ...
+    //     
       
     //     if (password === decryptedStoredPassword) {
-    //       const profile = await this.employeeService.showProfile(user.id); // Call showProfile to get role
+    //       const profile = await this.employeeService.showProfile(user.id); 
     //       if (!profile) {
     //         // Handle case where user not found
     //         return new HttpException('User not found', 404);
@@ -102,7 +102,7 @@ export class AuthService {
     //       const token = await this.jwtService.signAsync(profile);
     //       return { access_token: token, role: profile.role };
     //     }
-    //     // ...
+    //     
     //   }
 
     // async deriveUserRole(userId: number): Promise<string> {
