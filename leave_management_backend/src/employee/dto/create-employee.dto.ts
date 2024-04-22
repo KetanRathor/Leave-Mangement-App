@@ -49,6 +49,8 @@ export class CreateEmployeeDto {
         example:"Female",
     })
     gender: string;
+
+    admin: boolean;
     
 
     @ApiProperty({

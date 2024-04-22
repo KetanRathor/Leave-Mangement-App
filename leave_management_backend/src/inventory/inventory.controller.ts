@@ -52,6 +52,12 @@ export class InventoryController {
     return this.inventoryService.showAllInventories();
   }
 
+
+  @Get('/list_of_inventories')
+  ListOfInventories() {
+    return this.inventoryService.ListOfInventories();
+  }
+
   @UseGuards(AuthGuard)
   @Get('oneInventory/:id')
   @ApiOkResponse({

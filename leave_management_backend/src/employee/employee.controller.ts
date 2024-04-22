@@ -4,7 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -109,6 +109,7 @@ export class EmployeeController {
   
 
   @Post('upload-image/:id')
+  @ApiConsumes('multipart/form-data')
 @UseInterceptors(FileInterceptor('image'))
 async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
   

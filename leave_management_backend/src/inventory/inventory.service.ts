@@ -63,6 +63,12 @@ export class InventoryService {
     return await this.inventoryRepository.find({ where: { deleted_at: IsNull(), employee: IsNull() } , relations: ['category','employee']});
   }
 
+  async ListOfInventories() {
+    const inventories= await this.inventoryRepository.find({ where: { deleted_at: IsNull() } , relations: ['category','employee']});
+    // console.log("inventories",inventories)
+    return inventories
+  }
+
   async findOneInventory(id: number) {
     const inventory = await this.inventoryRepository.findOne({ where: { id, deleted_at: IsNull() }, relations: ['employee'] });
     // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });

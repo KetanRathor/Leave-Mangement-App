@@ -3,13 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
 // import { MailService } from 'src/mail/mail.service';
 import * as cache from 'memory-cache';
+import { Employee } from 'src/employee/entities/Employee.entity';
 
 
 
@@ -25,6 +26,7 @@ export class AuthService {
         private jwtService: JwtService,
         @InjectRepository(UserCredentials)
         private readonly userCredentialsRepository: Repository<UserCredentials>,
+        // private readonly employeeRepository: Repository<Employee>,
         private readonly mailService: MailService
     ) { }
 
@@ -74,6 +76,7 @@ export class AuthService {
             const decryptedStoredPassword = this.decrypt(user.password);
             console.log("decryptedStoredPassword", decryptedStoredPassword)
             if (password === decryptedStoredPassword) {
+
                 const { password, ...userdata } = user;
                 console.log("password", password);
                 const token = await this.jwtService.signAsync(userdata);
@@ -84,9 +87,47 @@ export class AuthService {
         } catch (error) {
             console.log("error", error)
         }
-
-
     }
+
+    // async validateUser({ email, password }: AuthPayloadDto) {
+    //     
+      
+    //     if (password === decryptedStoredPassword) {
+    //       const profile = await this.employeeService.showProfile(user.id); 
+    //       if (!profile) {
+    //         // Handle case where user not found
+    //         return new HttpException('User not found', 404);
+    //       }
+      
+    //       const token = await this.jwtService.signAsync(profile);
+    //       return { access_token: token, role: profile.role };
+    //     }
+    //     
+    //   }
+
+    // async deriveUserRole(userId: number): Promise<string> {
+        
+    //     const managerIDs = await this.employeeRepository.find({
+    //         where: { deleted_at: IsNull() },
+    //         select: ['manager_id'],
+    //     });
+    
+    //     const employee = await this.employeeRepository.findOne({
+    //         where: { id: userId, deleted_at: IsNull() },
+    //     });
+    
+    //     if (employee) {
+    //         if (employee.admin) {
+    //             return 'Admin';
+    //         } else if (managerIDs.some(manager => manager.manager_id === userId)) {
+    //             return 'Manager';
+    //         } else {
+    //             return 'Employee';
+    //         }
+    //     } else {
+    //         return null;
+    //     }
+    // }
 
     async registerUser(email: string) {
         const generatedPassword = this.generateRandomPassword(10);
@@ -171,6 +212,10 @@ export class AuthService {
     }
 
     async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
+        const user = await this.userCredentialsRepository.findOneBy({ email }); 
+        if (!user) {
+        throw new HttpException('Invalid email address', 400);
+  }
         cache.put(email, otp, this.otpTTL);
         const cachedOTP = cache.get(email);
         console.log('Cached OTP:', cachedOTP)

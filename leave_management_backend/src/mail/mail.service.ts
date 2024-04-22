@@ -70,7 +70,7 @@ export class MailService {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Your OTP for Password Reset',
+            subject: 'Password Reset Successfully',
             text: `Hello,\n\n Your password has been reset successfully. \n\nRegards,\nThe Admin Team`
         };
         // await this.sendOTPEmail(email,otp);

@@ -109,17 +109,34 @@ export class LeaveTypesAndRequestsService {
     });
   }
 
+  // async updateStatus(
+  //   leave_request_id: number,
+  //   status: string,
+  //   req_mail: string,
+  // ): Promise<LeaveRequest> {
+  //   const leaveRequest = await this.findOne(leave_request_id);
+  //   leaveRequest.status = status;
+  //   leaveRequest.updated_by = req_mail;
+  //   return this.leaveRequestRepository.save(leaveRequest);
+  // }
+
   async updateStatus(
     leave_request_id: number,
     status: string,
     req_mail: string,
-  ): Promise<LeaveRequest> {
+  ): Promise<{ leaveRequest: LeaveRequest, message: string }> {
     const leaveRequest = await this.findOne(leave_request_id);
     leaveRequest.status = status;
-    leaveRequest.updated_by = req_mail;
-    return this.leaveRequestRepository.save(leaveRequest);
+    // leaveRequest.updated_by = req_mail;
+    const employee = await this.employeeRepository.findOne({ where: { email: req_mail } });
+  const employeeName = employee ? employee.name : "Unknown";
+
+    const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
+    const message = `Your leave request has been ${status} by ${employeeName}.`;
+    return { leaveRequest: updatedLeaveRequest, message };
   }
 
+  
   async getLeaveRequest(id: number): Promise<LeaveRequest> {
     const leaveRequest = await this.leaveRequestRepository.findOneBy({ id });
     if (!leaveRequest) {
@@ -161,67 +178,143 @@ export class LeaveTypesAndRequestsService {
 
   
 
-  async getRemainingLeaveBalance(id: number): Promise<number> {
-    try {
-      const approvedRequests = await this.leaveRequestRepository.find({
-        where: {
-          emp_id: id,
-          status: 'approved',
-        },
-      });
+//   async getRemainingLeaveBalance(id: number): Promise<number> {
+//     try {
+//       const currentDate = new Date();
+//       const currentMonth = currentDate.getMonth();
+//       const currentYear = currentDate.getFullYear();
+//       const approvedRequests = await this.leaveRequestRepository.find({
+//         where: {
+//           emp_id: id,
+//           status: 'approved',
+//         },
+//       });
 
-      let remainingBalance = 21; 
+     
 
-      let fullDaysCounter = 0;
-      let firstHalfDaysCounter = 0;
-      let secondHalfDaysCounter = 0;
+//       let fullDaysCounter = 0;
+//       let firstHalfDaysCounter = 0;
+//       let secondHalfDaysCounter = 0;
 
-      for (const request of approvedRequests) {
-        const startDate = new Date(request.start_date);
-        const endDate = new Date(request.end_date);
-        const daysDifference = Math.ceil(
-          (endDate.getTime() - startDate.getTime()) / (1000  *60 *60 * 24),
-      );
+//       // for (const request of approvedRequests) {
+//       //   const startDate = new Date(request.start_date);
+//       //   const endDate = new Date(request.end_date);
+//       //   const daysDifference = Math.ceil(
+//       //     (endDate.getTime() - startDate.getTime()) / (1000  *60 *60 * 24),
+//       // );
 
-        switch (request.leave_type) {
+//       //   switch (request.leave_type) {
+//       //     case 'full':
+//       //       fullDaysCounter += daysDifference;
+//       //       break;
+//       //     case 'first half':
+//       //       firstHalfDaysCounter += daysDifference;
+//       //       break;
+//       //     case 'second half':
+//       //       secondHalfDaysCounter += daysDifference;
+//       //       break;
+//       //     default:
+//       //       break;
+//       //   }
+//       // }
+// let totalDays=0;
+
+//       approvedRequests.forEach((request) => {
+//         const startDate = new Date(request.start_date);
+//         const endDate = new Date(request.end_date);
+
+//         // const startMonth = startDate.getMonth();
+//         const startYear = startDate.getFullYear();
+
+//         if (startYear === currentYear ) {
+//           const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+//           totalDays += daysDifference;
+//         }
+//         switch (request.leave_type) {
+//               case 'full':
+//                 fullDaysCounter += totalDays;
+//                 break;
+//               case 'first half':
+//                 firstHalfDaysCounter += totalDays;
+//                 break;
+//               case 'second half':
+//                 secondHalfDaysCounter += totalDays;
+//                 break;
+//               default:
+//                 break;}
+//       });
+//       let remainingBalance = 21; 
+
+//       while (remainingBalance > 0) {
+//         if (fullDaysCounter > 0) {
+//           remainingBalance -= 1;
+//           fullDaysCounter -= 1;
+//         } else if (firstHalfDaysCounter > 0) {
+//           remainingBalance -= 0.5;
+//           firstHalfDaysCounter -= 1;
+//         } else if (secondHalfDaysCounter > 0) {
+//           remainingBalance -= 0.5;
+//           secondHalfDaysCounter -= 1;
+//         } else {
+//           break;
+//         }
+//       }
+
+//       remainingBalance = Math.max(remainingBalance, 0);
+
+//       return remainingBalance;
+//     } catch (error) {
+//       throw new BadRequestException(
+//         'Failed to calculate remaining leave balance',
+//       );
+//     }
+//   }
+
+async getRemainingLeaveBalance(id: number): Promise<number> {
+  try {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const approvedRequests = await this.leaveRequestRepository.find({
+      where: {
+        emp_id: id,
+        status: 'approved',
+      },
+    });
+
+    let remainingBalance = 21;
+
+    approvedRequests.forEach((request) => {
+      const startDate = new Date(request.start_date);
+      const endDate = new Date(request.end_date);
+      const leaveType = request.leave_type;
+
+      const startYear = startDate.getFullYear();
+
+      if (startYear === currentYear) {
+        const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        switch (leaveType) {
           case 'full':
-            fullDaysCounter += daysDifference;
+            remainingBalance -= daysDifference;
             break;
           case 'first half':
-            firstHalfDaysCounter += daysDifference;
-            break;
           case 'second half':
-            secondHalfDaysCounter += daysDifference;
+            remainingBalance -= daysDifference / 2;
             break;
           default:
             break;
         }
       }
+    });
 
-      while (remainingBalance > 0) {
-        if (fullDaysCounter > 0) {
-          remainingBalance -= 1;
-          fullDaysCounter -= 1;
-        } else if (firstHalfDaysCounter > 0) {
-          remainingBalance -= 0.5;
-          firstHalfDaysCounter -= 1;
-        } else if (secondHalfDaysCounter > 0) {
-          remainingBalance -= 0.5;
-          secondHalfDaysCounter -= 1;
-        } else {
-          break;
-        }
-      }
+    remainingBalance = Math.max(remainingBalance, 0);
 
-      remainingBalance = Math.max(remainingBalance, 0);
-
-      return remainingBalance;
-    } catch (error) {
-      throw new BadRequestException(
-        'Failed to calculate remaining leave balance',
-      );
-    }
+    return remainingBalance;
+  } catch (error) {
+    throw new BadRequestException('Failed to calculate remaining leave balance');
   }
+}
 
 
   async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
