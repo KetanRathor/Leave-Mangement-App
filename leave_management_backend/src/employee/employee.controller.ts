@@ -100,16 +100,16 @@ export class EmployeeController {
     return this.employeeService.findEmployees();
   }
 
-  @Get('/manager')
-  @ApiCreatedResponse(
-    {
-      description:"Get manager's List"
-    }
-  )
-  async showManagerList() {
-    console.log("first..............")
-    return await this.employeeService.getManagerIds();
-  }
+  // @Get('/manager')
+  // @ApiCreatedResponse(
+  //   {
+  //     description:"Get manager's List"
+  //   }
+  // )
+  // async showManagerList() {
+  //   console.log("first..............")
+  //   return await this.employeeService.getManagerIds();
+  // }
 
   
 

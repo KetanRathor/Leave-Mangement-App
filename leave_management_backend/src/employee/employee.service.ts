@@ -234,16 +234,16 @@ async findAll(): Promise<Employee[]> {
   }
 
 
-  async getManagerIds(): Promise<any[]> {
-    return await this.employeeRepository.find({
-        where: { deleted_at:IsNull() },
-        select: ['manager_id'],
-        relations: ['manager'], 
+  // async getManagerIds(): Promise<any[]> {
+  //   return await this.employeeRepository.find({
+  //       where: { deleted_at:IsNull() },
+  //       select: ['manager_id'],
+  //       relations: ['manager'], 
 
         
-    });
+  //   });
     
-  }
+  // }
 
 }
     
