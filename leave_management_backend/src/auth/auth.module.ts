@@ -7,6 +7,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import * as dotenv from 'dotenv';
 import { MailModule } from 'src/mail/mail.module';
+import { MailService } from 'src/mail/mail.service';
+import { Employee } from 'src/employee/entities/Employee.entity';
+import { EmployeeModule } from 'src/employee/employee.module';
+import { EmployeeService } from 'src/employee/employee.service';
 
 dotenv.config();
 
@@ -14,13 +18,16 @@ dotenv.config();
   imports: [
     TypeOrmModule.forFeature([UserCredentials])
     , PassportModule,
+    
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
       signOptions: { expiresIn: '1d' },
-
+      
+      
     }),
-    MailModule
+    MailModule,
+    
   ],
   controllers: [AuthController],
   providers: [AuthService],

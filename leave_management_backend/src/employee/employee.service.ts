@@ -28,10 +28,10 @@ export class EmployeeService {
 
     //Create employee
     async createEmployee(createEmployeeDto: CreateEmployeeDto,
-        req_mail:any
+        // req_mail:any
     ): Promise<Employee> {
         const newEmployee = this.employeeRepository.create(createEmployeeDto);
-        newEmployee.created_by=req_mail;
+        // newEmployee.created_by=req_mail;
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if (!emailRegex.test(createEmployeeDto.email)) {
             throw new Error('Invalid email format. Please enter a valid email address.');
@@ -43,7 +43,6 @@ export class EmployeeService {
         }
 
 
-        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
 
         // if (createEmployeeDto.role === "Admin") {
         //     newEmployee.manager_id = null;
@@ -53,6 +52,8 @@ export class EmployeeService {
 
 
         const savedEmployee = await this.employeeRepository.save(newEmployee);
+
+        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
 
         await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
 
@@ -126,7 +127,6 @@ export class EmployeeService {
     // }
     async showProfile(id: number): Promise<any> {
         try {
-          // Retrieve employee data with related entities (optimized)
           const employee = await this.employeeRepository.findOne({
             where: { id, deleted_at: IsNull() },
             relations: ['manager', 'department', 'inventories', 'project'],
