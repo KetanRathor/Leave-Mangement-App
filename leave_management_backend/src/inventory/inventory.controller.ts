@@ -7,7 +7,7 @@ import * as crypto from 'crypto'
 import { text } from 'stream/consumers';
 import { Inventory } from './entities/inventory.entity';
 import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Category } from './entities/inventoryCategory.entity';
 
 
@@ -96,6 +96,7 @@ export class InventoryController {
 @ApiCreatedResponse({
   description:'Assign Inventory to given Employee Id'
 })
+
 async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
   const req_mail = req.user.email;
 

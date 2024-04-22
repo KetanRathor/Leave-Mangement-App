@@ -142,7 +142,9 @@ export class Employee {
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'employee image'
+    description:'employee image',
+    type: 'string',
+    format: 'binary'
   })
   image: Buffer;
 

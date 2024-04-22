@@ -23,7 +23,7 @@ import { Department } from './entity/Department.entity';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
 
   @Post()
   @ApiCreatedResponse({
