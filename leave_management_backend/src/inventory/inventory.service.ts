@@ -29,10 +29,10 @@ export class InventoryService {
       if (!createInventoryDto.category_id) {
         throw new Error('Category ID is required to create inventory.');
       }
-  
+
       const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } });
       newInventory.category = category;
-  
+
       const savedInventory = await this.inventoryRepository.save(newInventory);
       return savedInventory;
     } catch (error) {
@@ -60,11 +60,11 @@ export class InventoryService {
 
 
   async showAllInventories() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull(), employee: IsNull() } , relations: ['category','employee']});
+    return await this.inventoryRepository.find({ where: { deleted_at: IsNull(), employee: IsNull() }, relations: ['category', 'employee'] });
   }
 
   async ListOfInventories() {
-    const inventories= await this.inventoryRepository.find({ where: { deleted_at: IsNull() } , relations: ['category','employee']});
+    const inventories = await this.inventoryRepository.find({ where: { deleted_at: IsNull() }, relations: ['category', 'employee'] });
     // console.log("inventories",inventories)
     return inventories
   }
@@ -89,7 +89,7 @@ export class InventoryService {
     inventory.deleted_by = req_mail;
     inventory.deleted_at = new Date()
 
-     await this.inventoryRepository.save(inventory)
+    await this.inventoryRepository.save(inventory)
 
     return (`Inventory with ID ${id} deleted by ${req_mail}`);
   }
@@ -171,7 +171,31 @@ export class InventoryService {
   }
 
 
+  async assignInventoryToEmployee(empId: number, inventoryId: number) {
+    try {
+      const inventory = await this.inventoryRepository.findOne({
+        where: { id: inventoryId },
+        relations: ['employee'], 
+      });
+  
+      if (!inventory) {      
+        return;
+      }
+  
+      const employee = await this.employeeRepository.findOne({ where: { id: empId } });
+      if (!employee) {
+        return;
+      }
+  
+      inventory.employee = employee; 
+      await this.inventoryRepository.save(inventory); 
+        } catch (error) {
+        console.error('Error assigning inventory to employee:', error);
+        }
+  }
 
+ 
+  
 
 
 }
