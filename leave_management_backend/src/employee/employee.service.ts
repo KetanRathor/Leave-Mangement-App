@@ -13,6 +13,8 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
 import { MailService } from 'src/mail/mail.service';
+import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { InventoryService } from 'src/inventory/inventory.service';
 
 
 @Injectable()
@@ -22,6 +24,10 @@ export class EmployeeService {
         private readonly employeeRepository: Repository<Employee>,
         @InjectRepository(UserCredentials)
         private readonly userCredentialRepository: Repository<UserCredentials>,
+        @InjectRepository(Inventory)
+        private readonly inventoryRepository: Repository<Inventory>,
+        private readonly inventoryService:InventoryService,
+        
         private readonly authService: AuthService,
         private readonly mailService: MailService,
     ) { }
@@ -36,27 +42,23 @@ export class EmployeeService {
         if (!emailRegex.test(createEmployeeDto.email)) {
             throw new Error('Invalid email format. Please enter a valid email address.');
         }
-
         const mobileRegex = /^\d{10}$/;
         if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
             throw new Error('Invalid mobile number format. Please enter a valid phone number.');
         }
 
-
-
-        // if (createEmployeeDto.role === "Admin") {
-        //     newEmployee.manager_id = null;
-        // } else {
-        //     newEmployee.manager_id = createEmployeeDto.manager_id;
-        // }
+        // const inventory = await this.inventoryRepository
 
 
         const savedEmployee = await this.employeeRepository.save(newEmployee);
+        const isInventry = createEmployeeDto?.inventory_id;
+        if(isInventry){
+          await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
+        }
 
         const userPassword = await this.authService.registerUser(createEmployeeDto.email)
 
         await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
-
 
         return savedEmployee;
     }
@@ -71,19 +73,20 @@ export class EmployeeService {
         const oldEmail = employee.email;
         console.log("oldEmail",oldEmail)
         for (const key in updatedEmployeeDetails) {
-            if (updatedEmployeeDetails[key] !== undefined) {
-                employee[key] = updatedEmployeeDetails[key];
+          if (key === 'inventory_id') {
+            const existingAssignment = await this.inventoryRepository.findOne({
+              where: { id: updatedEmployeeDetails.inventory_id },
+              relations: ['employee', 'category'],
+            });
+    
+            if (existingAssignment && existingAssignment.employee) {
+              throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
+            } else {
+              await this.inventoryService.assignInventoryToEmployee(employee.id, updatedEmployeeDetails.inventory_id);
+            }
             }
         }
         employee.updated_by = req_mail;
-
-        // if (updatedEmployeeDetails.email && updatedEmployeeDetails.email !== oldEmail) {
-        //     // console.log("updatedEmployeeDetails.email",updatedEmployeeDetails.email)
-        //     // Update the email in the user credentials table
-        //     await this.userCredentialRepository.update({ email: oldEmail }, { email: updatedEmployeeDetails.email });
-        //     // console.log("email",updatedEmployeeDetails.email)
-
-        // }
 
         const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
         if (userCredential) {

@@ -267,28 +267,10 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
   }
 
 
-  // async getNumberOfEmployeesOnLeaveToday(): Promise<number> {
-  //   try {
-  //     const today = new Date();
-  //     // const year = today.getFullYear();
-  //     // const month = today.getMonth() + 1; 
-  //     // const day = today.getDate();
   
-  //     const leaveRequests = await this.leaveRequestRepository.find({
-  //       where: {
-  //         status: 'approved',
-  //         start_date: LessThanOrEqual(today),
-  //         end_date: GreaterThanOrEqual(today),
-  //       },
-  //     });
   
-  //     return leaveRequests.length;
-  //   } catch (error) {
-  //     console.error('Error fetching number of employees on leave today:', error);
-  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-  // async getNumberOfEmployeesOnLeaveToday(): Promise<number> {
+
+  // async getEmployeesOnLeaveToday(): Promise<any> {
   //   try {
   //     const today = new Date();
   
@@ -297,40 +279,62 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
   //         status: 'approved',
   //         start_date: Between(new Date(today.setHours(0, 0, 0, 0)), new Date(today.setHours(23, 59, 59, 999))),
   //       },
+  //       relations: ['employee'], 
+        
   //     });
+  //     console.log("leaveRequests",leaveRequests)
   
-  //     return leaveRequests.length;
+  //     // return leaveRequests.map((leaveRequest) => leaveRequest.employee);
+  //     return leaveRequests.map((leaveRequest) => ({
+  //       // employee: leaveRequest.employee,
+  //       leaveRequest: leaveRequest,
+  //     }));
   //   } catch (error) {
-  //     console.error('Error fetching number of employees on leave today:', error);
+  //     console.error('Error fetching employees on leave today:', error);
   //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
   //   }
   // }
 
+  
   async getEmployeesOnLeaveToday(): Promise<any> {
     try {
-      const today = new Date();
-  
-      const leaveRequests = await this.leaveRequestRepository.find({
-        where: {
-          status: 'approved',
-          start_date: Between(new Date(today.setHours(0, 0, 0, 0)), new Date(today.setHours(23, 59, 59, 999))),
-        },
-        relations: ['employee'], 
-        
-      });
-      console.log("leaveRequests",leaveRequests)
-  
-      // return leaveRequests.map((leaveRequest) => leaveRequest.employee);
-      return leaveRequests.map((leaveRequest) => ({
-        // employee: leaveRequest.employee,
-        leaveRequest: leaveRequest,
-      }));
+        const today = new Date();
+
+        const leaveRequests = await this.leaveRequestRepository.find({
+            where: { status: 'approved' },
+            // select: ['start_date', 'end_date'],
+        });
+
+        console.log("leaveRequests", leaveRequests);
+
+        const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
+            const startDate = new Date(leaveRequest.start_date);
+            const endDate = new Date(leaveRequest.end_date);
+            return today >= startDate && today <= endDate;
+        });
+
+        if (filteredLeaveRequests.length === 0) {
+            console.log("No employees are on leave today.");
+            return "No employees are on leave today.";
+        }
+
+        const employeeDetails = await Promise.all(
+            filteredLeaveRequests.map(async (leaveRequest) => {
+                const employee = await this.employeeRepository.findOne({
+                    where: { id: leaveRequest.emp_id },
+                });
+                return { ...leaveRequest, employee };
+            })
+        );
+
+        console.log("employeesOnLeaveToday", employeeDetails);
+
+        return employeeDetails;
     } catch (error) {
-      console.error('Error fetching employees on leave today:', error);
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+        console.error('Error fetching employees on leave today:', error);
+        throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-  
+}
 
 }
 
