@@ -35,7 +35,6 @@ export class ProjectService {
     if (!project) {
       return { message: `Inventory with ID ${id} not found`, project };
     }
-
     return project;
   }
 

@@ -226,7 +226,7 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
 }
 
 
-  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
+  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
     try {
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth();
@@ -260,7 +260,7 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
 
       remainingWorkFromHomeBalance = Math.max(remainingWorkFromHomeBalance, 0);
 
-      return remainingWorkFromHomeBalance;
+      return {remainingBalance:remainingWorkFromHomeBalance,defaultBalance};
     } catch (error) {
       throw new BadRequestException('Failed to calculate remaining leave balance');
     }
