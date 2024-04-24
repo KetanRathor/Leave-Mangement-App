@@ -179,7 +179,7 @@ export class LeaveTypesAndRequestsService {
   
 
 
-async getRemainingLeaveBalance(id: number): Promise<number> {
+async getRemainingLeaveBalance(id: number): Promise<any> {
   try {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
@@ -191,7 +191,8 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
       },
     });
 
-    let remainingBalance = 21;
+    let default_balance = 21;
+    let remainingBalance = default_balance;
 
     approvedRequests.forEach((request) => {
       const startDate = new Date(request.start_date);
@@ -219,7 +220,7 @@ async getRemainingLeaveBalance(id: number): Promise<number> {
 
     remainingBalance = Math.max(remainingBalance, 0);
 
-    return remainingBalance;
+    return {remainingBalance:remainingBalance,default_balance:default_balance};
   } catch (error) {
     throw new BadRequestException('Failed to calculate remaining leave balance');
   }

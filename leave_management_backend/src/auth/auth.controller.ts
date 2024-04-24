@@ -59,6 +59,29 @@ async forgotPassword(@Body('email') email: string) {
         }
     }
 
+// @Post('reset-password')
+// async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+//     try {
+//         await this.authService.resetPassword(resetPasswordDto.email, resetPasswordDto.newPassword, resetPasswordDto.confirmPassword);
+//         return { message: 'Password reset successfully' };
+//     } catch (error) {
+//         return { error: error.message };
+//     }
+// }
+
+// @Post('verify-otp')
+// async verifyOTP(@Body() resetPasswordDto: ResetPasswordDto) {
+//     try {
+//         await this.authService.verifyOTP(resetPasswordDto.email, resetPasswordDto.otp);
+//         return { message: 'OTP verified successfully' };
+//     } catch (error) {
+//         return { error: error.message };
+//     }
+// }
+
+
+    
+
 
 
 }
