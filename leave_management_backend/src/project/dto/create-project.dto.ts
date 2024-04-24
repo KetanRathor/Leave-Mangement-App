@@ -17,12 +17,14 @@ export class CreateProjectDto {
     description: string;
 
     @ApiProperty({
-      description:'start date of the project'
+      description:'start date of the project',
+      example:'2024-03-01'
     })
     startDate: Date;
 
     @ApiProperty({
-      description:'end date of the project'
+      description:'end date of the project',
+      example:'2024-05-01'
     })
     endDate?: Date;
 
