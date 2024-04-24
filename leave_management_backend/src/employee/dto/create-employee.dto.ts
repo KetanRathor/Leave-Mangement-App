@@ -58,4 +58,11 @@ export class CreateEmployeeDto {
         example:1,
     })
     manager_id?: number;
+
+    //////////////
+    @ApiProperty({
+        description:"The inventory id of the inventory",
+        example:1,
+    })
+    inventory_id?: number;
 }

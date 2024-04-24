@@ -11,6 +11,8 @@ import { MailService } from 'src/mail/mail.service';
 // import { MailService } from 'src/mail/mail.service';
 import * as cache from 'memory-cache';
 import { Employee } from 'src/employee/entities/Employee.entity';
+// import { Employee } from 'src/employee/entities/Employee.entity';
+// import { EmployeeService } from 'src/employee/employee.service';
 
 
 
@@ -26,12 +28,11 @@ export class AuthService {
         private jwtService: JwtService,
         @InjectRepository(UserCredentials)
         private readonly userCredentialsRepository: Repository<UserCredentials>,
-        // private readonly employeeRepository: Repository<Employee>,
-        private readonly mailService: MailService
+        @InjectRepository(Employee)
+        private readonly employeeRepository: Repository<Employee>,
+        private readonly mailService: MailService,
+        // private employeeService : EmployeeService
     ) { }
-
-
-
 
 
     encrypt(text: string): string {
@@ -55,8 +56,39 @@ export class AuthService {
         decrypted += decipher.final('utf8');
         console.log("decrypted : ", decrypted);
 
-
         return decrypted;
+    }
+
+    async showProfile(id: number): Promise<any> {
+        try {
+            const employee = await this.employeeRepository.findOne({
+                where: { id, deleted_at: IsNull() },
+                // relations: ['manager', 'department', 'inventories', 'project'],
+            });
+            const managerIDs = await this.employeeRepository.find({
+                where: { deleted_at: IsNull() },
+                // select: ['manager_id'],
+                // relations: ['manager'], 
+            });
+            if (employee) {
+                let role;
+                if (employee.admin) {
+                    role = 'Admin';
+                } else if (managerIDs.some(manager => manager.manager_id === employee.id)) {
+
+                    role = 'Manager';
+                } else {
+                    role = 'Employee';
+                }
+
+                return { ...employee, role };
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
     }
 
 
@@ -67,8 +99,18 @@ export class AuthService {
         console.log("Inside Validate User...");
 
         const user = await this.userCredentialsRepository.findOne({
-            where: { email }
+            where: { email },
         })
+
+        const employeeId = (await this.employeeRepository.findOne({
+            where:{
+                email : user.email
+            }
+        })).id
+
+        const result = await this.showProfile(employeeId)
+
+
         console.log("user...", user);
 
         try {
@@ -77,7 +119,7 @@ export class AuthService {
             console.log("decryptedStoredPassword", decryptedStoredPassword)
             if (password === decryptedStoredPassword) {
 
-                const { password, ...userdata } = user;
+                const { password, ...userdata } = result;
                 console.log("password", password);
                 const token = await this.jwtService.signAsync(userdata);
                 return { access_token: token }
@@ -91,14 +133,14 @@ export class AuthService {
 
     // async validateUser({ email, password }: AuthPayloadDto) {
     //     
-      
+
     //     if (password === decryptedStoredPassword) {
     //       const profile = await this.employeeService.showProfile(user.id); 
     //       if (!profile) {
     //         // Handle case where user not found
     //         return new HttpException('User not found', 404);
     //       }
-      
+
     //       const token = await this.jwtService.signAsync(profile);
     //       return { access_token: token, role: profile.role };
     //     }
@@ -106,16 +148,16 @@ export class AuthService {
     //   }
 
     // async deriveUserRole(userId: number): Promise<string> {
-        
+
     //     const managerIDs = await this.employeeRepository.find({
     //         where: { deleted_at: IsNull() },
     //         select: ['manager_id'],
     //     });
-    
+
     //     const employee = await this.employeeRepository.findOne({
     //         where: { id: userId, deleted_at: IsNull() },
     //     });
-    
+
     //     if (employee) {
     //         if (employee.admin) {
     //             return 'Admin';
@@ -212,10 +254,10 @@ export class AuthService {
     }
 
     async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
-        const user = await this.userCredentialsRepository.findOneBy({ email }); 
+        const user = await this.userCredentialsRepository.findOneBy({ email });
         if (!user) {
-        throw new HttpException('Invalid email address', 400);
-  }
+            throw new HttpException('Invalid email address', 400);
+        }
         cache.put(email, otp, this.otpTTL);
         const cachedOTP = cache.get(email);
         console.log('Cached OTP:', cachedOTP)

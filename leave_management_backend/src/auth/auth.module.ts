@@ -7,16 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import * as dotenv from 'dotenv';
 import { MailModule } from 'src/mail/mail.module';
-import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
-import { EmployeeModule } from 'src/employee/employee.module';
-import { EmployeeService } from 'src/employee/employee.service';
+// import { MailService } from 'src/mail/mail.service';
+// import { Employee } from 'src/employee/entities/Employee.entity';
+// import { EmployeeModule } from 'src/employee/employee.module';
+// import { EmployeeService } from 'src/employee/employee.service';
 
 dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserCredentials])
+    TypeOrmModule.forFeature([UserCredentials,Employee])
     , PassportModule,
     
     JwtModule.register({
@@ -27,6 +28,7 @@ dotenv.config();
       
     }),
     MailModule,
+    // EmployeeModule
     
   ],
   controllers: [AuthController],
