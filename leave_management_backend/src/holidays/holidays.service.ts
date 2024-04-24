@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { Holidays } from './entities/holidays.entity';
@@ -20,17 +20,21 @@ export class HolidaysService {
     req_mail:string
   ): Promise<Holidays> {
 
-    const newHoliday = this.holidaysRepository.create({
-      date: date,
-      day: day,
-      occasion: occasion,
-      image: image,
-    });
-
-    console.log("newHoliday...........", newHoliday)
-    newHoliday.created_by=req_mail;
-    return await this.holidaysRepository.save(newHoliday);
-   
+    try{
+      const newHoliday = this.holidaysRepository.create({
+        date: date,
+        day: day,
+        occasion: occasion,
+        image: image,
+      });
+  
+      console.log("newHoliday...........", newHoliday)
+      newHoliday.created_by=req_mail;
+      return await this.holidaysRepository.save(newHoliday);
+    }
+   catch(error){
+    throw new HttpException('Not Able To Create',404)
+   }
     
   }
 

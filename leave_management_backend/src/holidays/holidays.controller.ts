@@ -33,63 +33,6 @@ export class HolidaysController {
   imageService: any;
   constructor(private readonly holidaysService: HolidaysService) { }
 
-  @UseGuards(AuthGuard)
-  @Post('upload')
-  // @ApiBody({
-  //   type: CreateHolidaysDto
-  // })
-  @ApiCreatedResponse({
-    description: 'create holiday object ',
-    type: Holidays
-  })
-  // @UseInterceptors(FileInterceptor('file'))
-@ApiConsumes('multipart/form-data')
-@UseInterceptors(FileInterceptor('file'))
-@ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      // date: { type: 'Date' },
-      // day: { type: 'string' },
-      // occasion: { type: 'string' },
-      data1:{
-        type:'string',
-        example:{"date":"2020-01-01","day":"tuesday","occasion":"new year"}
-      },
-     
-      file: {
-        type: 'string',
-        format: 'binary',
-      },
-    },
-  },
-})
-  async uploadImage(@UploadedFile() file, @Body() body: any,
-  @Request() req,) {
-
-    
-
-    const inputData = body.data1;
-if (!inputData) {
-  throw new HttpException('Data1 field is missing', HttpStatus.BAD_REQUEST);
-}
-const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
-
-    const req_mail = req.user.email;
-    const newHoliday = await this.holidaysService.uploadImage(
-      createHolidayDto.date,
-      createHolidayDto.day,
-      createHolidayDto.occasion,
-      file.buffer,
-      req_mail,
-    );
- 
-    return {
-      message: 'Image uploaded for holiday successfully',
-      holiday: newHoliday,
-      req_mail,
-    };
-  }
 
 
   @UseGuards(AuthGuard)
@@ -160,7 +103,7 @@ const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
+    description: 'Employee with given ID will be deleted as response'
 
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
@@ -184,5 +127,65 @@ const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+
+
+  @UseGuards(AuthGuard)
+  @Post('upload')
+  // @ApiBody({
+  //   type: CreateHolidaysDto
+  // })
+  @ApiCreatedResponse({
+    description: 'create holiday object ',
+    type: Holidays
+  })
+  // @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        // date: { type: 'Date' },
+        // day: { type: 'string' },
+        // occasion: { type: 'string' },
+        data1: {
+          type: 'string',
+          example: { "date": "2020-01-01", "day": "tuesday", "occasion": "new year" }
+        },
+
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadImage(@UploadedFile('file') file, @Body('data1') body: any,
+    @Request() req,) {
+
+    
+    const inputData = body;
+    if (!inputData) {
+      throw new HttpException('Data1 field is missing', HttpStatus.BAD_REQUEST);
+    }
+    const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
+
+    const req_mail = req.user.email;
+    const newHoliday = await this.holidaysService.uploadImage(
+      createHolidayDto.date,
+      createHolidayDto.day,
+      createHolidayDto.occasion,
+      file.buffer,
+      req_mail,
+    );
+
+    return {
+      message: 'Image uploaded for holiday successfully',
+      holiday: newHoliday,
+      req_mail,
+    };
+  }
+
 
 }
