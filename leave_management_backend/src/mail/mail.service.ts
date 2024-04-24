@@ -97,7 +97,7 @@ export class MailService {
             const managerMailOptions = {
                 from: email,
                 to: manager_email,
-                subject: `Leave request from: ${employeeName}`,
+                subject: `Leave request for: ${employeeName} from ${fromDateAndStartDate}`,
                 text: `Leave request for ${reason}\n\n A leave request has been submitted by ${employeeName}. Please review and take necessary actions.`,
             };
             
