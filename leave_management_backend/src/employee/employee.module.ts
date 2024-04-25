@@ -11,9 +11,10 @@ import { MailModule } from 'src/mail/mail.module';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Category } from 'src/inventory/entities/inventoryCategory.entity';
+import { UserOtp } from 'src/auth/entities/userOtp.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Employee,Department,UserCredentials,Inventory,Category]),MailModule],
+  imports : [TypeOrmModule.forFeature([Employee,Department,UserCredentials,Inventory,Category,UserOtp]),MailModule],
   controllers: [EmployeeController],
   providers: [EmployeeService,AuthService,InventoryService],
   exports:[EmployeeService]
