@@ -121,7 +121,7 @@ export class AuthService {
             console.log("decryptedStoredPassword", decryptedStoredPassword)
             if (password === decryptedStoredPassword) {
 
-                const { password, ...userdata } = result;
+                const { password,image, ...userdata } = result;
                 console.log("password", password);
                 const token = await this.jwtService.signAsync(userdata);
                 return { access_token: token }

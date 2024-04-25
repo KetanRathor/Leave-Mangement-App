@@ -11,9 +11,10 @@ import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Between, In, LessThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { start } from 'repl';
-import { Console } from 'console';
+import { Console, log } from 'console';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { ClientGrpcProxy } from '@nestjs/microservices';
 
 
 @Injectable()
@@ -70,7 +71,8 @@ export class LeaveTypesAndRequestsService {
         where: { id: emp_id },
         relations: ['manager'],
       });
-
+        console.log("Employee",employee);
+        
       if (!employee) {
         throw new NotFoundException('Employee not found');
       }
@@ -202,7 +204,7 @@ async getRemainingLeaveBalance(id: number): Promise<any> {
       const startYear = startDate.getFullYear();
 
       if (startYear === currentYear) {
-        const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))+1;
 
         switch (leaveType) {
           case 'full':
@@ -251,7 +253,8 @@ async getRemainingLeaveBalance(id: number): Promise<any> {
         const startYear = startDate.getFullYear();
 
         if (startMonth === currentMonth && startYear === currentYear) {
-          const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+          const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))+1;
+          console.log("............",daysDifference)
           totalWorkFromHomeDays += daysDifference;
         }
       });
