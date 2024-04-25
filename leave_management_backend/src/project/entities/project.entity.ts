@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
@@ -16,11 +16,13 @@ export class Project {
   @Column()
   name: string;
 
-  @ApiProperty({
-    description:'manager_name of project'
-  })
-  @Column()
-  manager_name: string;
+  @ManyToOne(() => Employee, (employee) => employee.projects)
+  // @JoinTable({name:'manager_id'})
+    @ApiProperty({
+        description:'prject manager',
+        type:CreateEmployeeDto
+    })
+    manager: Employee
 
   @ApiProperty({
     description:'description of project'
@@ -85,6 +87,9 @@ export class Project {
   })
   @Column({ default: '' })
   deleted_by: string;
+
+
+
 
   @ApiProperty({
     description:'employees of project',

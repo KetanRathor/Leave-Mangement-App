@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
-import { IsNull, Repository } from 'typeorm';
+import { FindOneOptions, IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv';
@@ -11,6 +11,7 @@ import { MailService } from 'src/mail/mail.service';
 // import { MailService } from 'src/mail/mail.service';
 import * as cache from 'memory-cache';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { UserOtp } from './entities/userOtp.entity';
 // import { Employee } from 'src/employee/entities/Employee.entity';
 // import { EmployeeService } from 'src/employee/employee.service';
 
@@ -30,6 +31,8 @@ export class AuthService {
         private readonly userCredentialsRepository: Repository<UserCredentials>,
         @InjectRepository(Employee)
         private readonly employeeRepository: Repository<Employee>,
+        @InjectRepository(UserOtp)
+        private readonly userOtp: Repository<UserOtp>,
         private readonly mailService: MailService,
         // private employeeService : EmployeeService
     ) { }
@@ -68,7 +71,7 @@ export class AuthService {
             const managerIDs = await this.employeeRepository.find({
                 where: { deleted_at: IsNull() },
                 // select: ['manager_id'],
-                
+
                 // relations: ['manager'], 
             });
             if (employee) {
@@ -83,7 +86,7 @@ export class AuthService {
                 }
 
                 return { ...employee, role };
-                
+
             } else {
                 return null;
             }
@@ -105,8 +108,8 @@ export class AuthService {
         })
 
         const employeeId = (await this.employeeRepository.findOne({
-            where:{
-                email : user.email
+            where: {
+                email: user.email
             }
         })).id
 
@@ -234,21 +237,62 @@ export class AuthService {
 
 
     async forgotPassword(email: string) {
+
+        const expiresAt = new Date(Date.now() + 30000)
+        const currentTimestamp = new Date();
+
         const user = await this.userCredentialsRepository.findOne({
             where: { email },
         });
         console.log("user", user);
 
         if (!user) {
-            // return { message: 'Email not found' };
+            
             console.log("hiii")
             return new HttpException('Email not found', 404);
         }
         else {
 
             const otp = this.generateOTP();
+            console.log("otp", otp)
             await this.mailService.sendOTPEmail(email, otp);
+            // const saveOtp = await this.userOtp.save({})
 
+            const employeeId = await this.employeeRepository.findOne({
+                where: {
+                    email
+                }
+            });
+
+            const isOtpAlreadySent = await this.userOtp.findOne({
+                where: {
+                    employeeId
+                }
+            });
+
+           
+            // let {} = 
+
+            console.log("isOtpAlreadySent...", isOtpAlreadySent);
+
+
+            if (isOtpAlreadySent) {
+                await this.userOtp.save({
+                    ...isOtpAlreadySent,
+                    otpCode: otp,
+                    createdAt:currentTimestamp,
+                    expiresAt
+                    
+                }
+                )
+            } else {
+                await this.userOtp.save({
+                    otpCode: otp,
+                    employeeId,
+                    expiresAt
+                    
+                })
+            }
 
             return { message: 'OTP sent to your email address' };
         }
@@ -260,13 +304,19 @@ export class AuthService {
         if (!user) {
             throw new HttpException('Invalid email address', 400);
         }
-        cache.put(email, otp, this.otpTTL);
-        const cachedOTP = cache.get(email);
-        console.log("cachedOTP",cachedOTP)
-        console.log('Cached OTP:', cachedOTP)
-        if (!cachedOTP || cachedOTP !== otp) {
+        
+
+        const savedOTPRecord = await this.userOtp.findOne({ where: { employeeId: user.id }as FindOneOptions<Employee>['where'] });
+
+        if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
             throw new HttpException('Invalid OTP', 400);
         }
+
+        if (new Date() > savedOTPRecord.expiresAt) {
+            throw new HttpException('OTP has expired', 400);
+        }
+
+
         if (!newPassword || newPassword.length < 6) {
             throw new HttpException('Password must be at least 6 characters long', 400);
         }
@@ -283,7 +333,7 @@ export class AuthService {
 
         await this.mailService.sendPasswordResetEmail(email)
 
-        cache.del(email);
+        // cache.del(email);
     }
 
     // async matchOtp(email: string,otp: string){
@@ -299,10 +349,10 @@ export class AuthService {
     //     }
     // }
 
-    
+
 
     // async verifyOTP(email: string, otp: string) {
-        
+
     //     await this.matchOtp(email, otp);
     // }
 
@@ -313,36 +363,36 @@ export class AuthService {
     //     if (!cachedOTP || cachedOTP !== otp) {
     //         throw new HttpException('Invalid OTP', 400);
     //     }
-        
+
     //     cache.del(email);
     // }
 
     // async resetPassword(email: string, newPassword: string, confirmPassword: string) {
 
-           
+
 
     //     if (newPassword !== confirmPassword) {
     //       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     //     }
-      
+
     //     if (newPassword.length < 6) {
     //       throw new HttpException('Password must be at least 6 characters long', HttpStatus.BAD_REQUEST);
     //     }
-      
-      
+
+
     //     const encryptedPassword = await this.encrypt(newPassword);
     //     await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
     //     await this.mailService.sendPasswordResetEmail(email); 
-      
+
     //     return { message: 'Password reset successfully' };
     //   }
-      
-      
-
-    
 
 
-    
+
+
+
+
+
 
 
 

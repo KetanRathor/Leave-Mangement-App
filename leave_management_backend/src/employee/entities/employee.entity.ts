@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
+import { UserOtp } from 'src/auth/entities/userOtp.entity';
 
 @Entity('employee')
 export class Employee {
@@ -154,8 +155,16 @@ export class Employee {
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
 
+  @ApiProperty()
+  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  projects: Project[]
+
   @ManyToMany(() => Project)
     @JoinTable({name:"employee_project"})
     project: Project[]
+
+
+  @OneToOne(() => UserOtp, { cascade:true })
+  otp: UserOtp;
   
 }

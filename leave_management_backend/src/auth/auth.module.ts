@@ -8,6 +8,7 @@ import { UserCredentials } from './entities/UserCredentials.entity';
 import * as dotenv from 'dotenv';
 import { MailModule } from 'src/mail/mail.module';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { UserOtp } from './entities/userOtp.entity';
 // import { MailService } from 'src/mail/mail.service';
 // import { Employee } from 'src/employee/entities/Employee.entity';
 // import { EmployeeModule } from 'src/employee/employee.module';
@@ -17,7 +18,7 @@ dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserCredentials,Employee])
+    TypeOrmModule.forFeature([UserCredentials,Employee,UserOtp])
     , PassportModule,
     
     JwtModule.register({

@@ -10,7 +10,7 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
         @ApiProperty({
           description:'manager name of the project'
         })
-        manager_name:string;
+        manager_id:number;
     
         @ApiProperty({
           description:'description of the project'
