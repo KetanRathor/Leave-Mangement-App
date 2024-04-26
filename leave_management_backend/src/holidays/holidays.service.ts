@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { Holidays } from './entities/holidays.entity';
@@ -20,17 +20,21 @@ export class HolidaysService {
     req_mail:string
   ): Promise<Holidays> {
 
-    const newHoliday = this.holidaysRepository.create({
-      date: date,
-      day: day,
-      occasion: occasion,
-      image: image,
-    });
-
-    console.log("newHoliday...........", newHoliday)
-    newHoliday.created_by=req_mail;
-    return await this.holidaysRepository.save(newHoliday);
-   
+    try{
+      const newHoliday = this.holidaysRepository.create({
+        date: date,
+        day: day,
+        occasion: occasion,
+        image: image,
+      });
+  
+      console.log("newHoliday...........", newHoliday)
+      newHoliday.created_by=req_mail;
+      return await this.holidaysRepository.save(newHoliday);
+    }
+   catch(error){
+    throw new HttpException('Not Able To Create',404)
+   }
     
   }
 
@@ -64,19 +68,38 @@ export class HolidaysService {
 
 
 
-async getRemainingHolidays(): Promise<number> {
+// async getRemainingHolidays(): Promise<number> {
+//   try {
+//     const currentDate = new Date();
+//     const holidaysUntilCurrentDate = await this.holidaysRepository.count({
+//       where: {
+//         date: LessThanOrEqual(currentDate),
+//       },
+//     });
+//     const defaultHolidays = 10; 
+
+//     return defaultHolidays - holidaysUntilCurrentDate;
+//   } catch (error) {
+//     throw new Error('Failed to calculate remaining holidays');
+//   }
+// } 
+
+async getRemainingHolidays(): Promise<any> {
   try {
     const currentDate = new Date();
+    const totalHolidays = await this.holidaysRepository.count();
+   
     const holidaysUntilCurrentDate = await this.holidaysRepository.count({
       where: {
         date: LessThanOrEqual(currentDate),
       },
     });
-    const defaultHolidays = 10; 
 
-    return defaultHolidays - holidaysUntilCurrentDate;
+    const remainingHolidays = totalHolidays - holidaysUntilCurrentDate;
+
+    return { remainingHolidays, totalHolidays };
   } catch (error) {
     throw new Error('Failed to calculate remaining holidays');
   }
-} 
+}
 }
