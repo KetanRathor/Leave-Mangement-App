@@ -38,7 +38,7 @@ export class LeaveRequest {
 })
   start_date: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @Column({ type: 'date', nullable: true })
   @ApiProperty({
     description:'end date for leave'
 })
