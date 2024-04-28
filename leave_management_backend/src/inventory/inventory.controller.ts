@@ -20,10 +20,6 @@ export class InventoryController {
     
   ) { }
 
-  
-
-
- 
 
   @UseGuards(AuthGuard)
   @Post()
@@ -45,15 +41,19 @@ export class InventoryController {
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
-    description:'Get List of all Inventories',
+    description:'Get List of Inventories which are not assigned to any employee',
     type:[Inventory]
   })
   findAllInventories() {
     return this.inventoryService.showAllInventories();
   }
 
-
+  @UseGuards(AuthGuard)
   @Get('/list_of_inventories')
+  @ApiOkResponse({
+    description:'Get List of all Inventories ',
+    type:[Inventory]
+  })
   ListOfInventories() {
     return this.inventoryService.ListOfInventories();
   }
@@ -159,7 +159,7 @@ async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDt
 }
 
 
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
   @Get('allCategory')
   @ApiOkResponse({
     description:'Get List Of All Categories of Inventories',

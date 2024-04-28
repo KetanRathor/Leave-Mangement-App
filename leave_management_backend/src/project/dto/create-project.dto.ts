@@ -2,17 +2,20 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateProjectDto {
   @ApiProperty({
-    description:'name of the project'
+    description:'name of the project',
+    example:'project_name'
   })
     name: string;
 
     @ApiProperty({
-      description:'manager name of the project'
+      description:'manager name of the project',
+      example:3
     })
     manager_id:number;
 
     @ApiProperty({
-      description:'description of the project'
+      description:'description of the project',
+      example:'project_description'
     })
     description: string;
 
@@ -29,7 +32,8 @@ export class CreateProjectDto {
     endDate?: Date;
 
     @ApiProperty({
-      description:'status of the project'
+      description:'status of the project',
+      example:'active'
     })
     status: 'active' | 'inactive';
     // manager_name?: string; 

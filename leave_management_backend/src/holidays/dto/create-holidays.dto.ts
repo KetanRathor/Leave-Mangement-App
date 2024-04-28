@@ -21,7 +21,6 @@ export class CreateHolidaysDto {
 
   @ApiProperty({
     description: 'occasion image',
-    example: 'example.jpg',
     type: 'string',
     format: 'binary'
   })

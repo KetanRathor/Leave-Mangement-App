@@ -238,7 +238,7 @@ export class AuthService {
 
     async forgotPassword(email: string) {
 
-        const expiresAt = new Date(Date.now() + 60000)
+        const expiresAt = new Date(Date.now() + 600000)
         const currentTimestamp = new Date();
 
         const user = await this.userCredentialsRepository.findOne({

@@ -149,6 +149,7 @@ export class Employee {
   })
   image: Buffer;
 
+  @ApiProperty()
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
@@ -161,11 +162,12 @@ export class Employee {
   @OneToMany(() => Project, (project) => project.employee, { cascade: true })
   projects: Project[]
 
+  @ApiProperty()
   @ManyToMany(() => Project)
     @JoinTable({name:"employee_project"})
     project: Project[]
 
-
+  @ApiProperty()
   @OneToOne(() => UserOtp, { cascade:true })
   otp: UserOtp;
   

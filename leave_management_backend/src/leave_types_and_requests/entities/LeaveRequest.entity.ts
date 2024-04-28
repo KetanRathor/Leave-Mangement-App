@@ -95,6 +95,7 @@ export class LeaveRequest {
   // @JoinColumn({ name: 'leave_type_id' })
   // leaveType: LeaveType;
 
+  // @ApiProperty()
   @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
   @JoinColumn({ name: 'emp_id' })
   employee: Employee;

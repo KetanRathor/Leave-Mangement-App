@@ -45,8 +45,10 @@ export class DepartmentController {
   }
 
   @Get()
+  @ApiOkResponse({
+    description:'Get List of Departments'
+  })
   async showDepartmentList() {
-    // console.log("first..............")
     return await this.departmentService.findDepartmentList();
   }
 

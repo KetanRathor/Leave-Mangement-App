@@ -359,5 +359,31 @@ export class LeaveTypesAndRequestsService {
     }
 }
 
+// async getEmployeesByManagerId(managerId: number): Promise<Employee[]> {
+//   console.log(managerId)
+//   return this.employeeRepository.find({
+//     where: { manager_id:managerId },
+//   });
+// }
+
+// async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
+//   return this.leaveRequestRepository.find({
+//     where: {emp_id: employeeId, status: 'pending' },
+//   });
+// }
+
+async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
+  return await this.employeeRepository.find({
+    where: { manager_id:emp_id }, 
+    // relations: ['employee'],
+  });
+}
+async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
+  return this.leaveRequestRepository.find({
+    where: { emp_id:employeeId, status: 'pending' },
+    relations: ['employee'],
+  });
+}
+
 }
 

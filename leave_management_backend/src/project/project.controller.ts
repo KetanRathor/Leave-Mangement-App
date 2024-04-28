@@ -72,7 +72,7 @@ export class ProjectController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
@@ -101,7 +101,6 @@ export class ProjectController {
   @Put('/status/:project_id')
   @ApiCreatedResponse({
     description: 'status of the project will be updated as response',
-    type: Project
   })
   @ApiBody({
     schema: {
