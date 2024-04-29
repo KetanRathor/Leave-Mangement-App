@@ -1,48 +1,69 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Put,
+  Param,
+  ParseIntPipe,
+  Delete,
+  Get,
+  UseGuards,
+  Request,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'created user object as response',
     type: Employee,
   })
-
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    // @Request() req,
+    @Request() req,
   ) {
-    // const req_mail = req.user.email;
+    const req_mail = req.user.email;
     try {
       return await this.employeeService.createEmployee(
         createEmployeeDto,
-        // req_mail,
+        req_mail,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
- 
 
   @UseGuards(AuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
-    description:'Employee with given ID will be updated as response',
-    type:Employee
+    description: 'Employee with given ID will be updated as response',
+    type: Employee,
   })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
@@ -51,7 +72,11 @@ export class EmployeeController {
   ) {
     const req_mail = req.user.email;
     try {
-      return await this.employeeService.updateEmployee(id, updateEmployeeDto,req_mail);
+      return await this.employeeService.updateEmployee(
+        id,
+        updateEmployeeDto,
+        req_mail,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -60,14 +85,13 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
-
+    description: 'Employee with given ID will be deleted as response',
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.email;
     try {
-      await this.employeeService.deleteEmployee(id,req_mail);
-      return 'Employee Deleted Successfully'
+      await this.employeeService.deleteEmployee(id, req_mail);
+      return 'Employee Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -77,8 +101,8 @@ export class EmployeeController {
   @UseGuards(AuthGuard)
   @Get('employee/:id')
   @ApiOkResponse({
-    description:'Get employee by id',
-    type:Employee
+    description: 'Get employee by id',
+    type: Employee,
   })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -88,13 +112,11 @@ export class EmployeeController {
     }
   }
 
-  
-
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
-    description:'All employees List',
-    type:[Employee]
+    description: 'All employees List',
+    type: [Employee],
   })
   showEmployeeList() {
     return this.employeeService.findEmployees();
@@ -102,59 +124,56 @@ export class EmployeeController {
 
   @Get('/manager')
   async showManagerList() {
-    console.log("first..............")
+    console.log('first..............');
     return await this.employeeService.getManagerIds();
   }
 
-  
-
   @Post('upload-image/:id')
   @ApiConsumes('multipart/form-data')
-@UseInterceptors(FileInterceptor('image'))
-async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
-  
-  if (!image) {
-    throw new Error('No image uploaded');
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @Param('id') id: number,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    if (!image) {
+      throw new Error('No image uploaded');
+    }
+
+    const employee = await this.employeeService.uploadImage(id, image.buffer);
+
+    return employee;
   }
 
-  const employee = await this.employeeService.uploadImage(id, image.buffer);
+  // @Get('/managers')
+  //   async findManagersAndAdmins() {
+  //     try {
+  //       const managerAndAdminEmployees = await this.employeeService.findManagers();
+  //       return managerAndAdminEmployees;
+  //     } catch (error) {
+  //       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 
-  return employee;
-}
-
-
-
-// @Get('/managers')
-//   async findManagersAndAdmins() {
-//     try {
-//       const managerAndAdminEmployees = await this.employeeService.findManagers();
-//       return managerAndAdminEmployees;
-//     } catch (error) {
-//       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
-//     }
-//   }
-
-async determineRole(employee, employeeService) {
-  
-  const hasManager = await employeeService.findById(employee.manager_id);
-  console.log("hasManager",hasManager)
-  if (employee.admin) {
-    return 'Admin';
-  } else if (hasManager) {
-    return 'Employee'; 
-  } else {
-    return 'Manager'; 
+  async determineRole(employee, employeeService) {
+    const hasManager = await employeeService.findById(employee.manager_id);
+    console.log('hasManager', hasManager);
+    if (employee.admin) {
+      return 'Admin';
+    } else if (hasManager) {
+      return 'Employee';
+    } else {
+      return 'Manager';
+    }
   }
-}
 
-@Get('/managers')
+  @Get('/managers')
   async getEmployeeList() {
     try {
       const employees = await this.employeeService.findAll();
 
-      const employeeList = employees.map(employee => {
-        const role =  this.determineRole(employee, this.employeeService); 
-        console.log("role",role);
+      const employeeList = employees.map((employee) => {
+        const role = this.determineRole(employee, this.employeeService);
+        console.log('role', role);
         return {
           id: employee.id,
           name: employee.name,
@@ -163,15 +182,13 @@ async determineRole(employee, employeeService) {
         };
       });
 
-      return employeeList; 
+      return employeeList;
     } catch (error) {
       console.error(error);
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
-
-  
-
-  
-
