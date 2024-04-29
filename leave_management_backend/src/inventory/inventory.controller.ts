@@ -24,6 +24,7 @@ import { Inventory } from './entities/inventory.entity';
 import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
@@ -63,15 +64,20 @@ export class InventoryController {
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
-    description: 'Get List of all Inventories',
+    description:
+      'Get List of Inventories which are not assigned to any employee',
     type: [Inventory],
   })
   findAllInventories() {
     return this.inventoryService.showAllInventories();
   }
 
-
+  @UseGuards(AuthGuard)
   @Get('/list_of_inventories')
+  @ApiOkResponse({
+    description: 'Get List of all Inventories ',
+    type: [Inventory],
+  })
   ListOfInventories() {
     return this.inventoryService.ListOfInventories();
   }
@@ -120,40 +126,30 @@ export class InventoryController {
     return await this.inventoryService.deleteInventory(id, req_mail);
   }
 
-  @UseGuards(AuthGuard)
-  @Post('assign/:employeeId')
-  @ApiCreatedResponse({
-    description: 'Assign Inventory to given Employee Id',
-  })
-  async assignInventory(
-    @Body() createInventoryDto: CreateInventoryDto,
-    @Param('employeeId') employeeId: number,
-    @Request() req,
-  ) {
-    const req_mail = req.user.email;
+  //   @UseGuards(AuthGuard)
+  // @Post('assign/:employeeId')
+  // @ApiCreatedResponse({
+  //   description:'Assign Inventory to given Employee Id'
+  // })
+  // async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
+  //   const req_mail = req.user.email;
 
-    try {
-      const existingInventory =
-        await this.inventoryService.findOneInventoryBySN(
-          createInventoryDto.serial_number,
-        );
+  //   try {
+  //     const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
 
-      if (existingInventory) {
-        return await this.inventoryService.assignInventory({
-          inventoryId: existingInventory.id,
-          employeeId,
-          categoryId: createInventoryDto.category_id,
-        });
-      } else {
-        return { message: 'Inventory not available' };
-      }
+  //     if (existingInventory) {
+  //       return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
+  //     }
+  //     else{
+  //       return {message:"Inventory not available"}
+  //     }
 
-      // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
-      // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
+  //     // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
+  //     // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //   }
+  //   }
 
   @Get('assigned/:employeeId')
   @ApiOkResponse({
@@ -195,7 +191,7 @@ export class InventoryController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get('allCategory')
   @ApiOkResponse({
     description: 'Get List Of All Categories of Inventories',

@@ -22,9 +22,17 @@ export class ProjectService {
     private employeeRepository: Repository<Employee>,
   ) {}
 
-  addProject(createProjectDto: CreateProjectDto, req_mail: any) {
+  async addProject(createProjectDto: CreateProjectDto, req_mail: any) {
     const newProject = this.projectRepository.create(createProjectDto);
     newProject.created_by = req_mail;
+    const manager = await this.employeeRepository.findOneBy({
+      id: createProjectDto.manager_id,
+    });
+
+    if (!manager) {
+      throw new Error('Manager not found for the provided ID');
+    }
+    newProject.manager = manager;
 
     return this.projectRepository.save(newProject);
   }
@@ -32,20 +40,19 @@ export class ProjectService {
   async showAllProjects() {
     return await this.projectRepository.find({
       where: { deleted_at: IsNull() },
-      relations: ['employee'],
+      relations: ['employee', 'manager'],
     });
   }
 
   async findOneProject(id: number) {
     const project = await this.projectRepository.findOne({
       where: { id, deleted_at: IsNull() },
-      relations: ['employee'],
+      relations: ['employee', 'manager'],
     });
 
     if (!project) {
       return { message: `Inventory with ID ${id} not found`, project };
     }
-
     return project;
   }
 
@@ -115,42 +122,46 @@ export class ProjectService {
   // async getEmployeesOnProject(id: number){
 
   // }
-  async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
-    try {
-      const project = await this.projectRepository.findOne({
-        where: { id: projectsId },
-        relations: ['projects'],
-      });
-
-      if (!project) {
-        throw new NotFoundException('Project not found');
-      }
-
-      return project.employee;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  // async getAssignedProjects(employeeId: number): Promise<{ assignedProjects: Project[]; projectCount: number }> {
+  // async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
   //   try {
-  //     const employee = await this.employeeRepository.findOne({where:{
-  //       id: employeeId},
+  //     const project = await this.projectRepository.findOne({
+  //       where:{id: projectsId},
   //       relations: ['projects'],
   //     });
 
-  //     if (!employee) {
-  //       throw new NotFoundException('Employee not found');
+  //     if (!project) {
+  //       throw new NotFoundException('Project not found');
   //     }
 
-  //     return {
-  //       assignedProjects: employee.projects,
-  //       projectCount: employee.projects.length,
-  //     };
+  //     return project.employee;
   //   } catch (error) {
   //     throw error;
   //   }
   // }
+
+  async getAssignedProjects(
+    employeeId: number,
+  ): Promise<{ assignedProjects: Project[]; projectCount: number }> {
+    try {
+      const employee = await this.employeeRepository.findOne({
+        where: {
+          id: employeeId,
+        },
+        relations: ['projects'],
+      });
+
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
+      }
+
+      return {
+        assignedProjects: employee.projects,
+        projectCount: employee.projects.length,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   // async updateProjectStatus(
   //   project_id: number,

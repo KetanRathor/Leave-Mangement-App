@@ -29,6 +29,7 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -36,7 +37,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @ApiBearerAuth('JWT-auth')
 @Controller('employees')
 export class EmployeeController {
-  constructor(private readonly employeeService: EmployeeService) {}
+  constructor(private readonly employeeService: EmployeeService) { }
 
   @UseGuards(AuthGuard)
   @Post()
@@ -59,11 +60,15 @@ export class EmployeeController {
     }
   }
 
+
+
   @UseGuards(AuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
     description: 'Employee with given ID will be updated as response',
     type: Employee,
+    description: 'Employee with given ID will be updated as response',
+    type: Employee
   })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
@@ -77,21 +82,27 @@ export class EmployeeController {
         updateEmployeeDto,
         req_mail,
       );
+      return await this.employeeService.updateEmployee(id, updateEmployeeDto, req_mail);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
+
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description: 'Employee with given ID will be deleted as response',
+    description: 'Employee with given ID will be deleted as response'
+
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.email;
     try {
       await this.employeeService.deleteEmployee(id, req_mail);
       return 'Employee Deleted Successfully';
+      await this.employeeService.deleteEmployee(id, req_mail);
+      return 'Employee Deleted Successfully'
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -103,6 +114,8 @@ export class EmployeeController {
   @ApiOkResponse({
     description: 'Get employee by id',
     type: Employee,
+    description: 'Get employee by id',
+    type: Employee
   })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -112,11 +125,15 @@ export class EmployeeController {
     }
   }
 
+
+
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All employees List',
     type: [Employee],
+    description: 'All employees List',
+    type: [Employee]
   })
   showEmployeeList() {
     return this.employeeService.findEmployees();
@@ -128,6 +145,18 @@ export class EmployeeController {
     return await this.employeeService.getManagerIds();
   }
 
+  // @Get('/manager')
+  // @ApiCreatedResponse(
+  //   {
+  //     description:"Get manager's List"
+  //   }
+  // )
+  // async showManagerList() {
+  //   console.log("first..............")
+  //   return await this.employeeService.getManagerIds();
+  // }
+
+  @UseGuards(AuthGuard)
   @Post('upload-image/:id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -139,6 +168,24 @@ export class EmployeeController {
       throw new Error('No image uploaded');
     }
 
+    const employee = await this.employeeService.uploadImage(id, image.buffer);
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiBody({
+    description: 'Image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+    if (!image) {
+      throw new Error('No image uploaded');
+    }
     const employee = await this.employeeService.uploadImage(id, image.buffer);
 
     return employee;
@@ -190,5 +237,11 @@ export class EmployeeController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+    return employee;
   }
 }
+
+
+
+
+

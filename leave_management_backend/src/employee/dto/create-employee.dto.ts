@@ -25,23 +25,11 @@ export class CreateEmployeeDto {
   })
   department_id: number;
 
-  // @ApiProperty({
-  //     description:"The role of the employee",
-  //     example:"employee",
-  // })
-  // role: string;
-
   @ApiProperty({
     description: 'The date of birth of employee',
     example: '2003-05-08',
   })
   dob: Date;
-
-  // @ApiProperty({
-  //     description:"The gender of the employee",
-  //     example:"female",
-  // })
-  // gender: string;
 
   @ApiProperty({
     description: 'The gender of the employee (Male/Female/Other)',
@@ -54,4 +42,10 @@ export class CreateEmployeeDto {
     example: 1,
   })
   manager_id?: number;
+
+  @ApiProperty({
+    description: 'The inventory id of the inventory',
+    example: 1,
+  })
+  inventory_id?: number;
 }

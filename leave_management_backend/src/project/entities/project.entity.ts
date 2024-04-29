@@ -5,6 +5,14 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
@@ -27,6 +35,13 @@ export class Project {
   })
   @Column()
   manager_name: string;
+  @ManyToOne(() => Employee, (employee) => employee.projects)
+  // @JoinTable({name:'manager_id'})
+  @ApiProperty({
+    description: 'prject manager',
+    type: CreateEmployeeDto,
+  })
+  manager: Employee;
 
   @ApiProperty({
     description: 'description of project',

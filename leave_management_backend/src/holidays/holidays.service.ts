@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -23,16 +24,20 @@ export class HolidaysService {
     image: Buffer,
     req_mail: string,
   ): Promise<Holidays> {
-    const newHoliday = this.holidaysRepository.create({
-      date: date,
-      day: day,
-      occasion: occasion,
-      image: image,
-    });
+    try {
+      const newHoliday = this.holidaysRepository.create({
+        date: date,
+        day: day,
+        occasion: occasion,
+        image: image,
+      });
 
-    console.log('newHoliday...........', newHoliday);
-    newHoliday.created_by = req_mail;
-    return await this.holidaysRepository.save(newHoliday);
+      console.log('newHoliday...........', newHoliday);
+      newHoliday.created_by = req_mail;
+      return await this.holidaysRepository.save(newHoliday);
+    } catch (error) {
+      throw new HttpException('Not Able To Create', 404);
+    }
   }
 
   async getAllHolidays(): Promise<Holidays[]> {
@@ -70,17 +75,36 @@ export class HolidaysService {
     return 'Holoday deleted successfully.';
   }
 
-  async getRemainingHolidays(): Promise<number> {
+  // async getRemainingHolidays(): Promise<number> {
+  //   try {
+  //     const currentDate = new Date();
+  //     const holidaysUntilCurrentDate = await this.holidaysRepository.count({
+  //       where: {
+  //         date: LessThanOrEqual(currentDate),
+  //       },
+  //     });
+  //     const defaultHolidays = 10;
+
+  //     return defaultHolidays - holidaysUntilCurrentDate;
+  //   } catch (error) {
+  //     throw new Error('Failed to calculate remaining holidays');
+  //   }
+  // }
+
+  async getRemainingHolidays(): Promise<any> {
     try {
       const currentDate = new Date();
+      const totalHolidays = await this.holidaysRepository.count();
+
       const holidaysUntilCurrentDate = await this.holidaysRepository.count({
         where: {
           date: LessThanOrEqual(currentDate),
         },
       });
-      const defaultHolidays = 10;
 
-      return defaultHolidays - holidaysUntilCurrentDate;
+      const remainingHolidays = totalHolidays - holidaysUntilCurrentDate;
+
+      return { remainingHolidays, totalHolidays };
     } catch (error) {
       throw new Error('Failed to calculate remaining holidays');
     }

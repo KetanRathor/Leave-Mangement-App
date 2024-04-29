@@ -11,9 +11,10 @@ import { LeaveRequest } from './entities/LeaveRequest.entity';
 import { Between, In, LessThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { start } from 'repl';
-import { Console } from 'console';
+import { Console, log } from 'console';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { ClientGrpcProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class LeaveTypesAndRequestsService {
@@ -61,6 +62,7 @@ export class LeaveTypesAndRequestsService {
         where: { id: emp_id },
         relations: ['manager'],
       });
+      console.log('Employee', employee);
 
       if (!employee) {
         throw new NotFoundException('Employee not found');
@@ -168,97 +170,7 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-  //   async getRemainingLeaveBalance(id: number): Promise<number> {
-  //     try {
-  //       const currentDate = new Date();
-  //       const currentMonth = currentDate.getMonth();
-  //       const currentYear = currentDate.getFullYear();
-  //       const approvedRequests = await this.leaveRequestRepository.find({
-  //         where: {
-  //           emp_id: id,
-  //           status: 'approved',
-  //         },
-  //       });
-
-  //       let fullDaysCounter = 0;
-  //       let firstHalfDaysCounter = 0;
-  //       let secondHalfDaysCounter = 0;
-
-  //       // for (const request of approvedRequests) {
-  //       //   const startDate = new Date(request.start_date);
-  //       //   const endDate = new Date(request.end_date);
-  //       //   const daysDifference = Math.ceil(
-  //       //     (endDate.getTime() - startDate.getTime()) / (1000  *60 *60 * 24),
-  //       // );
-
-  //       //   switch (request.leave_type) {
-  //       //     case 'full':
-  //       //       fullDaysCounter += daysDifference;
-  //       //       break;
-  //       //     case 'first half':
-  //       //       firstHalfDaysCounter += daysDifference;
-  //       //       break;
-  //       //     case 'second half':
-  //       //       secondHalfDaysCounter += daysDifference;
-  //       //       break;
-  //       //     default:
-  //       //       break;
-  //       //   }
-  //       // }
-  // let totalDays=0;
-
-  //       approvedRequests.forEach((request) => {
-  //         const startDate = new Date(request.start_date);
-  //         const endDate = new Date(request.end_date);
-
-  //         // const startMonth = startDate.getMonth();
-  //         const startYear = startDate.getFullYear();
-
-  //         if (startYear === currentYear ) {
-  //           const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  //           totalDays += daysDifference;
-  //         }
-  //         switch (request.leave_type) {
-  //               case 'full':
-  //                 fullDaysCounter += totalDays;
-  //                 break;
-  //               case 'first half':
-  //                 firstHalfDaysCounter += totalDays;
-  //                 break;
-  //               case 'second half':
-  //                 secondHalfDaysCounter += totalDays;
-  //                 break;
-  //               default:
-  //                 break;}
-  //       });
-  //       let remainingBalance = 21;
-
-  //       while (remainingBalance > 0) {
-  //         if (fullDaysCounter > 0) {
-  //           remainingBalance -= 1;
-  //           fullDaysCounter -= 1;
-  //         } else if (firstHalfDaysCounter > 0) {
-  //           remainingBalance -= 0.5;
-  //           firstHalfDaysCounter -= 1;
-  //         } else if (secondHalfDaysCounter > 0) {
-  //           remainingBalance -= 0.5;
-  //           secondHalfDaysCounter -= 1;
-  //         } else {
-  //           break;
-  //         }
-  //       }
-
-  //       remainingBalance = Math.max(remainingBalance, 0);
-
-  //       return remainingBalance;
-  //     } catch (error) {
-  //       throw new BadRequestException(
-  //         'Failed to calculate remaining leave balance',
-  //       );
-  //     }
-  //   }
-
-  async getRemainingLeaveBalance(id: number): Promise<number> {
+  async getRemainingLeaveBalance(id: number): Promise<any> {
     try {
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth();
@@ -270,21 +182,28 @@ export class LeaveTypesAndRequestsService {
         },
       });
 
-      let remainingBalance = 21;
+      let default_balance = 21;
+      let remainingBalance = default_balance;
 
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
-        const endDate = new Date(request.end_date);
-        const leaveType = request.leave_type;
+        const endDate = request.end_date ? new Date(request.end_date) : null; // Convert end date if provided
 
         const startYear = startDate.getFullYear();
 
         if (startYear === currentYear) {
-          const daysDifference = Math.ceil(
-            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
-          );
+          let daysDifference: number;
+          if (endDate) {
+            const millisecondsPerDay = 1000 * 60 * 60 * 24;
+            const differenceInMilliseconds =
+              endDate.getTime() - startDate.getTime();
+            daysDifference =
+              Math.ceil(differenceInMilliseconds / millisecondsPerDay) + 1;
+          } else {
+            daysDifference = 1;
+          }
 
-          switch (leaveType) {
+          switch (request.leave_type) {
             case 'full':
               remainingBalance -= daysDifference;
               break;
@@ -300,7 +219,10 @@ export class LeaveTypesAndRequestsService {
 
       remainingBalance = Math.max(remainingBalance, 0);
 
-      return remainingBalance;
+      return {
+        remainingBalance: remainingBalance,
+        default_balance: default_balance,
+      };
     } catch (error) {
       throw new BadRequestException(
         'Failed to calculate remaining leave balance',
@@ -308,11 +230,10 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<number> {
+  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
     try {
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth();
-      const currentYear = currentDate.getFullYear();
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
 
       const approvedRequests = await this.leaveRequestRepository.find({
         where: {
@@ -322,58 +243,60 @@ export class LeaveTypesAndRequestsService {
         },
       });
 
-      let totalWorkFromHomeDays = 0;
+      const defaultBalancePerMonth: number[] = new Array(12).fill(3); // Initialize array to hold default balance for each month with 3 for work from home
 
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
-        const endDate = new Date(request.end_date);
+        const endDate = request.end_date ? new Date(request.end_date) : null;
 
         const startMonth = startDate.getMonth();
         const startYear = startDate.getFullYear();
+        const endMonth = endDate ? endDate.getMonth() : null;
+        const endYear = endDate ? endDate.getFullYear() : null;
 
-        if (startMonth === currentMonth && startYear === currentYear) {
-          const daysDifference = Math.ceil(
-            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
-          );
-          totalWorkFromHomeDays += daysDifference;
+        let startDay = startDate.getDate();
+        let endDay = endDate ? endDate.getDate() : null;
+
+        if (startYear === currentYear) {
+          if (startMonth === currentMonth) {
+            if (endMonth === currentMonth) {
+              // If start and end months are the same as the current month
+              defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1;
+            } else {
+              // If start month is the current month but end month is different
+              const daysInStartMonth = new Date(
+                startYear,
+                startMonth + 1,
+                0,
+              ).getDate(); // Number of days in start month
+              defaultBalancePerMonth[currentMonth] -=
+                daysInStartMonth - startDay + 1;
+            }
+          } else if (endMonth === currentMonth) {
+            // If end month is the current month but start month is different
+            defaultBalancePerMonth[currentMonth] -= endDay;
+          }
         }
       });
 
-      const defaultBalance = 3;
-      let remainingWorkFromHomeBalance = defaultBalance - totalWorkFromHomeDays;
+      // Calculate remaining balance for the current month
+      let remainingWorkFromHomeBalance = Math.max(
+        defaultBalancePerMonth[currentMonth],
+        0,
+      );
 
-      remainingWorkFromHomeBalance = Math.max(remainingWorkFromHomeBalance, 0);
-
-      return remainingWorkFromHomeBalance;
+      return {
+        remainingBalance: remainingWorkFromHomeBalance,
+        defaultBalance: 3,
+      };
     } catch (error) {
       throw new BadRequestException(
-        'Failed to calculate remaining leave balance',
+        'Failed to calculate remaining work from home balance',
       );
     }
   }
 
-  // async getNumberOfEmployeesOnLeaveToday(): Promise<number> {
-  //   try {
-  //     const today = new Date();
-  //     // const year = today.getFullYear();
-  //     // const month = today.getMonth() + 1;
-  //     // const day = today.getDate();
-
-  //     const leaveRequests = await this.leaveRequestRepository.find({
-  //       where: {
-  //         status: 'approved',
-  //         start_date: LessThanOrEqual(today),
-  //         end_date: GreaterThanOrEqual(today),
-  //       },
-  //     });
-
-  //     return leaveRequests.length;
-  //   } catch (error) {
-  //     console.error('Error fetching number of employees on leave today:', error);
-  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-  // async getNumberOfEmployeesOnLeaveToday(): Promise<number> {
+  // async getEmployeesOnLeaveToday(): Promise<any> {
   //   try {
   //     const today = new Date();
 
@@ -382,11 +305,18 @@ export class LeaveTypesAndRequestsService {
   //         status: 'approved',
   //         start_date: Between(new Date(today.setHours(0, 0, 0, 0)), new Date(today.setHours(23, 59, 59, 999))),
   //       },
-  //     });
+  //       relations: ['employee'],
 
-  //     return leaveRequests.length;
+  //     });
+  //     console.log("leaveRequests",leaveRequests)
+
+  //     // return leaveRequests.map((leaveRequest) => leaveRequest.employee);
+  //     return leaveRequests.map((leaveRequest) => ({
+  //       // employee: leaveRequest.employee,
+  //       leaveRequest: leaveRequest,
+  //     }));
   //   } catch (error) {
-  //     console.error('Error fetching number of employees on leave today:', error);
+  //     console.error('Error fetching employees on leave today:', error);
   //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
   //   }
   // }
@@ -396,22 +326,35 @@ export class LeaveTypesAndRequestsService {
       const today = new Date();
 
       const leaveRequests = await this.leaveRequestRepository.find({
-        where: {
-          status: 'approved',
-          start_date: Between(
-            new Date(today.setHours(0, 0, 0, 0)),
-            new Date(today.setHours(23, 59, 59, 999)),
-          ),
-        },
-        relations: ['employee'],
+        where: { status: 'approved' },
+        // select: ['start_date', 'end_date'],
       });
+
       console.log('leaveRequests', leaveRequests);
 
-      // return leaveRequests.map((leaveRequest) => leaveRequest.employee);
-      return leaveRequests.map((leaveRequest) => ({
-        // employee: leaveRequest.employee,
-        leaveRequest: leaveRequest,
-      }));
+      const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
+        const startDate = new Date(leaveRequest.start_date);
+        const endDate = new Date(leaveRequest.end_date);
+        return today >= startDate && today <= endDate;
+      });
+
+      if (filteredLeaveRequests.length === 0) {
+        console.log('No employees are on leave today.');
+        return 'No employees are on leave today.';
+      }
+
+      const employeeDetails = await Promise.all(
+        filteredLeaveRequests.map(async (leaveRequest) => {
+          const employee = await this.employeeRepository.findOne({
+            where: { id: leaveRequest.emp_id },
+          });
+          return { ...leaveRequest, employee };
+        }),
+      );
+
+      console.log('employeesOnLeaveToday', employeeDetails);
+
+      return employeeDetails;
     } catch (error) {
       console.error('Error fetching employees on leave today:', error);
       throw new HttpException(
@@ -419,5 +362,33 @@ export class LeaveTypesAndRequestsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  // async getEmployeesByManagerId(managerId: number): Promise<Employee[]> {
+  //   console.log(managerId)
+  //   return this.employeeRepository.find({
+  //     where: { manager_id:managerId },
+  //   });
+  // }
+
+  // async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
+  //   return this.leaveRequestRepository.find({
+  //     where: {emp_id: employeeId, status: 'pending' },
+  //   });
+  // }
+
+  async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
+    return await this.employeeRepository.find({
+      where: { manager_id: emp_id },
+      // relations: ['employee'],
+    });
+  }
+  async findPendingRequestsByEmployeeId(
+    employeeId: number,
+  ): Promise<LeaveRequest[]> {
+    return this.leaveRequestRepository.find({
+      where: { emp_id: employeeId, status: 'pending' },
+      relations: ['employee'],
+    });
   }
 }

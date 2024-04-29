@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateLeaveTypesAndRequestDto {
-  // @ApiProperty({
-  //   description:'id of employee',
-  //   example:'1'
-  // })
-  // emp_id: number;
-
   @ApiProperty({
     description: 'the type of leave',
     example: 'full',
@@ -30,9 +24,4 @@ export class CreateLeaveTypesAndRequestDto {
     example: 'health issue',
   })
   reason: string;
-
-  // @ApiProperty({
-  //   description:'status of leave request'
-  // })
-  // status: string;
 }

@@ -38,7 +38,7 @@ export class LeaveRequest {
   })
   start_date: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @Column({ type: 'date', nullable: true })
   @ApiProperty({
     description: 'end date for leave',
   })
@@ -95,6 +95,7 @@ export class LeaveRequest {
   // @JoinColumn({ name: 'leave_type_id' })
   // leaveType: LeaveType;
 
+  // @ApiProperty()
   @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
   @JoinColumn({ name: 'emp_id' })
   employee: Employee;

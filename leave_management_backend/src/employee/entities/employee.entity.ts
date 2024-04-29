@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
+import { UserOtp } from 'src/auth/entities/userOtp.entity';
 
 @Entity('employee')
 export class Employee {
@@ -142,10 +143,13 @@ export class Employee {
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'employee image'
+    description:'employee image',
+    type: 'string',
+    format: 'binary'
   })
   image: Buffer;
 
+  @ApiProperty()
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
@@ -154,8 +158,17 @@ export class Employee {
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
 
+  @ApiProperty()
+  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  projects: Project[]
+
+  @ApiProperty()
   @ManyToMany(() => Project)
     @JoinTable({name:"employee_project"})
     project: Project[]
+
+  @ApiProperty()
+  @OneToOne(() => UserOtp, { cascade:true })
+  otp: UserOtp;
   
 }

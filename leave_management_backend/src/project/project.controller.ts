@@ -29,6 +29,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 // import { Project } from './entities/project.entity';
 
 @ApiTags('Project')
@@ -98,7 +99,7 @@ export class ProjectController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number,
@@ -125,6 +126,14 @@ export class ProjectController {
   ): Promise<Employee[]> {
     return await this.projectService.getAssignedEmployees(projectId);
   }
+  // @UseGuards(AuthGuard)
+  // @Get(':projectId/assigned-employees')
+  // @ApiOkResponse({
+  //   description: 'get list of employees who are assigned the project of given ID'
+  // })
+  // async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
+  //   return await this.projectService.getAssignedEmployees(projectId);
+  // }
 
   @UseGuards(AuthGuard)
   @Put('/status/:project_id')
@@ -137,6 +146,15 @@ export class ProjectController {
     @Body() body: { status: string },
     @Request() req,
   ): Promise<Project> {
+  })
+  @ApiBody({
+    schema: {
+        type: 'object',
+        properties: {
+            status: { type: 'string' }
+        },}
+})
+  async updateProjectStatus(@Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
