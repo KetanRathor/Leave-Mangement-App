@@ -16,21 +16,17 @@ dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserCredentials])
-    , PassportModule,
-    
+    TypeOrmModule.forFeature([UserCredentials]),
+    PassportModule,
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
       signOptions: { expiresIn: '1d' },
-      
-      
     }),
     MailModule,
-    
   ],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService]
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

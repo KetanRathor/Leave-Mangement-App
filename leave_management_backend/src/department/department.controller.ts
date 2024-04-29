@@ -9,16 +9,21 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
-  Get
+  Get,
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Department } from './entity/Department.entity';
 
 @ApiTags('Department')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @Controller('department')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
@@ -30,13 +35,14 @@ export class DepartmentController {
     description: 'created department object as response',
     type: Department,
   })
-  
-  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto
-  // ,@Request() req
-) {
+  async createDepartment(
+    @Body() createDepartmentDto: CreateDepartmentDto,
+    // ,@Request() req
+  ) {
     // const req_mail=req.user.email;
     try {
-      return await this.departmentService.createDepartment(createDepartmentDto,
+      return await this.departmentService.createDepartment(
+        createDepartmentDto,
         // req_mail
       );
     } catch (error) {
@@ -50,16 +56,18 @@ export class DepartmentController {
     return await this.departmentService.findDepartmentList();
   }
 
-
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description: 'department will be deleted as response'
+    description: 'department will be deleted as response',
   })
-  async deleteDepartment(@Param('id', ParseIntPipe) id: number,@Request() req) {
-    const req_mail=req.user.email;
+  async deleteDepartment(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    const req_mail = req.user.email;
     try {
-      await this.departmentService.deleteDepartment(id,req_mail);
+      await this.departmentService.deleteDepartment(id, req_mail);
       return 'Department Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateInvetoryCategoryDto {
-    @ApiProperty({
-        description:'Name of the Category'
-    })
-    name: string;
+  @ApiProperty({
+    description: 'Name of the Category',
+  })
+  name: string;
 }

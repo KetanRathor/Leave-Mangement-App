@@ -7,130 +7,96 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class MailService {
-    private transporter;
-    
-    // private generatedPassword: string;
-    constructor(
-        // private  authService : AuthService
-        // @InjectRepository(UserCredentials)
-        // private readonly userCredentialsRepository: Repository<UserCredentials>
-        ) 
-    
-    {
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-    }
-    
-    
-    async sendPasswordEmail(email: string,password:string): Promise<void> {
+  private transporter;
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Your Account Information',
-            text: `Hello,\n\nYour account has been created successfully. Your password is: ${password}\n\nRegards,\nThe Admin Team`
-        };
+  // private generatedPassword: string;
+  constructor() // @InjectRepository(UserCredentials) // private  authService : AuthService
+  // private readonly userCredentialsRepository: Repository<UserCredentials>
+  {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
 
-       
-        this.transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending password email:', error);
-                
-            } else {
-                console.log('Email sent:', info.response);
-            }
-        });
-    }
+  async sendPasswordEmail(email: string, password: string): Promise<void> {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your Account Information',
+      text: `Hello,\n\nYour account has been created successfully. Your password is: ${password}\n\nRegards,\nThe Admin Team`,
+    };
 
-    
-    async sendOTPEmail(email: string, otp: string){
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Your OTP for Password Reset',
-            text: `Hello,\n\nYour OTP for password reset is: ${otp}\n\nRegards,\nThe Admin Team`
-        };
-        // await this.sendOTPEmail(email,otp);
+    this.transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending password email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+  }
 
-        this.transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending OTP email:', error);
-            } else {
-                console.log('OTP Email sent:', info.response);
-            }
-        });
-    }
+  async sendOTPEmail(email: string, otp: string) {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP for Password Reset',
+      text: `Hello,\n\nYour OTP for password reset is: ${otp}\n\nRegards,\nThe Admin Team`,
+    };
+    // await this.sendOTPEmail(email,otp);
 
-    async sendPasswordResetEmail(email: string){
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Password Reset Successfully',
-            text: `Hello,\n\n Your password has been reset successfully. \n\nRegards,\nThe Admin Team`
-        };
-        // await this.sendOTPEmail(email,otp);
+    this.transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending OTP email:', error);
+      } else {
+        console.log('OTP Email sent:', info.response);
+      }
+    });
+  }
 
-        this.transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending OTP email:', error);
-            } else {
-                console.log('OTP Email sent:', info.response);
-            }
-        });
-    }
+  async sendPasswordResetEmail(email: string) {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP for Password Reset',
+      text: `Hello,\n\n Your password has been reset successfully. \n\nRegards,\nThe Admin Team`,
+    };
+    // await this.sendOTPEmail(email,otp);
 
+    this.transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending OTP email:', error);
+      } else {
+        console.log('OTP Email sent:', info.response);
+      }
+    });
+  }
 
-    async sendLeaveRequestEmail(email: string, manager_email:string,reason:string,employeeName:string,fromDateAndStartDate:string){
-    
-            const adminMailOptions = {
-                from: email,
-                to: process.env.EMAIL_USER,
-                subject: `Leave request for: ${employeeName} from ${fromDateAndStartDate}`,
-                text: `Leave request for ${reason}\n\n A leave request has been submitted by ${employeeName}. Please review and take necessary actions.`,
-            };
-            
-            const managerMailOptions = {
-                from: email,
-                to: manager_email,
-                subject: `Leave request from: ${employeeName}`,
-                text: `Leave request for ${reason}\n\n A leave request has been submitted by ${employeeName}. Please review and take necessary actions.`,
-            };
-            
-            
-            await Promise.all([
-                this.transporter.sendMail(adminMailOptions),
-                this.transporter.sendMail(managerMailOptions),
-            ]);
-            
-        }
+  async sendLeaveRequestEmail(
+    email: string,
+    manager_email: string,
+    reason: string,
+  ) {
+    const adminMailOptions = {
+      from: email,
+      to: process.env.EMAIL_USER,
+      subject: `Leave request for: ${email}`,
+      text: `A leave request has been submitted by ${email}. Please review and take necessary actions.`,
+    };
 
-        async sendLeaveStatusEmail(email: string, message:string){
-            const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: 'Your Leave Request Status',
-                text: message
-            };
-            
-    
-            this.transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error('Error sending OTP email:', error);
-                } else {
-                    console.log('OTP Email sent:', info.response);
-                }
-            });
-        }
+    const managerMailOptions = {
+      from: email,
+      to: manager_email,
+      subject: `Leave request for: ${email}`,
+      text: `Hello,\n\n${reason}.\n\nRegards,\nThe Admin Team`,
+    };
 
-
-
-
-    
-
-    
+    await Promise.all([
+      this.transporter.sendMail(adminMailOptions),
+      this.transporter.sendMail(managerMailOptions),
+    ]);
+  }
 }
