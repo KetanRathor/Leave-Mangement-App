@@ -4,13 +4,6 @@ import {
   Column,
   JoinTable,
   ManyToMany,
-} from 'typeorm';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
 } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
@@ -30,11 +23,6 @@ export class Project {
   @Column()
   name: string;
 
-  @ApiProperty({
-    description: 'manager_name of project',
-  })
-  @Column()
-  manager_name: string;
   @ManyToOne(() => Employee, (employee) => employee.projects)
   // @JoinTable({name:'manager_id'})
   @ApiProperty({
