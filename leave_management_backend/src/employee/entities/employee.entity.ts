@@ -164,7 +164,7 @@ export class Employee {
     project: Project[]
 
 
-  @OneToOne(() => UserOtp, { cascade:true })
-  otp: UserOtp;
+  @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade:true })
+  userOtp: UserOtp;
   
 }

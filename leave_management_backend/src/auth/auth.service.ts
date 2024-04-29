@@ -124,7 +124,7 @@ export class AuthService {
             console.log("decryptedStoredPassword", decryptedStoredPassword)
             if (password === decryptedStoredPassword) {
 
-                const { password, ...userdata } = result;
+                const { password,image, ...userdata } = result;
                 console.log("password", password);
                 const token = await this.jwtService.signAsync(userdata);
                 return { access_token: token }
@@ -213,32 +213,12 @@ export class AuthService {
     }
 
 
-    //   async forgotPassword(email: string) {
-    //     const user = await this.userCredentialsRepository.findOne({
-    //       where: { email },
-    //     });
-    //     console.log("user",user);
-    //     if (!user) {
-    //         const otp = this.generateOTP();
-    //         await this.mailService.sendOTPEmail(email, otp);
-
-
-    //         return { message: 'OTP sent to your email address' };
-
-    //             //   return new HttpException('Email not found', 404);
-    //             }
-    //             else{
-    //          return { message: 'Email not found' };
-
-
-    //     }
-
-    //   }
+    
 
 
     async forgotPassword(email: string) {
 
-        const expiresAt = new Date(Date.now() + 30000)
+        const expiresAt = new Date(Date.now() + 300000)
         const currentTimestamp = new Date();
 
         const user = await this.userCredentialsRepository.findOne({
@@ -248,7 +228,7 @@ export class AuthService {
 
         if (!user) {
             
-            console.log("hiii")
+            // console.log("hiii")
             return new HttpException('Email not found', 404);
         }
         else {
@@ -263,12 +243,16 @@ export class AuthService {
                     email
                 }
             });
+            console.log("employee",employeeId.id)
+
+
 
             const isOtpAlreadySent = await this.userOtp.findOne({
                 where: {
-                    employeeId
+                    employeeId: {id: employeeId?.id}
                 }
             });
+            
 
            
             // let {} = 
@@ -285,13 +269,19 @@ export class AuthService {
                     
                 }
                 )
-            } else {
+                console.log("isOtpAlreadySent...", isOtpAlreadySent);
+
+            } 
+            
+            else {
                 await this.userOtp.save({
                     otpCode: otp,
                     employeeId,
                     expiresAt
                     
                 })
+
+                console.log("otpCode",otp)
             }
 
             return { message: 'OTP sent to your email address' };
@@ -299,18 +289,32 @@ export class AuthService {
 
     }
 
+
+    
+
     async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
         const user = await this.userCredentialsRepository.findOneBy({ email });
         if (!user) {
             throw new HttpException('Invalid email address', 400);
         }
+
+        const employee = await this.employeeRepository.findOneBy({email})
+        if(!employee){
+            throw new HttpException("Invalid email address", 400)
+        }
+
+        console.log("uuuuuuuuuuuuu",user);
         
 
-        const savedOTPRecord = await this.userOtp.findOne({ where: { employeeId: user.id }as FindOneOptions<Employee>['where'] });
+        const savedOTPRecord = await this.userOtp.findOne( { where: { employeeId: { id: employee.id } } });
+        console.log("savedOTPRecord",savedOTPRecord)
+        console.log("Employeeiiiiiiiiiiiii",user.id)
+
 
         if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
             throw new HttpException('Invalid OTP', 400);
         }
+        console.log("savedOTPRecordOtppppp",otp)
 
         if (new Date() > savedOTPRecord.expiresAt) {
             throw new HttpException('OTP has expired', 400);
@@ -333,59 +337,12 @@ export class AuthService {
 
         await this.mailService.sendPasswordResetEmail(email)
 
+        
+
         // cache.del(email);
     }
 
-    // async matchOtp(email: string,otp: string){
-    //     const user = await this.userCredentialsRepository.findOneBy({ email });
-    //     if (!user) {
-    //         throw new HttpException('Invalid email address', 400);
-    //     }
-    //     cache.put(email, otp, this.otpTTL);
-    //     const cachedOTP = cache.get(email);
-    //     console.log('Cached OTP:', cachedOTP)
-    //     if (!cachedOTP || cachedOTP !== otp) {
-    //         throw new HttpException('Invalid OTP', 400);
-    //     }
-    // }
-
-
-
-    // async verifyOTP(email: string, otp: string) {
-
-    //     await this.matchOtp(email, otp);
-    // }
-
-    // async matchOtp(email: string, otp: string) {
-    //     cache.put(email, otp, this.otpTTL);
-    //     const cachedOTP = cache.get(email);
-    //     console.log('Cached OTP:', cachedOTP)
-    //     if (!cachedOTP || cachedOTP !== otp) {
-    //         throw new HttpException('Invalid OTP', 400);
-    //     }
-
-    //     cache.del(email);
-    // }
-
-    // async resetPassword(email: string, newPassword: string, confirmPassword: string) {
-
-
-
-    //     if (newPassword !== confirmPassword) {
-    //       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
-    //     }
-
-    //     if (newPassword.length < 6) {
-    //       throw new HttpException('Password must be at least 6 characters long', HttpStatus.BAD_REQUEST);
-    //     }
-
-
-    //     const encryptedPassword = await this.encrypt(newPassword);
-    //     await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
-    //     await this.mailService.sendPasswordResetEmail(email); 
-
-    //     return { message: 'Password reset successfully' };
-    //   }
+    
 
 
 
