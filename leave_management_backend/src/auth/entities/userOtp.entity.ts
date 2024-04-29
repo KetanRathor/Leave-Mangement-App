@@ -16,7 +16,14 @@ export class UserOtp {
   @Column({ type: 'datetime', nullable: false })
   expiresAt: Date;
 
-  @OneToOne(() => Employee, { "cascade": true } )
-  @JoinColumn({name:"employeeId" })
+  // @OneToOne(() => Employee,(employee) => employee.userOtp,)
+  // @JoinColumn({ name:"employeeId" })
+  // employee: Employee;
+
+
+  @OneToOne(() => Employee, (employee) => employee.userOtp)
+  @JoinColumn({ name: 'employeeId'})
   employeeId: Employee;
+
+  
 }
