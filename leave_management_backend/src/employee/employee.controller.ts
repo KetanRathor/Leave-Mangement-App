@@ -1,18 +1,43 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Put,
+  Param,
+  ParseIntPipe,
+  Delete,
+  Get,
+  UseGuards,
+  Request,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @Controller('employees')
 export class EmployeeController {
-  constructor(private readonly employeeService: EmployeeService) { }
+  constructor(private readonly employeeService: EmployeeService) {}
 
   @UseGuards(AuthGuard)
   @Post()
@@ -20,7 +45,6 @@ export class EmployeeController {
     description: 'created user object as response',
     type: Employee,
   })
-
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
     @Request() req,
@@ -36,13 +60,11 @@ export class EmployeeController {
     }
   }
 
-
-
   @UseGuards(AuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
     description: 'Employee with given ID will be updated as response',
-    type: Employee
+    type: Employee,
   })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
@@ -51,24 +73,26 @@ export class EmployeeController {
   ) {
     const req_mail = req.user.email;
     try {
-      return await this.employeeService.updateEmployee(id, updateEmployeeDto, req_mail);
+      return await this.employeeService.updateEmployee(
+        id,
+        updateEmployeeDto,
+        req_mail,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description: 'Employee with given ID will be deleted as response'
-
+    description: 'Employee with given ID will be deleted as response',
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.email;
     try {
       await this.employeeService.deleteEmployee(id, req_mail);
-      return 'Employee Deleted Successfully'
+      return 'Employee Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -79,7 +103,7 @@ export class EmployeeController {
   @Get('employee/:id')
   @ApiOkResponse({
     description: 'Get employee by id',
-    type: Employee
+    type: Employee,
   })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -89,13 +113,11 @@ export class EmployeeController {
     }
   }
 
-
-
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All employees List',
-    type: [Employee]
+    type: [Employee],
   })
   showEmployeeList() {
     return this.employeeService.findEmployees();
@@ -128,7 +150,10 @@ export class EmployeeController {
       },
     },
   })
-  async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+  async uploadImage(
+    @Param('id') id: number,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
     if (!image) {
       throw new Error('No image uploaded');
     }
@@ -137,8 +162,3 @@ export class EmployeeController {
     return employee;
   }
 }
-
-
-
-
-
