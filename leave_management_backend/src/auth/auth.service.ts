@@ -113,8 +113,8 @@ export class AuthService {
             }
         })).id
 
+        console.log("employeeIdemployeeIdemployeeId",employeeId)
         const result = await this.showProfile(employeeId)
-
 
         console.log("user...", user);
 
@@ -134,47 +134,7 @@ export class AuthService {
         } catch (error) {
             console.log("error", error)
         }
-    }
-
-    // async validateUser({ email, password }: AuthPayloadDto) {
-    //     
-
-    //     if (password === decryptedStoredPassword) {
-    //       const profile = await this.employeeService.showProfile(user.id); 
-    //       if (!profile) {
-    //         // Handle case where user not found
-    //         return new HttpException('User not found', 404);
-    //       }
-
-    //       const token = await this.jwtService.signAsync(profile);
-    //       return { access_token: token, role: profile.role };
-    //     }
-    //     
-    //   }
-
-    // async deriveUserRole(userId: number): Promise<string> {
-
-    //     const managerIDs = await this.employeeRepository.find({
-    //         where: { deleted_at: IsNull() },
-    //         select: ['manager_id'],
-    //     });
-
-    //     const employee = await this.employeeRepository.findOne({
-    //         where: { id: userId, deleted_at: IsNull() },
-    //     });
-
-    //     if (employee) {
-    //         if (employee.admin) {
-    //             return 'Admin';
-    //         } else if (managerIDs.some(manager => manager.manager_id === userId)) {
-    //             return 'Manager';
-    //         } else {
-    //             return 'Employee';
-    //         }
-    //     } else {
-    //         return null;
-    //     }
-    // }
+    } 
 
     async registerUser(email: string) {
         const generatedPassword = this.generateRandomPassword(10);
@@ -188,7 +148,32 @@ export class AuthService {
         await this.userCredentialsRepository.save(newUser);
 
         return generatedPassword;
-    }
+    }  
+
+    // async registerUser(
+    //     // email: string,
+    //      employeeId:number
+    //     ) {
+    //     const generatedPassword = this.generateRandomPassword(10);
+    //     const encryptedPassword = this.encrypt(generatedPassword);
+
+    //     const employee = await this.employeeRepository.findOne({ where: { id: employeeId } });
+
+    //     if (!employee) {
+    //     throw new Error('Employee with the provided ID not found');
+    //     }
+
+    //     const newUser = this.userCredentialsRepository.create({
+    //         // email,
+    //         password: encryptedPassword,
+    //         employee: employee
+            
+    //     });
+
+    //     await this.userCredentialsRepository.save(newUser);
+
+    //     return generatedPassword;
+    // }
 
     generateRandomPassword(length: number): string {
         const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -199,7 +184,6 @@ export class AuthService {
         }
         console.log("password", password)
         return password;
-
     }
 
     generateOTP() {
@@ -212,10 +196,6 @@ export class AuthService {
         return OTP;
     }
 
-
-    
-
-
     async forgotPassword(email: string) {
 
         const expiresAt = new Date(Date.now() + 300000)
@@ -227,7 +207,6 @@ export class AuthService {
         console.log("user", user);
 
         if (!user) {
-            
             // console.log("hiii")
             return new HttpException('Email not found', 404);
         }
@@ -237,42 +216,30 @@ export class AuthService {
             console.log("otp", otp)
             await this.mailService.sendOTPEmail(email, otp);
             // const saveOtp = await this.userOtp.save({})
-
             const employeeId = await this.employeeRepository.findOne({
                 where: {
                     email
                 }
             });
             console.log("employee",employeeId.id)
-
-
-
             const isOtpAlreadySent = await this.userOtp.findOne({
                 where: {
                     employeeId: {id: employeeId?.id}
                 }
             });
-            
-
-           
-            // let {} = 
 
             console.log("isOtpAlreadySent...", isOtpAlreadySent);
-
 
             if (isOtpAlreadySent) {
                 await this.userOtp.save({
                     ...isOtpAlreadySent,
                     otpCode: otp,
                     createdAt:currentTimestamp,
-                    expiresAt
-                    
+                    expiresAt     
                 }
                 )
                 console.log("isOtpAlreadySent...", isOtpAlreadySent);
-
             } 
-            
             else {
                 await this.userOtp.save({
                     otpCode: otp,
@@ -280,10 +247,8 @@ export class AuthService {
                     expiresAt
                     
                 })
-
                 console.log("otpCode",otp)
             }
-
             return { message: 'OTP sent to your email address' };
         }
 
@@ -304,12 +269,10 @@ export class AuthService {
         }
 
         console.log("uuuuuuuuuuuuu",user);
-        
 
         const savedOTPRecord = await this.userOtp.findOne( { where: { employeeId: { id: employee.id } } });
         console.log("savedOTPRecord",savedOTPRecord)
         console.log("Employeeiiiiiiiiiiiii",user.id)
-
 
         if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
             throw new HttpException('Invalid OTP', 400);
@@ -320,11 +283,9 @@ export class AuthService {
             throw new HttpException('OTP has expired', 400);
         }
 
-
         if (!newPassword || newPassword.length < 6) {
             throw new HttpException('Password must be at least 6 characters long', 400);
         }
-
 
         if (newPassword !== confirmPassword) {
             throw new HttpException('Passwords do not match', 400);
@@ -332,14 +293,10 @@ export class AuthService {
 
         const encryptedPassword = this.encrypt(newPassword);
 
-
         await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
 
         await this.mailService.sendPasswordResetEmail(email)
 
-        
-
-        // cache.del(email);
     }
 
     
