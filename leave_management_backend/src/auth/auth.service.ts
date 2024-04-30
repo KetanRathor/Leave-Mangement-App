@@ -8,20 +8,12 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
-// import { MailService } from 'src/mail/mail.service';
-import * as cache from 'memory-cache';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
-// import { Employee } from 'src/employee/entities/Employee.entity';
-// import { EmployeeService } from 'src/employee/employee.service';
-
-
-
 dotenv.config();
 
 @Injectable()
 export class AuthService {
-
 
     private readonly iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
     private readonly otpTTL = 300000;
@@ -95,9 +87,6 @@ export class AuthService {
             throw error;
         }
     }
-
-
-
 
 
     async validateUser({ email, password }: AuthPayloadDto) {
@@ -255,8 +244,6 @@ export class AuthService {
     }
 
 
-    
-
     async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
         const user = await this.userCredentialsRepository.findOneBy({ email });
         if (!user) {
@@ -268,12 +255,8 @@ export class AuthService {
             throw new HttpException("Invalid email address", 400)
         }
 
-        console.log("uuuuuuuuuuuuu",user);
-
         const savedOTPRecord = await this.userOtp.findOne( { where: { employeeId: { id: employee.id } } });
-        console.log("savedOTPRecord",savedOTPRecord)
-        console.log("Employeeiiiiiiiiiiiii",user.id)
-
+        
         if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
             throw new HttpException('Invalid OTP', 400);
         }
@@ -300,21 +283,7 @@ export class AuthService {
     }
 
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
     // async hashPassword(password: string): Promise<string> {
     //     const saltOrRounds = 10;
@@ -332,4 +301,3 @@ export class AuthService {
     // }
 
 
-}
