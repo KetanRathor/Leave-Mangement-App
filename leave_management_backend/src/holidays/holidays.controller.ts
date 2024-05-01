@@ -29,6 +29,7 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiTags,
+  ApiConsumes
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
