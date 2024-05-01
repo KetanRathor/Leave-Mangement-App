@@ -15,6 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { UserOtp } from 'src/auth/entities/userOtp.entity';
+import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
 
 @Entity('employee')
 export class Employee {
@@ -173,4 +174,9 @@ export class Employee {
 
   @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade: true })
   userOtp: UserOtp;
+
+  @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
+  // @JoinColumn({ name: 'employee_id' })
+  userCredentials: UserCredentials | null;
+  
 }

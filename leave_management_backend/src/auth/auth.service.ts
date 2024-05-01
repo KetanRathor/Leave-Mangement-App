@@ -14,30 +14,27 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
-// import { MailService } from 'src/mail/mail.service';
-import * as cache from 'memory-cache';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
-// import { Employee } from 'src/employee/entities/Employee.entity';
-// import { EmployeeService } from 'src/employee/employee.service';
-
 dotenv.config();
 
 @Injectable()
 export class AuthService {
-  private readonly iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
-  private readonly otpTTL = 300000;
-  constructor(
-    private jwtService: JwtService,
-    @InjectRepository(UserCredentials)
-    private readonly userCredentialsRepository: Repository<UserCredentials>,
-    @InjectRepository(Employee)
-    private readonly employeeRepository: Repository<Employee>,
-    @InjectRepository(UserOtp)
-    private readonly userOtp: Repository<UserOtp>,
-    private readonly mailService: MailService,
-    // private employeeService : EmployeeService
-  ) {}
+
+    private readonly iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
+    private readonly otpTTL = 300000;
+    constructor(
+        private jwtService: JwtService,
+        @InjectRepository(UserCredentials)
+        private readonly userCredentialsRepository: Repository<UserCredentials>,
+        @InjectRepository(Employee)
+        private readonly employeeRepository: Repository<Employee>,
+        @InjectRepository(UserOtp)
+        private readonly userOtp: Repository<UserOtp>,
+        private readonly mailService: MailService,
+        // private employeeService : EmployeeService
+    ) { }
+
 
   encrypt(text: string): string {
     console.log('tets', text);
@@ -95,15 +92,17 @@ export class AuthService {
           role = 'Employee';
         }
 
-        return { ...employee, role };
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(error);
-      throw error;
+                return { ...employee, role };
+
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
     }
-  }
+
 
   async validateUser({ email, password }: AuthPayloadDto) {
     console.log('Inside Validate User...');
@@ -112,72 +111,34 @@ export class AuthService {
       where: { email },
     });
 
-    const employeeId = (
-      await this.employeeRepository.findOne({
-        where: {
-          email: user.email,
-        },
-      })
-    ).id;
+        const employeeId = (await this.employeeRepository.findOne({
+            where: {
+                email: user.email
+            }
+        })).id
 
-    const result = await this.showProfile(employeeId);
+        console.log("employeeIdemployeeIdemployeeId",employeeId)
+        const result = await this.showProfile(employeeId)
 
-    console.log('user...', user);
+        console.log("user...", user);
 
-    try {
-      if (!user) return new HttpException('Username incorrect ', 403);
-      const decryptedStoredPassword = this.decrypt(user.password);
-      console.log('decryptedStoredPassword', decryptedStoredPassword);
-      if (password === decryptedStoredPassword) {
-        const { password, image, ...userdata } = result;
-        console.log('password', password);
-        const token = await this.jwtService.signAsync(userdata);
-        return { access_token: token };
-      } else return new HttpException('Password incorrect ', 404);
-    } catch (error) {
-      console.log('error', error);
-    }
-  }
+        try {
+            if (!user) return new HttpException('Username incorrect ', 403);
+            const decryptedStoredPassword = this.decrypt(user.password);
+            console.log("decryptedStoredPassword", decryptedStoredPassword)
+            if (password === decryptedStoredPassword) {
 
-  // async validateUser({ email, password }: AuthPayloadDto) {
-  //
+                const { password,image, ...userdata } = result;
+                console.log("password", password);
+                const token = await this.jwtService.signAsync(userdata);
+                return { access_token: token }
+            }
+            else return new HttpException('Password incorrect ', 404)
 
-  //     if (password === decryptedStoredPassword) {
-  //       const profile = await this.employeeService.showProfile(user.id);
-  //       if (!profile) {
-  //         // Handle case where user not found
-  //         return new HttpException('User not found', 404);
-  //       }
-
-  //       const token = await this.jwtService.signAsync(profile);
-  //       return { access_token: token, role: profile.role };
-  //     }
-  //
-  //   }
-
-  // async deriveUserRole(userId: number): Promise<string> {
-
-  //     const managerIDs = await this.employeeRepository.find({
-  //         where: { deleted_at: IsNull() },
-  //         select: ['manager_id'],
-  //     });
-
-  //     const employee = await this.employeeRepository.findOne({
-  //         where: { id: userId, deleted_at: IsNull() },
-  //     });
-
-  //     if (employee) {
-  //         if (employee.admin) {
-  //             return 'Admin';
-  //         } else if (managerIDs.some(manager => manager.manager_id === userId)) {
-  //             return 'Manager';
-  //         } else {
-  //             return 'Employee';
-  //         }
-  //     } else {
-  //         return null;
-  //     }
-  // }
+        } catch (error) {
+            console.log("error", error)
+        }
+    } 
 
   async registerUser(email: string) {
     const generatedPassword = this.generateRandomPassword(10);
@@ -190,30 +151,54 @@ export class AuthService {
 
     await this.userCredentialsRepository.save(newUser);
 
-    return generatedPassword;
-  }
+        return generatedPassword;
+    }  
 
-  generateRandomPassword(length: number): string {
-    const charset =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let password = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
-    }
-    console.log('password', password);
-    return password;
-  }
+    // async registerUser(
+    //     // email: string,
+    //      employeeId:number
+    //     ) {
+    //     const generatedPassword = this.generateRandomPassword(10);
+    //     const encryptedPassword = this.encrypt(generatedPassword);
 
-  generateOTP() {
-    const digits = '0123456789';
-    let OTP = '';
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * digits.length);
-      OTP += digits[randomIndex];
+    //     const employee = await this.employeeRepository.findOne({ where: { id: employeeId } });
+
+    //     if (!employee) {
+    //     throw new Error('Employee with the provided ID not found');
+    //     }
+
+    //     const newUser = this.userCredentialsRepository.create({
+    //         // email,
+    //         password: encryptedPassword,
+    //         employee: employee
+            
+    //     });
+
+    //     await this.userCredentialsRepository.save(newUser);
+
+    //     return generatedPassword;
+    // }
+
+    generateRandomPassword(length: number): string {
+        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+        console.log("password", password)
+        return password;
     }
-    return OTP;
-  }
+
+    generateOTP() {
+        const digits = '0123456789';
+        let OTP = '';
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * digits.length);
+            OTP += digits[randomIndex];
+        }
+        return OTP;
+    }
 
   async forgotPassword(email: string) {
     const expiresAt = new Date(Date.now() + 300000);
@@ -224,109 +209,95 @@ export class AuthService {
     });
     console.log('user', user);
 
-    if (!user) {
-      // console.log("hiii")
-      return new HttpException('Email not found', 404);
-    } else {
-      const otp = this.generateOTP();
-      console.log('otp', otp);
-      await this.mailService.sendOTPEmail(email, otp);
-      // const saveOtp = await this.userOtp.save({})
+        if (!user) {
+            // console.log("hiii")
+            return new HttpException('Email not found', 404);
+        }
+        else {
 
-      const employeeId = await this.employeeRepository.findOne({
-        where: {
-          email,
-        },
-      });
-      console.log('employee', employeeId.id);
+            const otp = this.generateOTP();
+            console.log("otp", otp)
+            await this.mailService.sendOTPEmail(email, otp);
+            // const saveOtp = await this.userOtp.save({})
+            const employeeId = await this.employeeRepository.findOne({
+                where: {
+                    email
+                }
+            });
+            console.log("employee",employeeId.id)
+            const isOtpAlreadySent = await this.userOtp.findOne({
+                where: {
+                    employeeId: {id: employeeId?.id}
+                }
+            });
 
-      const isOtpAlreadySent = await this.userOtp.findOne({
-        where: {
-          employeeId: { id: employeeId?.id },
-        },
-      });
+            console.log("isOtpAlreadySent...", isOtpAlreadySent);
 
-      // let {} =
+            if (isOtpAlreadySent) {
+                await this.userOtp.save({
+                    ...isOtpAlreadySent,
+                    otpCode: otp,
+                    createdAt:currentTimestamp,
+                    expiresAt     
+                }
+                )
+                console.log("isOtpAlreadySent...", isOtpAlreadySent);
+            } 
+            else {
+                await this.userOtp.save({
+                    otpCode: otp,
+                    employeeId,
+                    expiresAt
+                    
+                })
+                console.log("otpCode",otp)
+            }
+            return { message: 'OTP sent to your email address' };
+        }
 
-      console.log('isOtpAlreadySent...', isOtpAlreadySent);
-
-      if (isOtpAlreadySent) {
-        await this.userOtp.save({
-          ...isOtpAlreadySent,
-          otpCode: otp,
-          createdAt: currentTimestamp,
-          expiresAt,
-        });
-        console.log('isOtpAlreadySent...', isOtpAlreadySent);
-      } else {
-        await this.userOtp.save({
-          otpCode: otp,
-          employeeId,
-          expiresAt,
-        });
-
-        console.log('otpCode', otp);
-      }
-
-      return { message: 'OTP sent to your email address' };
-    }
-  }
-
-  async resetPasswordWithOTP(
-    email: string,
-    otp: string,
-    newPassword: string,
-    confirmPassword: string,
-  ) {
-    const user = await this.userCredentialsRepository.findOneBy({ email });
-    if (!user) {
-      throw new HttpException('Invalid email address', 400);
     }
 
-    const employee = await this.employeeRepository.findOneBy({ email });
-    if (!employee) {
-      throw new HttpException('Invalid email address', 400);
-    }
 
-    console.log('uuuuuuuuuuuuu', user);
+    async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
+        const user = await this.userCredentialsRepository.findOneBy({ email });
+        if (!user) {
+            throw new HttpException('Invalid email address', 400);
+        }
 
-    const savedOTPRecord = await this.userOtp.findOne({
-      where: { employeeId: { id: employee.id } },
-    });
-    console.log('savedOTPRecord', savedOTPRecord);
-    console.log('Employeeiiiiiiiiiiiii', user.id);
+        const employee = await this.employeeRepository.findOneBy({email})
+        if(!employee){
+            throw new HttpException("Invalid email address", 400)
+        }
 
-    if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
-      throw new HttpException('Invalid OTP', 400);
-    }
-    console.log('savedOTPRecordOtppppp', otp);
+        const savedOTPRecord = await this.userOtp.findOne( { where: { employeeId: { id: employee.id } } });
+        
+        if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
+            throw new HttpException('Invalid OTP', 400);
+        }
+        console.log("savedOTPRecordOtppppp",otp)
 
-    if (new Date() > savedOTPRecord.expiresAt) {
-      throw new HttpException('OTP has expired', 400);
-    }
+        if (new Date() > savedOTPRecord.expiresAt) {
+            throw new HttpException('OTP has expired', 400);
+        }
 
-    if (!newPassword || newPassword.length < 6) {
-      throw new HttpException(
-        'Password must be at least 6 characters long',
-        400,
-      );
-    }
+        if (!newPassword || newPassword.length < 6) {
+            throw new HttpException('Password must be at least 6 characters long', 400);
+        }
 
     if (newPassword !== confirmPassword) {
       throw new HttpException('Passwords do not match', 400);
     }
 
-    const encryptedPassword = this.encrypt(newPassword);
+        const encryptedPassword = this.encrypt(newPassword);
 
-    await this.userCredentialsRepository.update(
-      { email },
-      { password: encryptedPassword },
-    );
+        await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
 
-    await this.mailService.sendPasswordResetEmail(email);
+        await this.mailService.sendPasswordResetEmail(email)
 
-    // cache.del(email);
-  }
+    }
+
+    
+}
 
   // async hashPassword(password: string): Promise<string> {
   //     const saltOrRounds = 10;
@@ -339,6 +310,7 @@ export class AuthService {
   // const hashedPassword1 =await this.hashPassword(plainPassword);
   // console.log("hashedPassword1...",hashedPassword1);
 
-  //     return bcrypt.compare(plainPassword, hashedPassword);
-  // }
-}
+    //     return bcrypt.compare(plainPassword, hashedPassword);
+    // }
+
+

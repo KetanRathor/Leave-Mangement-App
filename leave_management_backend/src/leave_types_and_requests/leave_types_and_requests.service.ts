@@ -128,11 +128,21 @@ export class LeaveTypesAndRequestsService {
     leaveRequest.updated_by = req_mail;
     const employee = await this.employeeRepository.findOne({ where: { email: req_mail } });
   const employeeName = employee ? employee.name : "Unknown";
+  
+  // const employeeId = await this.employeeRepository.findOne({ where: { email: leaveRequest.created_by } });
+
+  // if (!employeeId) {
+  //   throw new Error(`Employee with email ${leaveRequest.created_by} not found`);
+  // }
+  const employeeEmail = leaveRequest.created_by;
+  // console.log("employeeId",employeeId.email)
+
+
 
     const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
-      await this.mailService.sendLeaveStatusEmail(req_mail, message); 
+      await this.mailService.sendLeaveStatusEmail(employeeEmail, message); 
     }
 
     return { leaveRequest: updatedLeaveRequest, message };
@@ -359,25 +369,17 @@ export class LeaveTypesAndRequestsService {
     }
 }
 
-// async getEmployeesByManagerId(managerId: number): Promise<Employee[]> {
-//   console.log(managerId)
-//   return this.employeeRepository.find({
-//     where: { manager_id:managerId },
-//   });
-// }
-
-// async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
-//   return this.leaveRequestRepository.find({
-//     where: {emp_id: employeeId, status: 'pending' },
-//   });
-// }
 
 async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
+
+  if(emp_id )
   return await this.employeeRepository.find({
-    where: { manager_id:emp_id }, 
-    // relations: ['employee'],
+    where: [
+      { manager_id: emp_id },
+    ],
   });
 }
+
 async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
   return this.leaveRequestRepository.find({
     where: { emp_id:employeeId, status: 'pending' },
