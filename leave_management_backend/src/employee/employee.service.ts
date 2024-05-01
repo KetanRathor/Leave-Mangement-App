@@ -62,24 +62,18 @@ export class EmployeeService {
 
     // const inventory = await this.inventoryRepository
 
-    const savedEmployee = await this.employeeRepository.save(newEmployee);
-    const savedEmployee = await this.employeeRepository.save(newEmployee);
-    const isInventry = createEmployeeDto?.inventory_id;
-    if (isInventry) {
-      await this.inventoryService.assignInventoryToEmployee(
-        savedEmployee.id,
-        isInventry,
-      );
-    }
 
-    const userPassword = await this.authService.registerUser(
-      createEmployeeDto.email,
-    );
+        const savedEmployee = await this.employeeRepository.save(newEmployee);
+        const isInventry = createEmployeeDto?.inventory_id;
+        if(isInventry){
+          await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
+        }
+        
+        const employeeId = savedEmployee.id
+        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
+        // const userPassword = await this.authService.registerUser(employeeId)
 
-    await this.mailService.sendPasswordEmail(
-      createEmployeeDto.email,
-      userPassword,
-    );
+        await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
 
     return savedEmployee;
   }
@@ -162,9 +156,12 @@ export class EmployeeService {
       where: { email: employee.email },
     });
 
-    if (userCredentials) {
-      await this.userCredentialRepository.remove(userCredentials);
-    }
+        if (userCredentials) {
+          userCredentials.deleted_by = req_mail;
+          userCredentials.deleted_at = new Date();
+          await this.userCredentialRepository.save(userCredentials);
+            // await this.userCredentialRepository.remove(userCredentials);
+        }
 
     employee.deleted_by = req_mail;
     employee.deleted_at = new Date();

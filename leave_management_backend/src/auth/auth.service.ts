@@ -112,72 +112,34 @@ export class AuthService {
       where: { email },
     });
 
-    const employeeId = (
-      await this.employeeRepository.findOne({
-        where: {
-          email: user.email,
-        },
-      })
-    ).id;
+        const employeeId = (await this.employeeRepository.findOne({
+            where: {
+                email: user.email
+            }
+        })).id
 
-    const result = await this.showProfile(employeeId);
+        console.log("employeeIdemployeeIdemployeeId",employeeId)
+        const result = await this.showProfile(employeeId)
 
-    console.log('user...', user);
+        console.log("user...", user);
 
-    try {
-      if (!user) return new HttpException('Username incorrect ', 403);
-      const decryptedStoredPassword = this.decrypt(user.password);
-      console.log('decryptedStoredPassword', decryptedStoredPassword);
-      if (password === decryptedStoredPassword) {
-        const { password, image, ...userdata } = result;
-        console.log('password', password);
-        const token = await this.jwtService.signAsync(userdata);
-        return { access_token: token };
-      } else return new HttpException('Password incorrect ', 404);
-    } catch (error) {
-      console.log('error', error);
-    }
-  }
+        try {
+            if (!user) return new HttpException('Username incorrect ', 403);
+            const decryptedStoredPassword = this.decrypt(user.password);
+            console.log("decryptedStoredPassword", decryptedStoredPassword)
+            if (password === decryptedStoredPassword) {
 
-  // async validateUser({ email, password }: AuthPayloadDto) {
-  //
+                const { password,image, ...userdata } = result;
+                console.log("password", password);
+                const token = await this.jwtService.signAsync(userdata);
+                return { access_token: token }
+            }
+            else return new HttpException('Password incorrect ', 404)
 
-  //     if (password === decryptedStoredPassword) {
-  //       const profile = await this.employeeService.showProfile(user.id);
-  //       if (!profile) {
-  //         // Handle case where user not found
-  //         return new HttpException('User not found', 404);
-  //       }
-
-  //       const token = await this.jwtService.signAsync(profile);
-  //       return { access_token: token, role: profile.role };
-  //     }
-  //
-  //   }
-
-  // async deriveUserRole(userId: number): Promise<string> {
-
-  //     const managerIDs = await this.employeeRepository.find({
-  //         where: { deleted_at: IsNull() },
-  //         select: ['manager_id'],
-  //     });
-
-  //     const employee = await this.employeeRepository.findOne({
-  //         where: { id: userId, deleted_at: IsNull() },
-  //     });
-
-  //     if (employee) {
-  //         if (employee.admin) {
-  //             return 'Admin';
-  //         } else if (managerIDs.some(manager => manager.manager_id === userId)) {
-  //             return 'Manager';
-  //         } else {
-  //             return 'Employee';
-  //         }
-  //     } else {
-  //         return null;
-  //     }
-  // }
+        } catch (error) {
+            console.log("error", error)
+        }
+    } 
 
   async registerUser(email: string) {
     const generatedPassword = this.generateRandomPassword(10);
@@ -190,195 +152,172 @@ export class AuthService {
 
     await this.userCredentialsRepository.save(newUser);
 
-    return generatedPassword;
-  }
+        return generatedPassword;
+    }  
 
-  generateRandomPassword(length: number): string {
-    const charset =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let password = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
+    // async registerUser(
+    //     // email: string,
+    //      employeeId:number
+    //     ) {
+    //     const generatedPassword = this.generateRandomPassword(10);
+    //     const encryptedPassword = this.encrypt(generatedPassword);
+
+    //     const employee = await this.employeeRepository.findOne({ where: { id: employeeId } });
+
+    //     if (!employee) {
+    //     throw new Error('Employee with the provided ID not found');
+    //     }
+
+    //     const newUser = this.userCredentialsRepository.create({
+    //         // email,
+    //         password: encryptedPassword,
+    //         employee: employee
+            
+    //     });
+
+    //     await this.userCredentialsRepository.save(newUser);
+
+    //     return generatedPassword;
+    // }
+
+    generateRandomPassword(length: number): string {
+        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+        console.log("password", password)
+        return password;
     }
-    console.log('password', password);
-    return password;
-  }
 
-  generateOTP() {
-    const digits = '0123456789';
-    let OTP = '';
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * digits.length);
-      OTP += digits[randomIndex];
+    generateOTP() {
+        const digits = '0123456789';
+        let OTP = '';
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * digits.length);
+            OTP += digits[randomIndex];
+        }
+        return OTP;
     }
-    return OTP;
-  }
 
-  //   async forgotPassword(email: string) {
-  //     const user = await this.userCredentialsRepository.findOne({
-  //       where: { email },
-  //     });
-  //     console.log("user",user);
-  //     if (!user) {
-  //         const otp = this.generateOTP();
-  //         await this.mailService.sendOTPEmail(email, otp);
+    async forgotPassword(email: string) {
 
-  //         return { message: 'OTP sent to your email address' };
-
-  //             //   return new HttpException('Email not found', 404);
-  //             }
-  //             else{
-  //          return { message: 'Email not found' };
-
-  //     }
-
-  //   }
-
-  async forgotPassword(email: string) {
-    const expiresAt = new Date(Date.now() + 600000);
-    const currentTimestamp = new Date();
+        const expiresAt = new Date(Date.now() + 300000)
+        const currentTimestamp = new Date();
 
     const user = await this.userCredentialsRepository.findOne({
       where: { email },
     });
     console.log('user', user);
 
-    if (!user) {
-      console.log('hiii');
-      return new HttpException('Email not found', 404);
-    } else {
-      const otp = this.generateOTP();
-      console.log('otp', otp);
-      await this.mailService.sendOTPEmail(email, otp);
-      // const saveOtp = await this.userOtp.save({})
+        if (!user) {
+            // console.log("hiii")
+            return new HttpException('Email not found', 404);
+        }
+        else {
 
-      const employeeId = await this.employeeRepository.findOne({
-        where: {
-          email,
-        },
-      });
+            const otp = this.generateOTP();
+            console.log("otp", otp)
+            await this.mailService.sendOTPEmail(email, otp);
+            // const saveOtp = await this.userOtp.save({})
+            const employeeId = await this.employeeRepository.findOne({
+                where: {
+                    email
+                }
+            });
+            console.log("employee",employeeId.id)
+            const isOtpAlreadySent = await this.userOtp.findOne({
+                where: {
+                    employeeId: {id: employeeId?.id}
+                }
+            });
 
-      const isOtpAlreadySent = await this.userOtp.findOne({
-        where: {
-          employeeId,
-        },
-      });
+            console.log("isOtpAlreadySent...", isOtpAlreadySent);
 
-      // let {} =
+            if (isOtpAlreadySent) {
+                await this.userOtp.save({
+                    ...isOtpAlreadySent,
+                    otpCode: otp,
+                    createdAt:currentTimestamp,
+                    expiresAt     
+                }
+                )
+                console.log("isOtpAlreadySent...", isOtpAlreadySent);
+            } 
+            else {
+                await this.userOtp.save({
+                    otpCode: otp,
+                    employeeId,
+                    expiresAt
+                    
+                })
+                console.log("otpCode",otp)
+            }
+            return { message: 'OTP sent to your email address' };
+        }
 
-      console.log('isOtpAlreadySent...', isOtpAlreadySent);
-
-      if (isOtpAlreadySent) {
-        await this.userOtp.save({
-          ...isOtpAlreadySent,
-          otpCode: otp,
-          createdAt: currentTimestamp,
-          expiresAt,
-        });
-      } else {
-        await this.userOtp.save({
-          otpCode: otp,
-          employeeId,
-          expiresAt,
-        });
-      }
-
-      return { message: 'OTP sent to your email address' };
-    }
-  }
-
-  async resetPasswordWithOTP(
-    email: string,
-    otp: string,
-    newPassword: string,
-    confirmPassword: string,
-  ) {
-    const user = await this.userCredentialsRepository.findOneBy({ email });
-    if (!user) {
-      throw new HttpException('Invalid email address', 400);
     }
 
-    const savedOTPRecord = await this.userOtp.findOne({
-      where: { employeeId: user.id } as FindOneOptions<Employee>['where'],
-    });
 
-    if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
-      throw new HttpException('Invalid OTP', 400);
-    }
+    
 
-    if (new Date() > savedOTPRecord.expiresAt) {
-      throw new HttpException('OTP has expired', 400);
-    }
+    async resetPasswordWithOTP(email: string, otp: string, newPassword: string, confirmPassword: string) {
+        const user = await this.userCredentialsRepository.findOneBy({ email });
+        if (!user) {
+            throw new HttpException('Invalid email address', 400);
+        }
 
-    if (!newPassword || newPassword.length < 6) {
-      throw new HttpException(
-        'Password must be at least 6 characters long',
-        400,
-      );
-    }
+        const employee = await this.employeeRepository.findOneBy({email})
+        if(!employee){
+            throw new HttpException("Invalid email address", 400)
+        }
+
+        console.log("uuuuuuuuuuuuu",user);
+
+        const savedOTPRecord = await this.userOtp.findOne( { where: { employeeId: { id: employee.id } } });
+        console.log("savedOTPRecord",savedOTPRecord)
+        console.log("Employeeiiiiiiiiiiiii",user.id)
+
+        if (!savedOTPRecord || savedOTPRecord.otpCode !== otp) {
+            throw new HttpException('Invalid OTP', 400);
+        }
+        console.log("savedOTPRecordOtppppp",otp)
+
+        if (new Date() > savedOTPRecord.expiresAt) {
+            throw new HttpException('OTP has expired', 400);
+        }
+
+        if (!newPassword || newPassword.length < 6) {
+            throw new HttpException('Password must be at least 6 characters long', 400);
+        }
 
     if (newPassword !== confirmPassword) {
       throw new HttpException('Passwords do not match', 400);
     }
 
-    const encryptedPassword = this.encrypt(newPassword);
-
-    await this.userCredentialsRepository.update(
-      { email },
-      { password: encryptedPassword },
-    );
+        const encryptedPassword = this.encrypt(newPassword);
 
     await this.mailService.sendPasswordResetEmail(email);
 
-    // cache.del(email);
-  }
+    }
 
-  // async matchOtp(email: string,otp: string){
-  //     const user = await this.userCredentialsRepository.findOneBy({ email });
-  //     if (!user) {
-  //         throw new HttpException('Invalid email address', 400);
-  //     }
-  //     cache.put(email, otp, this.otpTTL);
-  //     const cachedOTP = cache.get(email);
-  //     console.log('Cached OTP:', cachedOTP)
-  //     if (!cachedOTP || cachedOTP !== otp) {
-  //         throw new HttpException('Invalid OTP', 400);
-  //     }
-  // }
+    
 
-  // async verifyOTP(email: string, otp: string) {
 
-  //     await this.matchOtp(email, otp);
-  // }
 
-  // async matchOtp(email: string, otp: string) {
-  //     cache.put(email, otp, this.otpTTL);
-  //     const cachedOTP = cache.get(email);
-  //     console.log('Cached OTP:', cachedOTP)
-  //     if (!cachedOTP || cachedOTP !== otp) {
-  //         throw new HttpException('Invalid OTP', 400);
-  //     }
 
-  //     cache.del(email);
-  // }
 
-  // async resetPassword(email: string, newPassword: string, confirmPassword: string) {
 
-  //     if (newPassword !== confirmPassword) {
-  //       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
-  //     }
 
-  //     if (newPassword.length < 6) {
-  //       throw new HttpException('Password must be at least 6 characters long', HttpStatus.BAD_REQUEST);
-  //     }
 
-  //     const encryptedPassword = await this.encrypt(newPassword);
-  //     await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
-  //     await this.mailService.sendPasswordResetEmail(email);
 
-  //     return { message: 'Password reset successfully' };
-  //   }
+
+
+
+
+
+
 
   // async hashPassword(password: string): Promise<string> {
   //     const saltOrRounds = 10;
