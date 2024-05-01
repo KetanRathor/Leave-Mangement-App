@@ -14,6 +14,9 @@ import { access } from 'fs';
 
 @Injectable()
 export class ProjectService {
+  getAssignedEmployees(projectId: number): Employee[] | PromiseLike<Employee[]> {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
