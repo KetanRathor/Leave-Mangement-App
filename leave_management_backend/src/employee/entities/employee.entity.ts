@@ -169,7 +169,7 @@ export class Employee {
   userOtp: UserOtp;
 
   @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
-  @JoinColumn({ name: 'employee_id' })
+  // @JoinColumn({ name: 'employee_id' })
   userCredentials: UserCredentials | null;
   
 }

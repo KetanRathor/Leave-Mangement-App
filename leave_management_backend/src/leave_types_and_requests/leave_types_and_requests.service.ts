@@ -127,20 +127,20 @@ export class LeaveTypesAndRequestsService {
     const employee = await this.employeeRepository.findOne({ where: { email: req_mail } });
   const employeeName = employee ? employee.name : "Unknown";
   
-  const employeeId = await this.employeeRepository.findOne({ where: { email: leaveRequest.created_by } });
+  // const employeeId = await this.employeeRepository.findOne({ where: { email: leaveRequest.created_by } });
 
-  if (!employeeId) {
-    throw new Error(`Employee with email ${leaveRequest.created_by} not found`);
-  }
-
-  console.log("employeeId",employeeId.email)
+  // if (!employeeId) {
+  //   throw new Error(`Employee with email ${leaveRequest.created_by} not found`);
+  // }
+  const employeeEmail = leaveRequest.created_by;
+  // console.log("employeeId",employeeId.email)
 
 
 
     const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
-      await this.mailService.sendLeaveStatusEmail(employeeId.email, message); 
+      await this.mailService.sendLeaveStatusEmail(employeeEmail, message); 
     }
 
     return { leaveRequest: updatedLeaveRequest, message };
@@ -237,45 +237,54 @@ async getRemainingLeaveBalance(id: number): Promise<any> {
 }
 
 
-  async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
-    try {
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth();
-      const currentYear = currentDate.getFullYear();
+async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
+  try {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
 
-      const approvedRequests = await this.leaveRequestRepository.find({
-        where: {
-          emp_id: id,
-          status: 'approved',
-          leave_type: 'work from home',
-        },
-      });
+    const approvedRequests = await this.leaveRequestRepository.find({
+      where: {
+        emp_id: id,
+        status: 'approved',
+        leave_type: 'work from home',
+      },
+    });
 
-      let totalWorkFromHomeDays = 0;
+    const defaultBalancePerMonth: number[] = new Array(12).fill(3);
 
-      approvedRequests.forEach((request) => {
-        const startDate = new Date(request.start_date);
-        const endDate = new Date(request.end_date);
+    approvedRequests.forEach((request) => {
+      const startDate = new Date(request.start_date);
+      const endDate = request.end_date ? new Date(request.end_date) : null;
 
-        const startMonth = startDate.getMonth();
-        const startYear = startDate.getFullYear();
+      const startMonth = startDate.getMonth();
+      const startYear = startDate.getFullYear();
+      const endMonth = endDate ? endDate.getMonth() : null;
+      const endYear = endDate ? endDate.getFullYear() : null;
 
-        if (startMonth === currentMonth && startYear === currentYear) {
-          const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-          totalWorkFromHomeDays += daysDifference;
+      let startDay = startDate.getDate();
+      let endDay = endDate ? endDate.getDate() : null;
+
+      if (startYear === currentYear) {
+        if (startMonth === currentMonth) {
+          if (endMonth === currentMonth) {
+            defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1;
+          } else {
+            const daysInStartMonth = new Date(startYear, startMonth + 1, 0).getDate(); // Number of days in start month
+            defaultBalancePerMonth[currentMonth] -= daysInStartMonth - startDay + 1;
+          }
+        } else if (endMonth === currentMonth) {
+          defaultBalancePerMonth[currentMonth] -= endDay;
         }
-      });
+      }
+    });
 
-      const defaultBalance = 3;
-      let remainingWorkFromHomeBalance = defaultBalance - totalWorkFromHomeDays;
+    let remainingWorkFromHomeBalance = Math.max(defaultBalancePerMonth[currentMonth], 0);
 
-      remainingWorkFromHomeBalance = Math.max(remainingWorkFromHomeBalance, 0);
-
-      return {remainingBalance:remainingWorkFromHomeBalance,defaultBalance};
-    } catch (error) {
-      throw new BadRequestException('Failed to calculate remaining leave balance');
-    }
+    return { remainingBalance: remainingWorkFromHomeBalance, defaultBalance: 3 };
+  } catch (error) {
+    throw new BadRequestException('Failed to calculate remaining work from home balance');
   }
+}
 
 
   
@@ -345,6 +354,24 @@ async getRemainingLeaveBalance(id: number): Promise<any> {
         console.error('Error fetching employees on leave today:', error);
         throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
+
+
+async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
+
+  if(emp_id )
+  return await this.employeeRepository.find({
+    where: [
+      { manager_id: emp_id },
+    ],
+  });
+}
+
+async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
+  return this.leaveRequestRepository.find({
+    where: { emp_id:employeeId, status: 'pending' },
+    relations: ['employee'],
+  });
 }
 
 }

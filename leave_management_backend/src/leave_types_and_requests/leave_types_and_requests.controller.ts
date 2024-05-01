@@ -180,4 +180,26 @@ async getEmployeesOnLeaveToday(): Promise<Employee[]> {
     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
+
+@Get(':employeeId/pending-requests')
+@ApiOkResponse({
+  description:'Get list of pending leave requests of employees who have manager with given id',
+  type:LeaveRequest
+})
+  async findAllRequestsByEmployeeId(@Param('employeeId') employeeId: number): Promise<{ pendingRequests: LeaveRequest[] }> {
+    try{
+    const pendingRequests: LeaveRequest[] = [];
+
+    const ab=await this.leaveTypesAndRequestsService.findAllRequestsByEmployeeId(employeeId);
+
+    for (const employee of ab) {
+      const employeeRequests = await this.leaveTypesAndRequestsService.findPendingRequestsByEmployeeId(employee.id);
+      pendingRequests.push(...employeeRequests);
+    }
+    return { pendingRequests };
+    }catch(error){
+      console.error('Error occurred while fetching pending requests:', error);
+    }
+  }
 }
