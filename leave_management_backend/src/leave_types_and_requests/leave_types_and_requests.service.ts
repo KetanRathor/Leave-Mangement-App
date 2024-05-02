@@ -301,7 +301,6 @@ export class LeaveTypesAndRequestsService {
         if (startYear === currentYear) {
           if (startMonth === currentMonth) {
             if (endMonth === currentMonth) {
-              // If start and end months are the same as the current month
               defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1;
             } else {
               // If start month is the current month but end month is different
@@ -314,7 +313,6 @@ export class LeaveTypesAndRequestsService {
                 daysInStartMonth - startDay + 1;
             }
           } else if (endMonth === currentMonth) {
-            // If end month is the current month but start month is different
             defaultBalancePerMonth[currentMonth] -= endDay;
           }
         }
