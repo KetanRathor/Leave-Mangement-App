@@ -114,7 +114,6 @@ export class LeaveTypesAndRequestsService {
       // relations: ['employee']
     });
   }
-
   async updateStatus(
     leave_request_id: number,
     status: string,
