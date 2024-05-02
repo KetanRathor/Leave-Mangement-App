@@ -102,4 +102,8 @@ async getRemainingHolidays(): Promise<any> {
     throw new Error('Failed to calculate remaining holidays');
   }
 }
+async findAll(): Promise<Holidays[]> {
+  return await this.holidaysRepository.find();
+}
+
 }

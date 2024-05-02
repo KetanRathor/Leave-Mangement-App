@@ -148,4 +148,13 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+  @UseGuards(AuthGuard)
+  @Get()
+  @ApiOkResponse({
+    description: 'All Holidays List',
+    type: [Holidays],
+  })
+  showHolidaysList() {
+    return this.holidaysService.findAll();
+  }
 }

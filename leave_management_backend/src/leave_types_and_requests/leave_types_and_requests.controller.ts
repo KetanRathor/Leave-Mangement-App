@@ -57,15 +57,15 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
-  // @UseGuards(AuthGuard)
-  // @Get()
-  // @ApiOkResponse({
-  //   description: 'Get all leave requests',
-  //   type: [LeaveRequest]
-  // })
-  // async findAll() {
-  //   return this.leaveTypesAndRequestsService.findAll();
-  // }
+  @UseGuards(AuthGuard)
+  @Get()
+  @ApiOkResponse({
+    description: 'Get all leave requests',
+    type: [LeaveRequest]
+  })
+  async findAll() {
+    return this.leaveTypesAndRequestsService.findAll();
+  }
 
   // @UseGuards(AuthGuard)
   // @Get(':leave_request_id')
@@ -102,24 +102,24 @@ export class LeaveTypesAndRequestsController {
     return { leaveRequest, message };
   }
 
-  // @UseGuards(AuthGuard)
-  // @Get('employees/pending-requests')
-  // @ApiOkResponse({
-  //   description:'Get employee list whose leave request status is pending'
-  // })
-  // async getEmployeesWithPendingRequests() {
-  //   try {
-  //     const employeesWithPendingRequests =
-  //       await this.leaveTypesAndRequestsService.getEmployeesWithPendingLeaveRequests();
-  //     return employeesWithPendingRequests;
-  //   } catch (error) {
-  //     console.error('Error getting employees with pending requests:', error);
-  //     throw new HttpException(
-  //       'Internal server error',
-  //       HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
+  @UseGuards(AuthGuard)
+  @Get('employees/pending-requests')
+  @ApiOkResponse({
+    description:'Get employee list whose leave request status is pending'
+  })
+  async getEmployeesWithPendingRequests() {
+    try {
+      const employeesWithPendingRequests =
+        await this.leaveTypesAndRequestsService.getEmployeesWithPendingLeaveRequests();
+      return employeesWithPendingRequests;
+    } catch (error) {
+      console.error('Error getting employees with pending requests:', error);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   @UseGuards(AuthGuard)
   @Get('remaining-balance/:empId')

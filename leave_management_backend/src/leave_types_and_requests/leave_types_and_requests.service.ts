@@ -158,6 +158,7 @@ export class LeaveTypesAndRequestsService {
   }
 
   async getEmployeesWithPendingLeaveRequests(): Promise<{
+    id:Number;
     employeeName: string;
     start_date: Date;
     end_date: Date;
@@ -173,6 +174,7 @@ export class LeaveTypesAndRequestsService {
       });
 
       return pendingRequests.map((request) => ({
+        id:request.id,
         employeeName: request.employee.name,
         start_date: request.start_date,
         end_date: request.end_date,
