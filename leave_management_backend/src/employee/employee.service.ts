@@ -34,10 +34,10 @@ export class EmployeeService {
   //Create employee
   async createEmployee(
     createEmployeeDto: CreateEmployeeDto,
-    req_mail: any,
+    // req_mail: any,
   ): Promise<Employee> {
     const newEmployee = this.employeeRepository.create(createEmployeeDto);
-    newEmployee.created_by = req_mail;
+    // newEmployee.created_by = req_mail;
     const emailRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(createEmployeeDto.email)) {
@@ -54,17 +54,25 @@ export class EmployeeService {
 
     // const inventory = await this.inventoryRepository
 
-        const savedEmployee = await this.employeeRepository.save(newEmployee);
-        const isInventry = createEmployeeDto?.inventory_id;
-        if(isInventry){
-          await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
-        }
-        
-        const employeeId = savedEmployee.id
-        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
-        // const userPassword = await this.authService.registerUser(employeeId)
+    const savedEmployee = await this.employeeRepository.save(newEmployee);
+    const isInventry = createEmployeeDto?.inventory_id;
+    if (isInventry) {
+      await this.inventoryService.assignInventoryToEmployee(
+        savedEmployee.id,
+        isInventry,
+      );
+    }
 
-        await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
+    const employeeId = savedEmployee.id;
+    const userPassword = await this.authService.registerUser(
+      createEmployeeDto.email,
+    );
+    // const userPassword = await this.authService.registerUser(employeeId)
+
+    await this.mailService.sendPasswordEmail(
+      createEmployeeDto.email,
+      userPassword,
+    );
 
     return savedEmployee;
   }
@@ -131,12 +139,12 @@ export class EmployeeService {
       where: { email: employee.email },
     });
 
-        if (userCredentials) {
-          userCredentials.deleted_by = req_mail;
-          userCredentials.deleted_at = new Date();
-          await this.userCredentialRepository.save(userCredentials);
-            // await this.userCredentialRepository.remove(userCredentials);
-        }
+    if (userCredentials) {
+      userCredentials.deleted_by = req_mail;
+      userCredentials.deleted_at = new Date();
+      await this.userCredentialRepository.save(userCredentials);
+      // await this.userCredentialRepository.remove(userCredentials);
+    }
 
     employee.deleted_by = req_mail;
     employee.deleted_at = new Date();
