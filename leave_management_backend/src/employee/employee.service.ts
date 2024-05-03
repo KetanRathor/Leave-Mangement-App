@@ -107,7 +107,11 @@ export class EmployeeService {
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
-        //  await this.employeeRepository.remove(employee);
+        const inventory = await this.inventoryRepository.findOne({ where: { employee: employee } });
+    if (inventory) {
+        inventory.employee = null; 
+        await this.inventoryRepository.save(inventory);
+    }
         employee.deleted_by = req_mail;
         employee.deleted_at = new Date()
 
@@ -117,11 +121,12 @@ export class EmployeeService {
           userCredentials.deleted_by = req_mail;
           userCredentials.deleted_at = new Date();
           await this.userCredentialRepository.save(userCredentials);
-            // await this.userCredentialRepository.remove(userCredentials);
+            
         }
 
-        employee.deleted_by = req_mail;
-        employee.deleted_at = new Date()
+        // employee.deleted_by = req_mail;
+        // employee.deleted_at = new Date()
+        
         await this.employeeRepository.save(employee)
 
         return 'Employee and associated UserCredentials deleted successfully.';

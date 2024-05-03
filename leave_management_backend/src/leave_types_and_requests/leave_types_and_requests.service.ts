@@ -127,17 +127,8 @@ export class LeaveTypesAndRequestsService {
     const employee = await this.employeeRepository.findOne({ where: { email: req_mail } });
   const employeeName = employee ? employee.name : "Unknown";
   
-  // const employeeId = await this.employeeRepository.findOne({ where: { email: leaveRequest.created_by } });
-
-  // if (!employeeId) {
-  //   throw new Error(`Employee with email ${leaveRequest.created_by} not found`);
-  // }
   const employeeEmail = leaveRequest.created_by;
-  // console.log("employeeId",employeeId.email)
-
-
-
-    const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
+  const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
       await this.mailService.sendLeaveStatusEmail(employeeEmail, message); 
