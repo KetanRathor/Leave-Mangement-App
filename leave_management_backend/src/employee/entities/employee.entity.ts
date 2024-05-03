@@ -154,6 +154,7 @@ export class Employee {
 
   @ApiProperty()
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
+  @JoinColumn({ name: 'employee_id' })
   inventories: Inventory[]
 
   @ApiProperty()
