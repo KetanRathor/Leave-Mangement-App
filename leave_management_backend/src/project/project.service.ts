@@ -117,25 +117,7 @@ export class ProjectService {
   }
 
 
-  // async getEmployeesOnProject(id: number){
-
-  // }
-  // async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
-  //   try {
-  //     const project = await this.projectRepository.findOne({
-  //       where:{id: projectsId},
-  //       relations: ['projects'], 
-  //     });
   
-  //     if (!project) {
-  //       throw new NotFoundException('Project not found');
-  //     }
-  
-  //     return project.employee; 
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 
 
 

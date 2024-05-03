@@ -137,6 +137,14 @@ export class LeaveTypesAndRequestsService {
 
     const updatedLeaveRequest =
       await this.leaveRequestRepository.save(leaveRequest);
+    const employee = await this.employeeRepository.findOne({
+      where: { email: req_mail },
+    });
+    const employeeName = employee ? employee.name : 'Unknown';
+
+    const employeeEmail = leaveRequest.created_by;
+    const updatedLeaveRequest =
+      await this.leaveRequestRepository.save(leaveRequest);
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
       await this.mailService.sendLeaveStatusEmail(employeeEmail, message);
