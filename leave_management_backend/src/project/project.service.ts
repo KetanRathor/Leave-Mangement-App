@@ -42,7 +42,7 @@ export class ProjectService {
     const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee','manager']});
 
     if (!project) {
-      return { message: `Inventory with ID ${id} not found`, project };
+      return { message: `Project with ID ${id} not found`, project };
     }
     return project;
   }
@@ -51,29 +51,39 @@ export class ProjectService {
     const project = await this.projectRepository.findOneBy({ id });
 
     if (!project) {
-      throw new NotFoundException('Inventory not found.');
+      throw new NotFoundException('Project not found.');
     }
 
-    for (const key in updatedProjectDetails) {
-      if (updatedProjectDetails[key] !== undefined) {
-        project[key] = updatedProjectDetails[key];
+    if(updatedProjectDetails.manager_id){
+      const manager_id = updatedProjectDetails.manager_id
+      const manager = await this.employeeRepository.findOneBy({id: manager_id})
+      project.manager = manager
+    }else{
+      for (const key in updatedProjectDetails) {
+        if (updatedProjectDetails[key] !== undefined) {
+          project[key] = updatedProjectDetails[key];
+        }
       }
+      
     }
 
+
+    // console.log("manager",manager);
+    // console.log("first")
+   
     project.updated_by = req_mail;
 
-    return await this.projectRepository.save(project);
+    console.log("project....", project)
+
+    const res =  await this.projectRepository.save(project);
+    console.log(res)
+    
+    return res
   }
 
   async assignProject({employeeId, projectId }): Promise<string> {
     try {
-      // const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
-
-      // if (admin.role !== "Admin") {
-      //   throw new NotFoundException("Current user doesn't have admin access");
-      // }
-      // console.log("Admin", admin)
-
+    
       const [project, employee] = await Promise.all([
         this.projectRepository.findOne(
           {
@@ -94,10 +104,9 @@ export class ProjectService {
       }
 
       console.log("project", project)
-      // project.projects = [employee]
-      // console.log("project111", project.projects)
+      
       project.employee.push(employee);
-      // project.projects = [...project.projects, employee];
+      
 
       await this.projectRepository.save(project);
 
