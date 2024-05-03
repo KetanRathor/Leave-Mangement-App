@@ -145,6 +145,11 @@ export class EmployeeService {
         inventory.employee = null; 
         await this.inventoryRepository.save(inventory);
     }
+        const inventory = await this.inventoryRepository.findOne({ where: { employee: employee } });
+    if (inventory) {
+        inventory.employee = null; 
+        await this.inventoryRepository.save(inventory);
+    }
         employee.deleted_by = req_mail;
         employee.deleted_at = new Date()
 
@@ -163,8 +168,12 @@ export class EmployeeService {
           userCredentials.deleted_at = new Date();
           await this.userCredentialRepository.save(userCredentials);
             
+            
         }
 
+        // employee.deleted_by = req_mail;
+        // employee.deleted_at = new Date()
+        
     employee.deleted_by = req_mail;
     employee.deleted_at = new Date();
     await this.employeeRepository.save(employee);
