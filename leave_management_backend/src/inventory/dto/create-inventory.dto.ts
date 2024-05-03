@@ -15,8 +15,8 @@ export class CreateInventoryDto {
     serial_number:string;
 
     @ApiProperty({
-        description:'category of inventory',
-        example:'Laptop'
+        description:'category id of inventory',
+        example:'1'
     })
     category_id:number;
 

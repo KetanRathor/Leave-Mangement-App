@@ -51,6 +51,32 @@ export class HolidaysController {
   })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    description: 'Image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        data1: {
+          type: 'object',
+          properties: {
+            date: {
+              type: 'string',
+            },
+            day: {
+              type: 'string',
+            },
+            occasion: {
+              type: 'string',
+            },
+          },
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async uploadImage(@UploadedFile() file, @Body() body: any, @Request() req) {
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
