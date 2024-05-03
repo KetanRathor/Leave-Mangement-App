@@ -401,7 +401,24 @@ export class LeaveTypesAndRequestsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
+}
+
+async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
+
+  if(emp_id )
+  return await this.employeeRepository.find({
+    where: [
+      { manager_id: emp_id },
+    ],
+  });
+}
+
+async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
+  return this.leaveRequestRepository.find({
+    where: { emp_id:employeeId, status: 'pending' },
+    relations: ['employee'],
+  });
+}
 
   async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
     if (emp_id)
