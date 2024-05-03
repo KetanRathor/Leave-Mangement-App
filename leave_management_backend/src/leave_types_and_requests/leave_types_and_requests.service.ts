@@ -259,6 +259,7 @@ export class LeaveTypesAndRequestsService {
       });
 
       remainingBalance = Math.max(remainingBalance, 0);
+      remainingBalance = Math.max(remainingBalance, 0);
 
       return {
         remainingBalance: remainingBalance,
@@ -270,6 +271,8 @@ export class LeaveTypesAndRequestsService {
       );
     }
   }
+
+
 
   async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
     try {
