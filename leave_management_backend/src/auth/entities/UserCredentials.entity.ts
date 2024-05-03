@@ -32,9 +32,9 @@ export class UserCredentials {
   })
   deleted_by: string;
 
-  @OneToOne(() => Employee, (employee) => employee.userCredentials, { nullable: true, cascade: ['insert', 'update'] })
-  @JoinColumn({ name: 'employee_id' })
-  employee: Employee | null;
+  // @OneToOne(() => Employee, (employee) => employee.userCredentials, { nullable: true, cascade: ['insert', 'update'] })
+  // @JoinColumn({ name: 'employee_id' })
+  // employee: Employee | null;
 
 
   // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

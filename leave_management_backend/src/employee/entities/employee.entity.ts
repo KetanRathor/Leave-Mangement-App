@@ -164,7 +164,7 @@ export class Employee {
   inventories: Inventory[];
 
   @ApiProperty()
-  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  @OneToMany(() => Project, (project) => project.employee)
   projects: Project[];
 
   @ApiProperty()
@@ -175,8 +175,7 @@ export class Employee {
   @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade: true })
   userOtp: UserOtp;
 
-  @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
-  // @JoinColumn({ name: 'employee_id' })
-  userCredentials: UserCredentials | null;
-  
+  // @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
+  // // @JoinColumn({ name: 'employee_id' })
+  // userCredentials: UserCredentials | null;
 }
