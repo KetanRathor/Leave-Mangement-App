@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
@@ -17,7 +17,7 @@ export class Project {
   name: string;
 
   @ManyToOne(() => Employee, (employee) => employee.projects)
-  // @JoinTable({name:'manager_id'})
+  @JoinColumn({name:'manager_id'})
     @ApiProperty({
         description:'prject manager',
         type:CreateEmployeeDto

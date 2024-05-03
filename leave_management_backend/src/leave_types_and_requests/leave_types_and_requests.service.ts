@@ -189,52 +189,71 @@ export class LeaveTypesAndRequestsService {
   
 
 
-async getRemainingLeaveBalance(id: number): Promise<any> {
-  try {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id,
-        status: 'approved',
-      },
-    });
+  async getRemainingLeaveBalance(id: number): Promise<any> {
+    try {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear =
+        currentMonth >= 3
+          ? currentDate.getFullYear()
+          : currentDate.getFullYear() - 1; // Adjust year based on current month
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
 
-    let default_balance = 21;
-    let remainingBalance = default_balance;
+      let default_balance = 21;
+      let remainingBalance = default_balance;
 
-    approvedRequests.forEach((request) => {
-      const startDate = new Date(request.start_date);
-      const endDate = new Date(request.end_date);
-      const leaveType = request.leave_type;
+      approvedRequests.forEach((request) => {
+        const startDate = new Date(request.start_date);
+        const endDate = request.end_date ? new Date(request.end_date) : null; // Convert end date if provided
 
-      const startYear = startDate.getFullYear();
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth();
 
-      if (startYear === currentYear) {
-        const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (startYear === currentYear && startMonth >= 3) {
+          // Check if leave started after 1st April of current year
+          let daysDifference: number;
+          if (endDate) {
+            const millisecondsPerDay = 1000 * 60 * 60 * 24;
+            const differenceInMilliseconds =
+              endDate.getTime() - startDate.getTime();
+            daysDifference =
+              Math.ceil(differenceInMilliseconds / millisecondsPerDay) + 1;
+          } else {
+            daysDifference = 1;
+          }
 
-        switch (leaveType) {
-          case 'full':
-            remainingBalance -= daysDifference;
-            break;
-          case 'first half':
-          case 'second half':
-            remainingBalance -= daysDifference / 2;
-            break;
-          default:
-            break;
+          switch (request.leave_type) {
+            case 'full':
+              remainingBalance -= daysDifference;
+              break;
+            case 'first half':
+            case 'second half':
+              remainingBalance -= daysDifference / 2;
+              break;
+            default:
+              break;
+          }
         }
-      }
-    });
+      });
 
-    remainingBalance = Math.max(remainingBalance, 0);
+      remainingBalance = Math.max(remainingBalance, 0);
 
-    return {remainingBalance:remainingBalance,default_balance:default_balance};
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
+      return {
+        remainingBalance: remainingBalance,
+        default_balance: default_balance,
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
   }
-}
+
 
 
 async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
