@@ -1,8 +1,5 @@
-// import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-// import { Request } from 'express';
 import { AuthPayloadDto } from './dto/auth.dto';
-// import { AuthGuard } from '@nestjs/passport';
 import { AuthGuard } from './guards/auth.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import {

@@ -139,30 +139,6 @@ export class AuthService {
         return generatedPassword;
     }  
 
-    // async registerUser(
-    //     // email: string,
-    //      employeeId:number
-    //     ) {
-    //     const generatedPassword = this.generateRandomPassword(10);
-    //     const encryptedPassword = this.encrypt(generatedPassword);
-
-    //     const employee = await this.employeeRepository.findOne({ where: { id: employeeId } });
-
-    //     if (!employee) {
-    //     throw new Error('Employee with the provided ID not found');
-    //     }
-
-    //     const newUser = this.userCredentialsRepository.create({
-    //         // email,
-    //         password: encryptedPassword,
-    //         employee: employee
-            
-    //     });
-
-    //     await this.userCredentialsRepository.save(newUser);
-
-    //     return generatedPassword;
-    // }
 
     generateRandomPassword(length: number): string {
         const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

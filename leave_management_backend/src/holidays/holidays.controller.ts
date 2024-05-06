@@ -21,7 +21,7 @@ import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
@@ -42,7 +42,34 @@ export class HolidaysController {
     description: 'create holiday object ',
     type: Holidays
   })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    description: 'Image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        data1: {
+          type: 'object',
+          properties: {
+            date: {
+              type: 'string',
+            },
+            day: {
+              type: 'string',
+            },
+            occasion: {
+              type: 'string',
+            },
+          },
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async uploadImage(@UploadedFile() file, @Body() body: any,
   @Request() req,) {
 

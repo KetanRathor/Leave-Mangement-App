@@ -166,7 +166,7 @@ export class LeaveTypesAndRequestsController {
 //   const numEmployeesOnLeave = await this.leaveTypesAndRequestsService.getNumberOfEmployeesOnLeaveToday();
 //   return { numEmployeesOnLeave };
 // }
-
+@UseGuards(AuthGuard)
 @Get('/employees/employees-leave-on-today')
 
 async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
@@ -181,7 +181,7 @@ async getEmployeesOnLeaveToday(): Promise<Employee[]> {
   }
 }
 
-
+@UseGuards(AuthGuard)
 @Get(':employeeId/pending-requests')
 @ApiOkResponse({
   description:'Get list of pending leave requests of employees who have manager with given id',
