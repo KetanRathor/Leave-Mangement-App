@@ -1,14 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-  OneToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -16,41 +6,40 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { UserOtp } from 'src/auth/entities/userOtp.entity';
 import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
-import { CreateEmployeeDto } from '../dto/create-employee.dto';
-import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { CreateLeaveTypesAndRequestDto } from 'src/leave_types_and_requests/dto/create-leave_types_and_request.dto';
-import { CreateInventoryDto } from 'src/inventory/dto/create-inventory.dto';
-import { CreateProjectDto } from 'src/project/dto/create-project.dto';
 
 @Entity('employee')
 export class Employee {
+  
   @PrimaryGeneratedColumn()
   @ApiProperty({
-    description: 'The id of Employee',
+    description:'The id of Employee'
   })
   id: number;
 
+  
   @Column({ nullable: false })
   @ApiProperty({
-    description: 'The name of Employee',
+    description:'The name of Employee'
   })
   name: string;
 
+  
   @Column({ nullable: false, unique: true })
   @ApiProperty({
-    description: 'The email of Employee',
+    description:'The email of Employee'
   })
   email: string;
 
-  @Column({ nullable: false, unique: true })
+  
+  @Column({ nullable: false,unique: true })
   @ApiProperty({
-    description: 'The mobile number of Employee',
+    description:'The mobile number of Employee'
   })
   mobile_number: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type:'timestamp'})
   @ApiProperty({
-    description: 'The date of birth of Employee',
+    description:'The date of birth of Employee'
   })
   dob: Date;
 
@@ -72,72 +61,69 @@ export class Employee {
     default: 'Male',
   })
   @ApiProperty({
-    description: 'The gender of Employee',
+    description:'The gender of Employee'
   })
   gender: string;
-
+  
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
-    description: 'When employee was Created',
+    description:'When employee was Created'
   })
   created_at: Date;
 
+
   @Column({ default: '' })
   @ApiProperty({
-    description: 'employee created by',
+    description:'employee created by'
   })
   created_by: string;
 
-  @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', nullable: true,onUpdate: 'CURRENT_TIMESTAMP' })
   @ApiProperty({
-    description: 'When employee was Updated',
+    description:'When employee was Updated'
   })
   updated_at: Date;
 
-  @Column({ default: '' })
+  @Column({ default: ''})
   @ApiProperty({
-    description: 'Employee Updated By',
+    description:'Employee Updated By'
   })
   updated_by: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+
+  @Column({ type: 'timestamp', nullable:true })
   @ApiProperty({
-    description: 'The date at which employee deleted',
+    description:'The date at which employee deleted'
   })
   deleted_at: Date;
 
-  @Column({ default: '' })
+  @Column({ default: ''})
   @ApiProperty({
-    description: 'employee deleted by',
+    description:'employee deleted by'
   })
   deleted_by: string;
 
+
   @Column({ default: null })
   @ApiProperty({
-    description: 'The manager id of Employee',
+    description:'The manager id of Employee'
   })
   manager_id: number | null;
 
   @ApiProperty()
-  @ApiProperty({
-    description:'Manager',
-    type:Employee
-})
   @ManyToOne(() => Employee)
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
+  
   @Column({ default: null })
   @ApiProperty({
-    description: 'The department id of Employee',
+    description:'The department id of Employee'
   })
   department_id: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Department, (department) => department.employees)
-  @ApiProperty({
-    description:'Department',
-    type:CreateDepartmentDto
-})
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
@@ -150,61 +136,41 @@ export class Employee {
   // })
   // role: string;
 
-  @Column({ default: false })
+  @Column({ default: false })  
   @ApiProperty({
-    description: 'Is the employee an admin?',
+    description: 'Is the employee an admin?'
   })
   admin: boolean;
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description: 'employee image',
-    type: 'string',
-    format: 'binary',
+    description:'employee image'
   })
   image: Buffer;
 
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  @ApiProperty({
-    description:'Leave Requests',
-    type:LeaveRequest
-})
-  @JoinColumn({ name: 'leave_request_id' })
+  @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
 
   @ApiProperty()
-  @OneToMany(() => Inventory, (inventory) => inventory.employee, {
-    cascade: true,
-  })
-  
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
-  @ApiProperty({
-    description:'inventories',
-    type:Inventory
-})
   @JoinColumn({ name: 'employee_id' })
   inventories: Inventory[]
 
-  
+  @ApiProperty()
   @OneToMany(() => Project, (project) => project.employee)
-  projects: Project[];
-  @ApiProperty({
-    description:'projects',
-    type:Project
-})
   projects: Project[]
 
-  @JoinTable({ name: 'employee_project' })
-  project: Project[];
+  @ManyToMany(() => Project)
+    @JoinTable({name:"employee_project"})
+    project: Project[]
 
-  @ApiProperty({
-    description:'userOtp',
-    type:UserOtp
-})
-  @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade: true })
+
+  @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade:true })
   userOtp: UserOtp;
 
   // @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
   // // @JoinColumn({ name: 'employee_id' })
   // userCredentials: UserCredentials | null;
+  
 }

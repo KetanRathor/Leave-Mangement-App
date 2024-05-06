@@ -137,14 +137,7 @@ export class LeaveTypesAndRequestsService {
 
     const updatedLeaveRequest =
       await this.leaveRequestRepository.save(leaveRequest);
-    const employee = await this.employeeRepository.findOne({
-      where: { email: req_mail },
-    });
-    const employeeName = employee ? employee.name : 'Unknown';
-
-    const employeeEmail = leaveRequest.created_by;
-    const updatedLeaveRequest =
-      await this.leaveRequestRepository.save(leaveRequest);
+    
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
       await this.mailService.sendLeaveStatusEmail(employeeEmail, message);
@@ -236,14 +229,7 @@ export class LeaveTypesAndRequestsService {
   //   }
   // }
 
-  async getEmployeesWithPendingLeaveRequests() // employeeId: number,
-  : Promise<LeaveRequest[]> {
-    return this.leaveRequestRepository.find({
-      where: { status: 'pending' },
-      relations: ['employee'],
-    });
-  }
-
+  
   async getRemainingLeaveBalance(id: number): Promise<any> {
     try {
       const currentDate = new Date();
@@ -444,22 +430,6 @@ export class LeaveTypesAndRequestsService {
     }
 }
 
-async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
-
-  if(emp_id )
-  return await this.employeeRepository.find({
-    where: [
-      { manager_id: emp_id },
-    ],
-  });
-}
-
-async findPendingRequestsByEmployeeId(employeeId: number): Promise<LeaveRequest[]> {
-  return this.leaveRequestRepository.find({
-    where: { emp_id:employeeId, status: 'pending' },
-    relations: ['employee'],
-  });
-}
 
   async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
     if (emp_id)
