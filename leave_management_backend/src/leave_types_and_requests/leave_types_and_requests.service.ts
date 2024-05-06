@@ -153,41 +153,49 @@ export class LeaveTypesAndRequestsService {
     return leaveRequest;
   }
 
-  async getEmployeesWithPendingLeaveRequests(): Promise<
-    {
-      id: Number;
-      emp_id: Number;
-      employeeName: string;
-      start_date: Date;
-      end_date: Date;
-      leave_type: string;
-      reason: string;
-    }[]
-  > {
-    try {
-      const pendingRequests = await this.leaveRequestRepository.find({
-        where: {
-          status: 'pending',
-        },
-        relations: ['employee'],
-      });
+  // async getEmployeesWithPendingLeaveRequests(): Promise<
+  //   {
+  //     id: Number;
+  //     emp_id: Number;
+  //     employeeName: string;
+  //     start_date: Date;
+  //     end_date: Date;
+  //     leave_type: string;
+  //     reason: string;
+  //   }[]
+  // > {
+  //   try {
+  //     const pendingRequests = await this.leaveRequestRepository.find({
+  //       where: {
+  //         status: 'pending',
+  //       },
+  //       relations: ['employee'],
+  //     });
 
-      return pendingRequests.map((request) => ({
-        id: request.id,
-        emp_id: request.employee.id,
-        employeeName: request.employee.name,
-        start_date: request.start_date,
-        end_date: request.end_date,
-        leave_type: request.leave_type,
-        reason: request.reason,
-      }));
-    } catch (error) {
-      console.error('Error fetching employees with pending requests:', error);
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  //     return pendingRequests.map((request) => ({
+  //       id: request.id,
+  //       emp_id: request.employee.id,
+  //       employeeName: request.employee.name,
+  //       start_date: request.start_date,
+  //       end_date: request.end_date,
+  //       leave_type: request.leave_type,
+  //       reason: request.reason,
+  //     }));
+  //   } catch (error) {
+  //     console.error('Error fetching employees with pending requests:', error);
+  //     throw new HttpException(
+  //       'Internal server error',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
+
+  async getEmployeesWithPendingLeaveRequests() // employeeId: number,
+  : Promise<LeaveRequest[]> {
+    return this.leaveRequestRepository.find({
+      where: { status: 'pending' },
+      relations: ['employee'],
+    });
   }
 
   async getRemainingLeaveBalance(id: number): Promise<any> {
