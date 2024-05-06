@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 

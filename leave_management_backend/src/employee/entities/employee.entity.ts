@@ -16,6 +16,11 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { UserOtp } from 'src/auth/entities/userOtp.entity';
 import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
+import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
+import { CreateLeaveTypesAndRequestDto } from 'src/leave_types_and_requests/dto/create-leave_types_and_request.dto';
+import { CreateInventoryDto } from 'src/inventory/dto/create-inventory.dto';
+import { CreateProjectDto } from 'src/project/dto/create-project.dto';
 
 @Entity('employee')
 export class Employee {
@@ -114,6 +119,10 @@ export class Employee {
   manager_id: number | null;
 
   @ApiProperty()
+  @ApiProperty({
+    description:'Manager',
+    type:Employee
+})
   @ManyToOne(() => Employee)
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
@@ -124,8 +133,11 @@ export class Employee {
   })
   department_id: number | null;
 
-  @ApiProperty()
   @ManyToOne(() => Department, (department) => department.employees)
+  @ApiProperty({
+    description:'Department',
+    type:CreateDepartmentDto
+})
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
@@ -152,8 +164,11 @@ export class Employee {
   })
   image: Buffer;
 
-  @ApiProperty()
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
+  @ApiProperty({
+    description:'Leave Requests',
+    type:LeaveRequest
+})
   @JoinColumn({ name: 'leave_request_id' })
   leaveRequests: LeaveRequest[];
 
@@ -161,18 +176,31 @@ export class Employee {
   @OneToMany(() => Inventory, (inventory) => inventory.employee, {
     cascade: true,
   })
+  
+  @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
+  @ApiProperty({
+    description:'inventories',
+    type:Inventory
+})
   @JoinColumn({ name: 'employee_id' })
-  inventories: Inventory[];
+  inventories: Inventory[]
 
-  @ApiProperty()
+  
   @OneToMany(() => Project, (project) => project.employee)
   projects: Project[];
+  @ApiProperty({
+    description:'projects',
+    type:Project
+})
+  projects: Project[]
 
-  @ApiProperty()
-  @ManyToMany(() => Project)
   @JoinTable({ name: 'employee_project' })
   project: Project[];
 
+  @ApiProperty({
+    description:'userOtp',
+    type:UserOtp
+})
   @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade: true })
   userOtp: UserOtp;
 

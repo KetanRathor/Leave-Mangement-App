@@ -112,7 +112,7 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
   @ApiOkResponse({
-    description: 'Get employee list whose leave request status is pending',
+    description:'Get employee list whose leave request status is pending'
   })
   async getEmployeesWithPendingRequests() {
     try {
