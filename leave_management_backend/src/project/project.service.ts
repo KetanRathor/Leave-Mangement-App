@@ -67,10 +67,7 @@ export class ProjectService {
       
     }
 
-
-    // console.log("manager",manager);
-    // console.log("first")
-   
+ 
     project.updated_by = req_mail;
 
     console.log("project....", project)

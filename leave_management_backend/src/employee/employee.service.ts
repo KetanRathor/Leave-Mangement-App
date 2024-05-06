@@ -48,11 +48,10 @@ export class EmployeeService {
         }
 
         // const inventory = await this.inventoryRepository
-
-
-        const savedEmployee = await this.employeeRepository.save(newEmployee);
+         const savedEmployee = await this.employeeRepository.save(newEmployee);
         const isInventry = createEmployeeDto?.inventory_id;
         if(isInventry){
+          
           await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
         }
         
@@ -133,12 +132,7 @@ export class EmployeeService {
 
     }
 
-    //Show Employe Profile
-    // async showProfile(id: number) {
-    //     return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
-    //          relations: ['manager','department','inventories','project'] });
-             
-    // }
+    
     async showProfile(id: number): Promise<any> {
         try {
           const employee = await this.employeeRepository.findOne({
@@ -171,17 +165,7 @@ export class EmployeeService {
         }
       }
 
-    
-    
-
-    //Show Employee List
-    // async findEmployees() {
-
-    //     return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project','inventories'] })
-    // }
-
-
-    async findEmployees() {
+     async findEmployees() {
         try {
           const employees = await this.employeeRepository.find({
             where: { deleted_at: IsNull() },
@@ -210,14 +194,8 @@ export class EmployeeService {
         }
       }
       
-
-
-    // async findManagerList(){
-    //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
-    // }
-
-
-    async uploadImage(employeeId: number, imageData: Buffer) {
+      
+  async uploadImage(employeeId: number, imageData: Buffer) {
         const employee = await this.employeeRepository.findOneBy({id:employeeId});
         if (!employee) {
           throw new Error(`Employee with ID ${employeeId} not found`);
@@ -226,20 +204,7 @@ export class EmployeeService {
         return await this.employeeRepository.save(employee);
       }
 
-
-
-// async findManagers() {
-  
-//   const managerEmployees = await this.employeeRepository.find({
-//     where: [
-//       { manager_id: IsNull(), deleted_at: IsNull() }, 
-//       { admin: true, deleted_at: IsNull() }, 
-//     ],
-//   });
-
-//   return managerEmployees;
-// }
-async findAll(): Promise<Employee[]> {
+  async findAll(): Promise<Employee[]> {
     return await this.employeeRepository.find();
   }
 

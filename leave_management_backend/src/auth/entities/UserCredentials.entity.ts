@@ -7,18 +7,11 @@ export class UserCredentials {
   @PrimaryGeneratedColumn()
   id: number;
 
-  
-
-  
-
-
   @Column({ nullable: false, unique: true })
   email: string;
 
   @Column({ nullable: false })
   password: string;
-
-  
 
   @Column({ type: 'timestamp', nullable:true })
   @ApiProperty({
@@ -32,29 +25,4 @@ export class UserCredentials {
   })
   deleted_by: string;
 
-  // @OneToOne(() => Employee, (employee) => employee.userCredentials, { nullable: true, cascade: ['insert', 'update'] })
-  // @JoinColumn({ name: 'employee_id' })
-  // employee: Employee | null;
-
-
-  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  // created_at: Date;
-  
-  // @Column({ default: '' })
-  // created_by: string;
-
-
-  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  // updated_at: Date;
-
-  // @Column({ default: '' })
-  // updated_by: string;
-
-  // @Column({ type: 'timestamp',nullable:true })
-  // deleted_at: Date;
-
-  // @Column({ default: '' })
-  // deleted_by: string;
-
-  
 }

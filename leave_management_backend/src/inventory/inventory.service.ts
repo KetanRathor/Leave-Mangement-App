@@ -179,12 +179,12 @@ export class InventoryService {
       });
   
       if (!inventory) {      
-        return;
+        throw new Error('No inventory found.');
       }
   
       const employee = await this.employeeRepository.findOne({ where: { id: empId } });
       if (!employee) {
-        return;
+        throw new Error('No employee found.');
       }
   
       inventory.employee = employee; 
@@ -193,9 +193,6 @@ export class InventoryService {
         console.error('Error assigning inventory to employee:', error);
         }
   }
-
- 
-  
 
 
 }
