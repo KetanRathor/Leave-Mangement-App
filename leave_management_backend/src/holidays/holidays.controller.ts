@@ -22,7 +22,7 @@ import { HolidaysService } from './holidays.service';
 import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
 import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
 
@@ -33,7 +33,7 @@ export class HolidaysController {
   imageService: any;
   constructor(private readonly holidaysService: HolidaysService) { }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('upload')
   @ApiBody({
     type: Holidays
@@ -94,7 +94,7 @@ export class HolidaysController {
   }
 
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'Get all Holidays',
@@ -144,7 +144,7 @@ export class HolidaysController {
   //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('upcoming')
   @ApiOkResponse({
     description: 'Get upcoming Holidays',
@@ -159,7 +159,7 @@ export class HolidaysController {
     };
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
@@ -173,7 +173,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',

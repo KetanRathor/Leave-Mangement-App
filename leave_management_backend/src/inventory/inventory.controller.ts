@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpS
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import * as crypto from 'crypto'
 import { text } from 'stream/consumers';
 import { Inventory } from './entities/inventory.entity';
@@ -25,7 +25,7 @@ export class InventoryController {
 
  
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description:'Inventory will be created as response',
@@ -42,7 +42,7 @@ export class InventoryController {
   }
 
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description:'Get List of all Inventories',
@@ -58,7 +58,7 @@ export class InventoryController {
     return this.inventoryService.ListOfInventories();
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('oneInventory/:id')
   @ApiOkResponse({
     description:'Get Inventory of given ID',
@@ -69,7 +69,7 @@ export class InventoryController {
   }
 
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Patch(':id')
   @ApiCreatedResponse({
     description:'Inventory will be updated as response',
@@ -86,7 +86,7 @@ export class InventoryController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description:'Inventory will be deleted as response'
@@ -140,7 +140,7 @@ async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inv
   }
 }
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Post("/category")
 @ApiCreatedResponse({
   description:'Category will be created as response',

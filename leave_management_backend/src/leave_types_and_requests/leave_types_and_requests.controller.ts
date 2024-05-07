@@ -23,7 +23,7 @@ import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_requ
 // import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 // import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 import { Res } from '@nestjs/common';
@@ -39,7 +39,7 @@ export class LeaveTypesAndRequestsController {
     private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
   ) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'Leave request created',
@@ -57,7 +57,7 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'Get all leave requests',
@@ -67,7 +67,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':leave_request_id')
   @ApiOkResponse({
     description: 'Get leave requests of employee with given id',
@@ -77,7 +77,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.findOne(leave_request_id);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
     description: 'leave request status will be updated as response'
@@ -117,7 +117,7 @@ export class LeaveTypesAndRequestsController {
     return { leaveRequest, message };
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
   @ApiOkResponse({
     description:'Get employee list whose leave request status is pending'
@@ -135,7 +135,7 @@ export class LeaveTypesAndRequestsController {
       );
     }
   }
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-balance/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
@@ -145,7 +145,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
   
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-balance/work-from-home/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {
@@ -166,7 +166,7 @@ export class LeaveTypesAndRequestsController {
 //   const numEmployeesOnLeave = await this.leaveTypesAndRequestsService.getNumberOfEmployeesOnLeaveToday();
 //   return { numEmployeesOnLeave };
 // }
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Get('/employees/employees-leave-on-today')
 
 async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
@@ -181,7 +181,7 @@ async getEmployeesOnLeaveToday(): Promise<Employee[]> {
   }
 }
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Get(':employeeId/pending-requests')
 @ApiOkResponse({
   description:'Get list of pending leave requests of employees who have manager with given id',

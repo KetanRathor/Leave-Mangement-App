@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseInt
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
@@ -38,7 +38,7 @@ export class EmployeeController {
   
  
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
     description:'Employee with given ID will be updated as response',
@@ -57,7 +57,7 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
@@ -74,7 +74,7 @@ export class EmployeeController {
   }
 
   //Show Profile or display employee details
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('employee/:id')
   @ApiOkResponse({
     description:'Get employee by id',
@@ -90,7 +90,7 @@ export class EmployeeController {
 
   
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description:'All employees List',

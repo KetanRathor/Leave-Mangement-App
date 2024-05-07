@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateInventoryDto } from 'src/inventory/dto/update-inventory.dto';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
@@ -19,7 +19,7 @@ export class ProjectController {
     // private readonly employeeService: EmployeeService
   ) { }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'Project will be added as response',
@@ -36,7 +36,7 @@ export class ProjectController {
   }
 
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All project List',
@@ -46,7 +46,7 @@ export class ProjectController {
     return this.projectService.showAllProjects();
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOkResponse({
     description: 'The project with given ID',
@@ -56,7 +56,7 @@ export class ProjectController {
     return await this.projectService.findOneProject(id);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Patch(':id')
   @ApiCreatedResponse({
     description: 'project will be updated as response',
@@ -97,7 +97,7 @@ export class ProjectController {
   //   return await this.projectService.getAssignedEmployees(projectId);
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Put('/status/:project_id')
   @ApiCreatedResponse({
     description: 'status of the project will be updated as response',

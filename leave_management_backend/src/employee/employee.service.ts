@@ -56,10 +56,10 @@ export class EmployeeService {
         }
         
         const employeeId = savedEmployee.id
-        const userPassword = await this.authService.registerUser(createEmployeeDto.email)
+        // const userPassword = await this.authService.registerUser(createEmployeeDto.email)
         // const userPassword = await this.authService.registerUser(employeeId)
 
-        await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
+        // await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
 
         return savedEmployee;
     }
@@ -117,8 +117,8 @@ export class EmployeeService {
         const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
 
         if (userCredentials) {
-          userCredentials.deleted_by = req_mail;
-          userCredentials.deleted_at = new Date();
+          // userCredentials.deleted_by = req_mail;
+          // userCredentials.deleted_at = new Date();
           await this.userCredentialRepository.save(userCredentials);
             
         }
