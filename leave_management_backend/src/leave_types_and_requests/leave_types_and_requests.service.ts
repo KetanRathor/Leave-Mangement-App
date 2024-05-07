@@ -238,17 +238,17 @@ export class LeaveTypesAndRequestsService {
         currentMonth >= 3
           ? currentDate.getFullYear()
           : currentDate.getFullYear() - 1; // Adjust year based on current month
-      const approvedRequests = await this.leaveRequestRepository.find({
+      const leaveRequests = await this.leaveRequestRepository.find({
         where: {
           emp_id: id,
-          status: 'approved',
+          // status: 'approved' || 'pending',
         },
       });
 
       let default_balance = 21;
       let remainingBalance = default_balance;
 
-      approvedRequests.forEach((request) => {
+      leaveRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
         const endDate = request.end_date ? new Date(request.end_date) : null; // Convert end date if provided
 
@@ -268,21 +268,23 @@ export class LeaveTypesAndRequestsService {
             daysDifference = 1;
           }
 
-          switch (request.leave_type) {
-            case 'full':
-              remainingBalance -= daysDifference;
-              break;
-            case 'first half':
-            case 'second half':
-              remainingBalance -= daysDifference / 2;
-              break;
-            default:
-              break;
+          if (request.status === 'approved' || request.status === 'pending') {
+            switch (request.leave_type) {
+              case 'full':
+                remainingBalance -= daysDifference;
+                break;
+              case 'first half':
+              case 'second half':
+                remainingBalance -= daysDifference / 2;
+                break;
+              default:
+                break;
+            }
           }
         }
       });
 
-      remainingBalance = Math.max(remainingBalance, 0);
+      // remainingBalance = Math.max(remainingBalance, 0);
       remainingBalance = Math.max(remainingBalance, 0);
 
       return {
@@ -306,8 +308,8 @@ export class LeaveTypesAndRequestsService {
       const approvedRequests = await this.leaveRequestRepository.find({
         where: {
           emp_id: id,
-          status: 'approved',
           leave_type: 'work from home',
+          status: In(['approved', 'pending']), // Only consider approved or pending requests
         },
       });
 
@@ -316,33 +318,41 @@ export class LeaveTypesAndRequestsService {
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
         const endDate = request.end_date ? new Date(request.end_date) : null;
-    
+
         const startMonth = startDate.getMonth();
         const startYear = startDate.getFullYear();
         const endMonth = endDate ? endDate.getMonth() : null;
         const endYear = endDate ? endDate.getFullYear() : null;
-    
+
         let startDay = startDate.getDate();
         let endDay = endDate ? endDate.getDate() : null;
-    
+
         if (startYear === currentYear && startMonth === currentMonth) {
-            if (endDate === null || (endMonth !== null && endMonth === currentMonth && endDate.getTime() === startDate.getTime())) {
-                // If end date is null or end date is in the same month and same as start date (one-day leave)
-                defaultBalancePerMonth[currentMonth] -= 1; // Subtract only 1 day
-            } else if (endMonth === currentMonth) {
-                defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1; // Subtract the difference between end and start day, plus 1
-            } else {
-                // If end month is different from current month
-                const daysInStartMonth = new Date(startYear, startMonth + 1, 0).getDate();
-                defaultBalancePerMonth[currentMonth] -= daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
-            }
+          if (
+            endDate === null ||
+            (endMonth !== null &&
+              endMonth === currentMonth &&
+              endDate.getTime() === startDate.getTime())
+          ) {
+            // If end date is null or end date is in the same month and same as start date (one-day leave)
+            defaultBalancePerMonth[currentMonth] -= 1; // Subtract only 1 day
+          } else if (endMonth === currentMonth) {
+            defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1; // Subtract the difference between end and start day
+          } else {
+            // If end month is different from current month
+            const daysInStartMonth = new Date(
+              startYear,
+              startMonth + 1,
+              0,
+            ).getDate();
+            defaultBalancePerMonth[currentMonth] -=
+              daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
+          }
         }
-    });
-    
-    
+      });
 
       // Calculate remaining balance for the current month
-      let remainingWorkFromHomeBalance = Math.max(
+      const remainingWorkFromHomeBalance = Math.max(
         defaultBalancePerMonth[currentMonth],
         0,
       );
@@ -357,7 +367,6 @@ export class LeaveTypesAndRequestsService {
       );
     }
   }
-
   // async getEmployeesOnLeaveToday(): Promise<any> {
   //   try {
   //     const today = new Date();
