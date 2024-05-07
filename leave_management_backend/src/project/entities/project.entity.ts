@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
 @Entity('projects')
 export class Project {
@@ -8,8 +8,13 @@ export class Project {
   @Column()
   name: string;
 
-  @Column()
-  manager_name: string;
+  @ManyToOne(() => Employee, (employee) => employee.projects)
+  @JoinColumn({name:'manager_id'})
+    @ApiProperty({
+        description:'prject manager',
+        type:CreateEmployeeDto
+    })
+    manager: Employee
 
   @Column({ nullable: true })
   description?: string;
@@ -45,6 +50,13 @@ export class Project {
   @Column({ default: '' })
   deleted_by: string;
 
+
+
+
+  @ApiProperty({
+    description:'employees of project',
+    type:CreateEmployeeDto
+  })
   @ManyToMany(() => Employee)
     @JoinTable({name:'employee_project'})
     employee: Employee[]

@@ -90,20 +90,36 @@ export class LeaveTypesAndRequestsController {
   @ApiBody({
     type: UpdateLeaveStatus,
   })
+  // async updateStatus(
+  //   @Param('leave_request_id') leave_request_id: number,
+  //   @Body() body: { status: string },
+  //   @Request() req,
+  // ): Promise<LeaveRequest> {
+  //   const req_mail = req.user.email;
+  //   if (!body.status) {
+  //     throw new BadRequestException('Status is required');
+  //   }   
+  //   return this.leaveTypesAndRequestsService.updateStatus(
+  //     leave_request_id,
+  //     body.status,
+  //     req_mail
+  //   );
+  // }
   async updateStatus(
     @Param('leave_request_id') leave_request_id: number,
     @Body() body: { status: string },
     @Request() req,
-  ): Promise<LeaveRequest> {
+  ): Promise<{ leaveRequest: LeaveRequest, message: string }> {
     const req_mail = req.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
-    }
-    return this.leaveTypesAndRequestsService.updateStatus(
+    }   
+    const { leaveRequest, message } = await this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
       req_mail,
     );
+    return { leaveRequest, message };
   }
 
   @UseGuards(AuthGuard)
@@ -173,11 +189,49 @@ export class LeaveTypesAndRequestsController {
   // }
 
   @Get(':employeeId/requests')
-  async findAllByEmployeeId(
-    @Param('employeeId') employeeId: number,
-  ): Promise<LeaveRequest[]> {
-    return await this.leaveTypesAndRequestsService.findAllByEmployeeId(
-      employeeId,
-    );
+  async findAllByEmployeeId(@Param('employeeId') employeeId: number): Promise<LeaveRequest[]> {
+    return await this.leaveTypesAndRequestsService.findAllByEmployeeId(employeeId);
+  }
+
+//   @Get('leave/employees_on_leave_today')
+// async getEmployeesOnLeaveToday() {
+//   const numEmployeesOnLeave = await this.leaveTypesAndRequestsService.getNumberOfEmployeesOnLeaveToday();
+//   return { numEmployeesOnLeave };
+// }
+@UseGuards(AuthGuard)
+@Get('/employees/employees-leave-on-today')
+
+async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
+  try {
+    console.log(".............................");
+    
+    const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
+    return employeesOnLeave;
+  } catch (error) {
+    console.error('Error fetching employees on leave today:', error);
+    throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@UseGuards(AuthGuard)
+@Get(':employeeId/pending-requests')
+@ApiOkResponse({
+  description:'Get list of pending leave requests of employees who have manager with given id',
+  type:LeaveRequest
+})
+  async findAllRequestsByEmployeeId(@Param('employeeId') employeeId: number): Promise<{ pendingRequests: LeaveRequest[] }> {
+    try{
+    const pendingRequests: LeaveRequest[] = [];
+
+    const ab=await this.leaveTypesAndRequestsService.findAllRequestsByEmployeeId(employeeId);
+
+    for (const employee of ab) {
+      const employeeRequests = await this.leaveTypesAndRequestsService.findPendingRequestsByEmployeeId(employee.id);
+      pendingRequests.push(...employeeRequests);
+    }
+    return { pendingRequests };
+    }catch(error){
+      console.error('Error occurred while fetching pending requests:', error);
+    }
   }
 }

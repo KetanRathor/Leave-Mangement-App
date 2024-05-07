@@ -61,19 +61,38 @@ export class HolidaysService {
 
 
 
-async getRemainingHolidays(): Promise<number> {
+// async getRemainingHolidays(): Promise<number> {
+//   try {
+//     const currentDate = new Date();
+//     const holidaysUntilCurrentDate = await this.holidaysRepository.count({
+//       where: {
+//         date: LessThanOrEqual(currentDate),
+//       },
+//     });
+//     const defaultHolidays = 10; 
+
+//     return defaultHolidays - holidaysUntilCurrentDate;
+//   } catch (error) {
+//     throw new Error('Failed to calculate remaining holidays');
+//   }
+// } 
+
+async getRemainingHolidays(): Promise<any> {
   try {
     const currentDate = new Date();
+    const totalHolidays = await this.holidaysRepository.count();
+   
     const holidaysUntilCurrentDate = await this.holidaysRepository.count({
       where: {
         date: LessThanOrEqual(currentDate),
       },
     });
-    const defaultHolidays = 10; 
 
-    return defaultHolidays - holidaysUntilCurrentDate;
+    const remainingHolidays = totalHolidays - holidaysUntilCurrentDate;
+
+    return { remainingHolidays, totalHolidays };
   } catch (error) {
     throw new Error('Failed to calculate remaining holidays');
   }
-} 
+}
 }

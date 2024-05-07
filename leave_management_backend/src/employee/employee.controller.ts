@@ -21,13 +21,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiSecurity,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -128,65 +122,32 @@ export class EmployeeController {
   }
 
   @Post('upload-image/:id')
-  @UseInterceptors(FileInterceptor('image'))
-  async uploadImage(
-    @Param('id') id: number,
-    @UploadedFile() image: Express.Multer.File,
-  ) {
-    if (!image) {
-      throw new Error('No image uploaded');
-    }
+  @ApiConsumes('multipart/form-data')
+@UseInterceptors(FileInterceptor('image'))
+@ApiBody({
+  description: 'Image upload',
+  schema: {
+    type: 'object',
+    properties: {
+      image: {
+        type: 'string',
+        format: 'binary',
+      },
+    },
+  },
+})
+async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+  
+  if (!image) {
+    throw new Error('No image uploaded');
+  }
 
     const employee = await this.employeeService.uploadImage(id, image.buffer);
 
-    return employee;
-  }
+  return employee;
+}
 
-  // @Get('/managers')
-  //   async findManagersAndAdmins() {
-  //     try {
-  //       const managerAndAdminEmployees = await this.employeeService.findManagers();
-  //       return managerAndAdminEmployees;
-  //     } catch (error) {
-  //       throw new HttpException('Error retrieving managers and admins.', HttpStatus.INTERNAL_SERVER_ERROR);
-  //     }
-  //   }
 
-  async determineRole(employee, employeeService) {
-    const hasManager = await employeeService.findById(employee.manager_id);
-    console.log('hasManager', hasManager);
-    if (employee.admin) {
-      return 'Admin';
-    } else if (hasManager) {
-      return 'Employee';
-    } else {
-      return 'Manager';
-    }
-  }
 
-  @Get('/managers')
-  async getEmployeeList() {
-    try {
-      const employees = await this.employeeService.findAll();
 
-      const employeeList = employees.map((employee) => {
-        const role = this.determineRole(employee, this.employeeService);
-        console.log('role', role);
-        return {
-          id: employee.id,
-          name: employee.name,
-          email: employee.email,
-          role,
-        };
-      });
-
-      return employeeList;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
 }

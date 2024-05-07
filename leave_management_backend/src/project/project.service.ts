@@ -18,24 +18,32 @@ export class ProjectService {
       private employeeRepository: Repository<Employee>,
     ) { }
 
-  addProject(createProjectDto: CreateProjectDto, req_mail: any) {
+  async addProject(createProjectDto: CreateProjectDto, req_mail: any) {
+
+   
     const newProject = this.projectRepository.create(createProjectDto);
     newProject.created_by = req_mail;
+    const manager = await this.employeeRepository.findOneBy({ id: createProjectDto.manager_id });
+
+    if (!manager) {
+      
+      throw new Error('Manager not found for the provided ID');
+    }
+    newProject.manager = manager
 
     return this.projectRepository.save(newProject)
   }
 
   async showAllProjects() {
-    return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee'] });
+    return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee','manager'] });
   }
 
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee'] });
+    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee','manager']});
 
     if (!project) {
-      return { message: `Inventory with ID ${id} not found`, project };
+      return { message: `Project with ID ${id} not found`, project };
     }
-
     return project;
   }
 
@@ -43,29 +51,36 @@ export class ProjectService {
     const project = await this.projectRepository.findOneBy({ id });
 
     if (!project) {
-      throw new NotFoundException('Inventory not found.');
+      throw new NotFoundException('Project not found.');
     }
 
-    for (const key in updatedProjectDetails) {
-      if (updatedProjectDetails[key] !== undefined) {
-        project[key] = updatedProjectDetails[key];
+    if(updatedProjectDetails.manager_id){
+      const manager_id = updatedProjectDetails.manager_id
+      const manager = await this.employeeRepository.findOneBy({id: manager_id})
+      project.manager = manager
+    }else{
+      for (const key in updatedProjectDetails) {
+        if (updatedProjectDetails[key] !== undefined) {
+          project[key] = updatedProjectDetails[key];
+        }
       }
+      
     }
 
+ 
     project.updated_by = req_mail;
 
-    return await this.projectRepository.save(project);
+    console.log("project....", project)
+
+    const res =  await this.projectRepository.save(project);
+    console.log(res)
+    
+    return res
   }
 
   async assignProject({employeeId, projectId }): Promise<string> {
     try {
-      // const admin = await this.employeeRepository.findOne({ where: { id: adminId } });
-
-      // if (admin.role !== "Admin") {
-      //   throw new NotFoundException("Current user doesn't have admin access");
-      // }
-      // console.log("Admin", admin)
-
+    
       const [project, employee] = await Promise.all([
         this.projectRepository.findOne(
           {
@@ -86,10 +101,9 @@ export class ProjectService {
       }
 
       console.log("project", project)
-      // project.projects = [employee]
-      // console.log("project111", project.projects)
+      
       project.employee.push(employee);
-      // project.projects = [...project.projects, employee];
+      
 
       await this.projectRepository.save(project);
 
@@ -100,47 +114,29 @@ export class ProjectService {
   }
 
 
-  // async getEmployeesOnProject(id: number){
+  
 
-  // }
-  async getAssignedEmployees(projectsId: number): Promise<Employee[]> {
+
+
+  async getAssignedProjects(employeeId: number): Promise<{ assignedProjects: Project[]; projectCount: number }> {
     try {
-      const project = await this.projectRepository.findOne({
-        where:{id: projectsId},
+      const employee = await this.employeeRepository.findOne({where:{
+        id: employeeId},
         relations: ['projects'], 
       });
-  
-      if (!project) {
-        throw new NotFoundException('Project not found');
+
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
       }
-  
-      return project.employee; 
+
+      return {
+        assignedProjects: employee.projects, 
+        projectCount: employee.projects.length, 
+      };
     } catch (error) {
       throw error;
     }
   }
-
-
-
-  // async getAssignedProjects(employeeId: number): Promise<{ assignedProjects: Project[]; projectCount: number }> {
-  //   try {
-  //     const employee = await this.employeeRepository.findOne({where:{
-  //       id: employeeId},
-  //       relations: ['projects'], 
-  //     });
-
-  //     if (!employee) {
-  //       throw new NotFoundException('Employee not found');
-  //     }
-
-  //     return {
-  //       assignedProjects: employee.projects, 
-  //       projectCount: employee.projects.length, 
-  //     };
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 
 
 

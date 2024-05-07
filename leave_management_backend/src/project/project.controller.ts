@@ -75,10 +75,14 @@ export class ProjectController {
     }
   }
 
-@Get(':projectId/assigned-employees')
-async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
-  return await this.projectService.getAssignedEmployees(projectId);
-}
+  // @UseGuards(AuthGuard)
+  // @Get(':projectId/assigned-employees')
+  // @ApiOkResponse({
+  //   description: 'get list of employees who are assigned the project of given ID'
+  // })
+  // async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
+  //   return await this.projectService.getAssignedEmployees(projectId);
+  // }
 
 @UseGuards(AuthGuard)
 @Put('/status/:project_id')

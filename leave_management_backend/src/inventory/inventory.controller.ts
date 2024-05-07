@@ -43,6 +43,12 @@ export class InventoryController {
     return this.inventoryService.showAllInventories();
   }
 
+
+  @Get('/list_of_inventories')
+  ListOfInventories() {
+    return this.inventoryService.ListOfInventories();
+  }
+
   @UseGuards(AuthGuard)
   @Get('oneInventory/:id')
   async findOneInventory(@Param('id', ParseIntPipe) id: number) {
@@ -71,27 +77,30 @@ export class InventoryController {
   }
 
 
-  @UseGuards(AuthGuard)
-@Post('assign/:employeeId')
-async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
-  const req_mail = req.user.email;
+//   @UseGuards(AuthGuard)
+// @Post('assign/:employeeId')
+// @ApiCreatedResponse({
+//   description:'Assign Inventory to given Employee Id'
+// })
+// async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
+//   const req_mail = req.user.email;
 
-  try {
-    const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
+//   try {
+//     const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
 
-    if (existingInventory) {
-      return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
-    }
-    else{
-      return {message:"Inventory not available"}
-    }
+//     if (existingInventory) {
+//       return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
+//     }
+//     else{
+//       return {message:"Inventory not available"}
+//     }
 
-    // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
-    // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
-  } catch (error) {
-    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  }
-  }
+//     // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
+//     // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
+//   } catch (error) {
+//     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+//   }
+//   }
 
 
 
