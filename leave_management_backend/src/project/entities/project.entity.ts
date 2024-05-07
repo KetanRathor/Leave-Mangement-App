@@ -1,5 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
 @Entity('projects')
 export class Project {
   @PrimaryGeneratedColumn()
@@ -9,12 +19,12 @@ export class Project {
   name: string;
 
   @ManyToOne(() => Employee, (employee) => employee.projects)
-  @JoinColumn({name:'manager_id'})
-    @ApiProperty({
-        description:'prject manager',
-        type:CreateEmployeeDto
-    })
-    manager: Employee
+  @JoinColumn({ name: 'manager_id' })
+  @ApiProperty({
+    description: 'prject manager',
+    type: CreateEmployeeDto,
+  })
+  manager: Employee;
 
   @Column({ nullable: true })
   description?: string;
@@ -30,7 +40,7 @@ export class Project {
     enum: ['active', 'inactive'],
     default: 'active',
   })
-  status: 'active' | 'inactive'; 
+  status: 'active' | 'inactive';
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
@@ -38,7 +48,7 @@ export class Project {
   @Column({ default: '' })
   created_by: string;
 
-  @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP'})
+  @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
   @Column({ default: '' })
@@ -50,16 +60,11 @@ export class Project {
   @Column({ default: '' })
   deleted_by: string;
 
-
-
-
   @ApiProperty({
-    description:'employees of project',
-    type:CreateEmployeeDto
+    description: 'employees of project',
+    type: CreateEmployeeDto,
   })
   @ManyToMany(() => Employee)
-    @JoinTable({name:'employee_project'})
-    employee: Employee[]
-
-
+  @JoinTable({ name: 'employee_project' })
+  employee: Employee[];
 }
