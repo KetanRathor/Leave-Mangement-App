@@ -316,34 +316,30 @@ export class LeaveTypesAndRequestsService {
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
         const endDate = request.end_date ? new Date(request.end_date) : null;
-
+    
         const startMonth = startDate.getMonth();
         const startYear = startDate.getFullYear();
         const endMonth = endDate ? endDate.getMonth() : null;
         const endYear = endDate ? endDate.getFullYear() : null;
-
+    
         let startDay = startDate.getDate();
         let endDay = endDate ? endDate.getDate() : null;
-
-        if (startYear === currentYear) {
-          if (startMonth === currentMonth) {
-            if (endMonth === currentMonth) {
-              defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1;
+    
+        if (startYear === currentYear && startMonth === currentMonth) {
+            if (endDate === null || (endMonth !== null && endMonth === currentMonth && endDate.getTime() === startDate.getTime())) {
+                // If end date is null or end date is in the same month and same as start date (one-day leave)
+                defaultBalancePerMonth[currentMonth] -= 1; // Subtract only 1 day
+            } else if (endMonth === currentMonth) {
+                defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1; // Subtract the difference between end and start day, plus 1
             } else {
-              // If start month is the current month but end month is different
-              const daysInStartMonth = new Date(
-                startYear,
-                startMonth + 1,
-                0,
-              ).getDate(); // Number of days in start month
-              defaultBalancePerMonth[currentMonth] -=
-                daysInStartMonth - startDay + 1;
+                // If end month is different from current month
+                const daysInStartMonth = new Date(startYear, startMonth + 1, 0).getDate();
+                defaultBalancePerMonth[currentMonth] -= daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
             }
-          } else if (endMonth === currentMonth) {
-            defaultBalancePerMonth[currentMonth] -= endDay;
-          }
         }
-      });
+    });
+    
+    
 
       // Calculate remaining balance for the current month
       let remainingWorkFromHomeBalance = Math.max(
@@ -387,49 +383,50 @@ export class LeaveTypesAndRequestsService {
   //   }
   // }
 
-  async getEmployeesOnLeaveToday(): Promise<any> {
-    try {
-      const today = new Date();
+//   async getEmployeesOnLeaveToday(): Promise<any> {
+//     try {
+//         const today = new Date();
 
-      const leaveRequests = await this.leaveRequestRepository.find({
-        where: { status: 'approved' },
-        // select: ['start_date', 'end_date'],
-      });
+//         const leaveRequests = await this.leaveRequestRepository.find({
+//             where: { status: 'approved' },
+//             // select: ['start_date', 'end_date'],
+//         });
 
-      console.log('leaveRequests', leaveRequests);
+//         // console.log("leaveRequests", leaveRequests);
 
-      const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
-        const startDate = new Date(leaveRequest.start_date);
-        const endDate = new Date(leaveRequest.end_date);
-        return today >= startDate && today <= endDate;
-      });
+//         const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
+//             const startDate = new Date(leaveRequest.start_date);
+//             const endDate = leaveRequest.end_date?new Date(leaveRequest.end_date):null;
+//             // return today >= startDate && today <= endDate;
+//             if (endDate==null && startDate.toDateString() === today.toDateString()) {
+//               return true;
+//             }
+//             return (today >= startDate && today <= endDate);
+      
+//         });
+//         // console.log(filteredLeaveRequests )
+//         if (filteredLeaveRequests.length === 0) {
+//             console.log("No employees are on leave today.");
+//             return "No employees are on leave today.";
+//         }
 
-      if (filteredLeaveRequests.length === 0) {
-        console.log('No employees are on leave today.');
-        return 'No employees are on leave today.';
-      }
+//         const employeeDetails = await Promise.all(
+//             filteredLeaveRequests.map(async (leaveRequest) => {
+//                 const employee = await this.employeeRepository.findOne({
+//                     where: { id: leaveRequest.emp_id },
+//                 });
+//                 return { ...leaveRequest, employee };
+//             })
+//         );
 
-      const employeeDetails = await Promise.all(
-        filteredLeaveRequests.map(async (leaveRequest) => {
-          const employee = await this.employeeRepository.findOne({
-            where: { id: leaveRequest.emp_id },
-          });
-          return { ...leaveRequest, employee };
-        }),
-      );
+//         console.log("employeesOnLeaveToday", employeeDetails);
 
-      console.log('employeesOnLeaveToday', employeeDetails);
-
-      return employeeDetails;
-    } catch (error) {
-      console.error('Error fetching employees on leave today:', error);
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-}
-
+//         return employeeDetails;
+//     } catch (error) {
+//         console.error('Error fetching employees on leave today:', error);
+//         throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+// }
 
   async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
     if (emp_id)
@@ -446,4 +443,49 @@ export class LeaveTypesAndRequestsService {
       relations: ['employee'],
     });
   }
+
+
+
+  async getEmployeesOnLeaveToday(managerId: number,role:string): Promise<Employee[]> {
+
+    try {
+      const today = new Date();
+      const leaveRequests = await this.leaveRequestRepository.find({
+        where: { status: 'approved' },
+        relations: ['employee'],
+      });
+       
+      const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
+        const startDate = new Date(leaveRequest.start_date);
+        const endDate = leaveRequest.end_date?new Date(leaveRequest.end_date):null;
+        // console.log(endDate)
+        // return (today >= startDate && today <= endDate);
+        console.log(role)
+
+        if (role=='Admin'){
+          return (endDate == null && startDate.toDateString() === today.toDateString()
+        || (today >= startDate && today <= endDate)) 
+        }
+        else{
+        return (endDate == null && startDate.toDateString() === today.toDateString()
+        || (today >= startDate && today <= endDate)) 
+        && leaveRequest.employee.manager_id === managerId;}
+});
+      const employeesOnLeaveToday: any[] = filteredLeaveRequests.map((leaveRequest) => {
+        return {
+            // employee: leaveRequest.employee,
+            leaveRequest
+        };
+    });
+      return employeesOnLeaveToday;
+
+    
+    } catch (error) {
+      console.error('Error fetching employees on leave today:', error);
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
+  
+  
 }

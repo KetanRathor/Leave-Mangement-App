@@ -176,27 +176,24 @@ export class LeaveTypesAndRequestsController {
   //   return { numEmployeesOnLeave };
   // }
 
-  @UseGuards(AuthGuard)
-  @Get('/employees/employees-leave-on-today')
-  @ApiOkResponse({
-    description: 'Get list of employees who are on leave today',
-    type: LeaveRequest,
-  })
-  async getEmployeesOnLeaveToday(): Promise<Employee[]> {
-    try {
-      const employeesOnLeave =
-        await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
-      return employeesOnLeave;
-    } catch (error) {
-      console.error('Error fetching employees on leave today:', error);
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+//   @Get('/employees/employees-leave-on-today')
 
-  // @UseGuards(AuthGuard)
+// async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
+  
+  
+//   try {
+//     console.log(".............................");
+    
+//     const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
+//     return employeesOnLeave;
+//   } catch (error) {
+//     console.error('Error fetching employees on leave today:', error);
+//     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+//   }
+// }
+
+
+  @UseGuards(AuthGuard)
   @Get(':employeeId/pending-requests')
   @ApiOkResponse({
     description:
@@ -226,4 +223,26 @@ export class LeaveTypesAndRequestsController {
       console.error('Error occurred while fetching pending requests:', error);
     }
   }
+
+
+@UseGuards(AuthGuard)
+@Get('/employees-leave-on-today')
+@ApiOkResponse({
+  description: 'Get employees on leave today ',
+})
+async getEmployeesOnLeaveToday(
+  @Request() req,
+): Promise<Employee[]> {
+  const loggedInEmployeeId = req.user.id; // Assuming you're storing the logged-in user's ID in req.user.id
+  const role=req.user.role;
+  // console.log(role)
+  try {
+    const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday(loggedInEmployeeId,role);
+    return employeesOnLeave;
+  } catch (error) {
+    console.error('Error fetching employees on leave today:', error);
+    throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
 }
