@@ -14,27 +14,27 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // @UseGuards(AuthGuard)
-  @Post()
-  @ApiCreatedResponse({
-    description: 'created user object as response',
-    type: Employee,
-  })
+  // // @UseGuards(AuthGuard)
+  // @Post()
+  // @ApiCreatedResponse({
+  //   description: 'created user object as response',
+  //   type: Employee,
+  // })
 
-  async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto,
-    // @Request() req,
-  ) {
-    // const req_mail = req.user.email;
-    try {
-      return await this.employeeService.createEmployee(
-        createEmployeeDto,
-        // req_mail,
-      );
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
+  // async createEmployee(
+  //   @Body() createEmployeeDto: CreateEmployeeDto,
+  //   // @Request() req,
+  // ) {
+  //   // const req_mail = req.user.email;
+  //   try {
+  //     return await this.employeeService.createEmployee(
+  //       createEmployeeDto,
+  //       // req_mail,
+  //     );
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
   
  
 

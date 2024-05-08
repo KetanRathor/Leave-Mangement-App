@@ -33,36 +33,36 @@ export class EmployeeService {
     ) { }
 
     //Create employee
-    async createEmployee(createEmployeeDto: CreateEmployeeDto,
-        // req_mail:any
-    ): Promise<Employee> {
-        const newEmployee = this.employeeRepository.create(createEmployeeDto);
-        // newEmployee.created_by=req_mail;
-        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        if (!emailRegex.test(createEmployeeDto.email)) {
-            throw new Error('Invalid email format. Please enter a valid email address.');
-        }
-        const mobileRegex = /^\d{10}$/;
-        if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
-            throw new Error('Invalid mobile number format. Please enter a valid phone number.');
-        }
+    // async createEmployee(createEmployeeDto: CreateEmployeeDto,
+    //     // req_mail:any
+    // ): Promise<Employee> {
+    //     const newEmployee = this.employeeRepository.create(createEmployeeDto);
+    //     // newEmployee.created_by=req_mail;
+    //     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    //     if (!emailRegex.test(createEmployeeDto.email)) {
+    //         throw new Error('Invalid email format. Please enter a valid email address.');
+    //     }
+    //     const mobileRegex = /^\d{10}$/;
+    //     if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
+    //         throw new Error('Invalid mobile number format. Please enter a valid phone number.');
+    //     }
 
-        // const inventory = await this.inventoryRepository
-         const savedEmployee = await this.employeeRepository.save(newEmployee);
-        const isInventry = createEmployeeDto?.inventory_id;
-        if(isInventry){
+    //     // const inventory = await this.inventoryRepository
+    //      const savedEmployee = await this.employeeRepository.save(newEmployee);
+    //     const isInventry = createEmployeeDto?.inventory_id;
+    //     if(isInventry){
           
-          await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
-        }
+    //       await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
+    //     }
         
-        const employeeId = savedEmployee.id
-        // const userPassword = await this.authService.registerUser(createEmployeeDto.email)
-        // const userPassword = await this.authService.registerUser(employeeId)
+    //     const employeeId = savedEmployee.id
+    //     // const userPassword = await this.authService.registerUser(createEmployeeDto.email)
+    //     // const userPassword = await this.authService.registerUser(employeeId)
 
-        // await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
+    //     // await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
 
-        return savedEmployee;
-    }
+    //     return savedEmployee;
+    // }
 
     //Update employee using id
     async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto, req_mail): Promise<Employee> {

@@ -11,6 +11,8 @@ import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
 import { UserDetails } from './utils/types';
+import { OAuth2Client } from 'google-auth-library';
+import { profile } from 'console';
 dotenv.config();
 
 @Injectable()
@@ -89,6 +91,8 @@ export class AuthService {
         }
     }
 
+
+
   /*  async findOrCreateUser({ email, googleId }: { email: string; googleId?: string }): Promise<UserCredentials> {
         let user: UserCredentials | undefined;
         // let user;
@@ -111,20 +115,93 @@ export class AuthService {
 
 */
      async validateUserGoogle(details:UserDetails){
+        console.log("*************************************")
             console.log('AuthService');
             console.log(details);
-            const user = await this.userCredentialsRepository.findOneBy({email:details.email});
+            let user = await this.employeeRepository.findOneBy({email:details.email});
+            // user.created_by=
             console.log(user);
-            if(user) return user;
-            console.log('User not found. Creating...')
-            const newUser = this.userCredentialsRepository.create(details);
-            return this.userCredentialsRepository.save(newUser) ;
+            if (user) {
+                
+                console.log('User found. Updating...');
+                user = { ...user, ...details }; 
+                console.log("user............",user)
+                return this.employeeRepository.save(user);
+            } else {
+                
+                console.log('User not found. Creating...');
+                const newUser = this.employeeRepository.create(details);
+               
+                console.log("details............",details)
+                console.log("newUser............",newUser)
+                return this.employeeRepository.save(newUser);
+            }
+        }
+
+        async generateToken(user: UserDetails) {
+            const payload = { username: user.name, sub: user.email };
+            return {
+                accessToken: this.jwtService.sign(payload),
+            };
         }
 
         async findUser(id:number){
         const user = await this.userCredentialsRepository.findOneBy({id});
         return user;
         }
+
+        async verifyGoogleToken(accessToken: string) {
+            const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        
+            try {
+              const ticket = await client.verifyIdToken({
+                idToken: accessToken,
+                audience: process.env.GOOGLE_CLIENT_ID,
+              });
+        
+              const payload = ticket.getPayload();
+              return payload;
+            } catch (error) {
+              console.error('Error verifying Google token:', error);
+              throw new Error('Invalid access token');
+            }
+          }
+
+          googleLogin(req){
+            if(!req.user){
+                return 'No user from google'
+            }
+            return{
+                message:'User Info from Google',
+                user:req.user
+            }
+
+          }
+
+
+          async generateTokens(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
+            const accessToken = this.jwtService.sign({ userId }, { expiresIn: '15m' }); // Short-lived access token
+            const refreshToken = this.jwtService.sign({ userId }, { expiresIn: '30d' }); // Long-lived refresh token
+        
+            // Store the refresh token in the database or another secure storage
+            // You may associate it with the user ID or other information
+            // Example: await this.storeRefreshToken(userId, refreshToken);
+        
+            return { accessToken, refreshToken };
+          }
+        
+          async refreshAccessToken(refreshToken: string): Promise<string> {
+            // Verify and decode the refresh token
+            const { userId } = this.jwtService.verify(refreshToken);
+        
+            // Perform additional checks if needed, such as checking if the refresh token is revoked or expired
+        
+            // Generate a new access token
+            const accessToken = this.jwtService.sign({ userId }, { expiresIn: '15m' }); // Short-lived access token
+        
+            return accessToken;
+          }
+        
 
     // async validateUser({ email, password }: AuthPayloadDto) {
     //     console.log("Inside Validate User...");
