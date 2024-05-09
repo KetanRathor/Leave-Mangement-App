@@ -28,11 +28,13 @@ import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, Ap
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 import { Res } from '@nestjs/common';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 
 @ApiTags('Leave Request')
 @ApiBearerAuth("JWT-auth")
 @Controller('leave')
+@UseGuards(JwtAuthGuard)
 export class LeaveTypesAndRequestsController {
   leaveService: any;
   constructor(
@@ -46,11 +48,12 @@ export class LeaveTypesAndRequestsController {
     type: LeaveRequest
   })
   createRequest(
-    @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,@Request() req
+    @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,
+    @Request() req
   ) 
   {
-    const req_mail=req.user.email;
-    const emp_id = req.user.id
+    const req_mail=req.user.user.email;
+    const emp_id = req.user.user.id
 
     return this.leaveTypesAndRequestsService.createRequest(
       createLeaveTypesAndRequestDto,req_mail,emp_id
@@ -105,7 +108,7 @@ export class LeaveTypesAndRequestsController {
     @Body() body: { status: string },
     @Request() req,
   ): Promise<{ leaveRequest: LeaveRequest, message: string }> {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
     }   

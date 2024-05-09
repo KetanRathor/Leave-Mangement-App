@@ -65,14 +65,16 @@ export class EmployeeService {
     // }
 
     //Update employee using id
-    async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto, req_mail): Promise<Employee> {
+    async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto, 
+      req_mail
+    ): Promise<Employee> {
         const employee = await this.employeeRepository.findOneBy({ id });
         if (!employee) {
             throw new NotFoundException('Employee not found.');
         }
 
-        const oldEmail = employee.email;
-        console.log("oldEmail",oldEmail)
+        // const oldEmail = employee.email;
+        // console.log("oldEmail",oldEmail)
         for (const key in updatedEmployeeDetails) {
           if (updatedEmployeeDetails[key] !== undefined)
             employee[key] = updatedEmployeeDetails[key]
@@ -91,11 +93,11 @@ export class EmployeeService {
         }
         employee.updated_by = req_mail;
 
-        const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
-        if (userCredential) {
-        userCredential.email = updatedEmployeeDetails.email;
-        await this.userCredentialRepository.save(userCredential);
-}
+        // const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
+//         if (userCredential) {
+//         userCredential.email = updatedEmployeeDetails.email;
+//         await this.userCredentialRepository.save(userCredential);
+// }
 
         return await this.employeeRepository.save(employee);
     }

@@ -33,29 +33,29 @@ export class AuthService {
     ) { }
 
 
-    encrypt(text: string): string {
-        console.log("tets", text)
-        const cipher = crypto.createCipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
-        console.log("key", process.env.ENCRYPTION_KEY)
-        let encrypted = cipher.update(text, 'utf8', 'hex');
-        console.log("first", encrypted);
-        encrypted += cipher.final('hex');
-        console.log("finalenc", encrypted);
-        return encrypted;
-    }
+    // encrypt(text: string): string {
+    //     console.log("tets", text)
+    //     const cipher = crypto.createCipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
+    //     console.log("key", process.env.ENCRYPTION_KEY)
+    //     let encrypted = cipher.update(text, 'utf8', 'hex');
+    //     console.log("first", encrypted);
+    //     encrypted += cipher.final('hex');
+    //     console.log("finalenc", encrypted);
+    //     return encrypted;
+    // }
 
-    decrypt(encryptedText: string): string {
-        // console.log("Tesxttttt",encryptedText)
-        // console.log("Key", this.key );
+    // decrypt(encryptedText: string): string {
+    //     // console.log("Tesxttttt",encryptedText)
+    //     // console.log("Key", this.key );
 
-        console.log("key dec", process.env.ENCRYPTION_KEY)
-        const decipher = crypto.createDecipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
-        let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        console.log("decrypted : ", decrypted);
+    //     console.log("key dec", process.env.ENCRYPTION_KEY)
+    //     const decipher = crypto.createDecipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
+    //     let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    //     decrypted += decipher.final('utf8');
+    //     console.log("decrypted : ", decrypted);
 
-        return decrypted;
-    }
+    //     return decrypted;
+    // }
 
     async showProfile(id: number): Promise<any> {
         try {
@@ -180,23 +180,15 @@ export class AuthService {
 
 
           async generateTokens(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
-            const accessToken = this.jwtService.sign({ userId }, { expiresIn: '15m' }); // Short-lived access token
-            const refreshToken = this.jwtService.sign({ userId }, { expiresIn: '30d' }); // Long-lived refresh token
-        
-            // Store the refresh token in the database or another secure storage
-            // You may associate it with the user ID or other information
-            // Example: await this.storeRefreshToken(userId, refreshToken);
+            const accessToken = this.jwtService.sign({ userId }, { expiresIn: '15m' }); 
+            const refreshToken = this.jwtService.sign({ userId }, { expiresIn: '30d' }); 
         
             return { accessToken, refreshToken };
           }
         
           async refreshAccessToken(refreshToken: string): Promise<string> {
-            // Verify and decode the refresh token
             const { userId } = this.jwtService.verify(refreshToken);
-        
-            // Perform additional checks if needed, such as checking if the refresh token is revoked or expired
-        
-            // Generate a new access token
+         
             const accessToken = this.jwtService.sign({ userId }, { expiresIn: '15m' }); // Short-lived access token
         
             return accessToken;

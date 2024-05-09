@@ -16,10 +16,12 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 // import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Department } from './entity/Department.entity';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 @ApiTags('Department')
 @ApiBearerAuth("JWT-auth")
 @Controller('department')
+@UseGuards(JwtAuthGuard)
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
@@ -32,12 +34,12 @@ export class DepartmentController {
   })
   
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto
-  // ,@Request() req
+  ,@Request() req
 ) {
-    // const req_mail=req.user.email;
+    const req_mail=req.user.user.email;
     try {
       return await this.departmentService.createDepartment(createDepartmentDto,
-        // req_mail
+        req_mail
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -57,7 +59,7 @@ export class DepartmentController {
     description: 'department will be deleted as response'
   })
   async deleteDepartment(@Param('id', ParseIntPipe) id: number,@Request() req) {
-    const req_mail=req.user.email;
+    const req_mail=req.user.user.email;
     try {
       await this.departmentService.deleteDepartment(id,req_mail);
       return 'Department Deleted Successfully';

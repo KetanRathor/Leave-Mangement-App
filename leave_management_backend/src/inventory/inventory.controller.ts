@@ -9,11 +9,13 @@ import { Inventory } from './entities/inventory.entity';
 import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Category } from './entities/inventoryCategory.entity';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 
 @ApiTags('Inventory')
 @ApiBearerAuth("JWT-auth")
 @Controller('inventory')
+@UseGuards(JwtAuthGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService,
               // private readonly categoryService: CategoryService,
@@ -32,7 +34,7 @@ export class InventoryController {
     type:Inventory
   })
   async createInventory(@Body() createInventoryDto: CreateInventoryDto, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     try {
       return await this.inventoryService.createInventory(createInventoryDto, req_mail);
     }
@@ -76,7 +78,7 @@ export class InventoryController {
     type:Inventory
   })
   async updateInventory(@Param('id', ParseIntPipe) id: number, @Body() updateInventoryDto: UpdateInventoryDto, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
 
     try {
       return await this.inventoryService.updateInventory(id, updateInventoryDto, req_mail);
@@ -92,7 +94,7 @@ export class InventoryController {
     description:'Inventory will be deleted as response'
   })
   async deleteInventory(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     return await this.inventoryService.deleteInventory(id, req_mail);
   }
 
@@ -146,12 +148,16 @@ async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inv
   description:'Category will be created as response',
   type:Category
 })
-async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDto, @Request() req) {
-  const req_mail = req.user.email;
+async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDto, 
+@Request() req
+) {
+  const req_mail = req.user.user.email;
   try {
     console.log("..................................");
     
-    return await this.inventoryService.createCategory(createInvetoryCategoryDto, req_mail);
+    return await this.inventoryService.createCategory(createInvetoryCategoryDto, 
+      req_mail
+    );
   }
   catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

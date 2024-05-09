@@ -9,11 +9,13 @@ import { Project } from './entities/project.entity';
 import { AssignProjectDto } from './dto/assign-project.dto';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 // import { Project } from './entities/project.entity';
 
 @ApiTags('Project')
 @ApiBearerAuth("JWT-auth")
 @Controller('project')
+@UseGuards(JwtAuthGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService,
     // private readonly employeeService: EmployeeService
@@ -26,7 +28,7 @@ export class ProjectController {
     type: Project
   })
   async addProject(@Body() createProjectDto: CreateProjectDto, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     try {
       return await this.projectService.addProject(createProjectDto, req_mail);
     }
@@ -63,7 +65,7 @@ export class ProjectController {
     type: Project
   })
   async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
-    const req_mail = req.user.email
+    const req_mail = req.user.user.email
     try {
       return await this.projectService.updateProject(id, updateProjectDto, req_mail);
     } catch (error) {
@@ -77,9 +79,9 @@ export class ProjectController {
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
     @Body() { employeeId, projectId }: AssignProjectDto,
-    //  @Request() req
+     @Request() req
   ) {
-    // const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
 
     try {
       return await this.projectService.assignProject({ employeeId, projectId });
@@ -104,7 +106,7 @@ export class ProjectController {
     type: Project
   })
   async updateProjectStatus(@Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
     }

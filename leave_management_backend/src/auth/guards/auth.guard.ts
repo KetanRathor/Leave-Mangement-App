@@ -55,3 +55,52 @@ export class GoogleAuthGuard extends AuthGuard('google'){
     return activate;
   }
 }
+  
+// import { ExecutionContext, UnauthorizedException, Injectable } from '@nestjs/common';
+// import { AuthGuard } from '@nestjs/passport';
+// // Import JwtService if using JWT verification
+// import { JwtService } from '@nestjs/jwt'; // Optional
+// import { Request } from 'express';
+
+// @Injectable()
+// export class GoogleAuthGuard extends AuthGuard('google') {
+  
+//   constructor(private readonly jwtService?: JwtService) {
+//     super();
+//   } // Optional dependency injection
+
+//   async canActivate(context: ExecutionContext): Promise<boolean> {
+    
+//     const request = context.switchToHttp().getRequest<Request>();
+
+    
+//     const activate = (await super.canActivate(context)) as boolean;
+//     if (!activate) {
+//       throw new UnauthorizedException('Google authentication failed');
+//     }
+
+//     // 2. (Optional) JWT Verification
+//     if (this.jwtService) { 
+//       const token = this.extractTokenFromHeader(request);
+//       if (!token) {
+//         throw new UnauthorizedException('Missing JWT token');
+//       }
+//       try {
+//         const payload = await this.jwtService.verifyAsync(token, {
+//           secret: process.env.SECRET, 
+//         });
+//         request['user'] = payload; 
+//       } catch (error) {
+//         throw new UnauthorizedException('Invalid JWT token'); 
+//       }
+//     }
+    
+
+//     return true; 
+//   }
+
+//   private extractTokenFromHeader(request: Request): string | undefined {
+//     const [type, token] = request.headers?.authorization?.split(' ') ?? [];
+//     return type === 'Bearer' ? token : undefined;
+//   }
+// }
