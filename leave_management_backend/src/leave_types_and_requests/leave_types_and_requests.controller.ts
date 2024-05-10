@@ -21,7 +21,7 @@ import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_requ
 // import { CreateLeaveTypeDto } from './dto/create-leave-type.dto';
 // import { UpdateLeaveTypeDto } from './dto/update-leave-type.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -33,6 +33,7 @@ import {
 import { UpdateLeaveStatus } from './dto/update-leave_status.dto';
 import { Res } from '@nestjs/common';
 import { Employee } from 'src/employee/entities/Employee.entity';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 @ApiTags('Leave Request')
 @ApiBearerAuth('JWT-auth')
@@ -54,8 +55,8 @@ export class LeaveTypesAndRequestsController {
     @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,
     @Request() req,
   ) {
-    const req_mail = req.user.email;
-    const emp_id = req.user.id;
+    const req_mail = req.user.user.email;
+    const emp_id = req.user.user.id;
 
     return this.leaveTypesAndRequestsService.createRequest(
       createLeaveTypesAndRequestDto,
@@ -113,7 +114,7 @@ export class LeaveTypesAndRequestsController {
   // @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
   @ApiOkResponse({
-    description:'Get employee list whose leave request status is pending'
+    description: 'Get employee list whose leave request status is pending',
   })
   async getEmployeesWithPendingRequests() {
     try {
@@ -129,7 +130,7 @@ export class LeaveTypesAndRequestsController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-balance/:empId')
   @ApiOkResponse({
     description: 'Get remaining annual leave balance ',
@@ -141,7 +142,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-balance/work-from-home/:empId')
   // @ApiParam({ name: 'empId', description: 'Employee ID' })
   @ApiOkResponse({
@@ -158,7 +159,7 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':employeeId/requests')
   @ApiOkResponse({
     description: 'Get all leave requests of given employee id',
@@ -177,24 +178,22 @@ export class LeaveTypesAndRequestsController {
   //   return { numEmployeesOnLeave };
   // }
 
-//   @Get('/employees/employees-leave-on-today')
+  //   @Get('/employees/employees-leave-on-today')
 
-// async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
-  
-  
-//   try {
-//     console.log(".............................");
-    
-//     const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
-//     return employeesOnLeave;
-//   } catch (error) {
-//     console.error('Error fetching employees on leave today:', error);
-//     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-//   }
-// }
+  // async getEmployeesOnLeaveToday(): Promise<Employee[]> {
 
+  //   try {
+  //     console.log(".............................");
 
-  @UseGuards(AuthGuard)
+  //     const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
+  //     return employeesOnLeave;
+  //   } catch (error) {
+  //     console.error('Error fetching employees on leave today:', error);
+  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+
+  // @UseGuards(AuthGuard)
   @Get(':employeeId/pending-requests')
   @ApiOkResponse({
     description:
@@ -225,25 +224,29 @@ export class LeaveTypesAndRequestsController {
     }
   }
 
-
-@UseGuards(AuthGuard)
-@Get('/employees-leave-on-today')
-@ApiOkResponse({
-  description: 'Get employees on leave today ',
-})
-async getEmployeesOnLeaveToday(
-  @Request() req,
-): Promise<Employee[]> {
-  const loggedInEmployeeId = req.user.id; // Assuming you're storing the logged-in user's ID in req.user.id
-  const role=req.user.role;
-  // console.log(role)
-  try {
-    const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday(loggedInEmployeeId,role);
-    return employeesOnLeave;
-  } catch (error) {
-    console.error('Error fetching employees on leave today:', error);
-    throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  // @UseGuards(AuthGuard)
+  @Get('/employees-leave-on-today')
+  @ApiOkResponse({
+    description: 'Get employees on leave today ',
+  })
+  async getEmployeesOnLeaveToday(@Request() req): Promise<Employee[]> {
+    const loggedInEmployeeId = req.user.user.id; // Assuming you're storing the logged-in user's ID in req.user.id
+    const role = req.user.user.role;
+    // console.log(req.user);
+    // console.log(role);
+    try {
+      const employeesOnLeave =
+        await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday(
+          loggedInEmployeeId,
+          role,
+        );
+      return employeesOnLeave;
+    } catch (error) {
+      console.error('Error fetching employees on leave today:', error);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
-}
-
 }

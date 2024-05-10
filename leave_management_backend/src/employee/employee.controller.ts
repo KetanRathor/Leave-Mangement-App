@@ -145,7 +145,7 @@ export class EmployeeController {
   //   return await this.employeeService.getManagerIds();
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('upload-image/:id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))

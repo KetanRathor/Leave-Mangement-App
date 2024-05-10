@@ -137,7 +137,7 @@ export class LeaveTypesAndRequestsService {
 
     const updatedLeaveRequest =
       await this.leaveRequestRepository.save(leaveRequest);
-    
+
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
       await this.mailService.sendLeaveStatusEmail(employeeEmail, message);
@@ -191,7 +191,6 @@ export class LeaveTypesAndRequestsService {
     });
   }
 
-  
   // async getEmployeesWithPendingLeaveRequests(): Promise<
   //   {
   //     id: Number;
@@ -229,7 +228,6 @@ export class LeaveTypesAndRequestsService {
   //   }
   // }
 
-  
   async getRemainingLeaveBalance(id: number): Promise<any> {
     try {
       const currentDate = new Date();
@@ -298,8 +296,6 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-
-
   async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
     try {
       const currentMonth = new Date().getMonth();
@@ -345,7 +341,7 @@ export class LeaveTypesAndRequestsService {
               startMonth + 1,
               0,
             ).getDate();
-            defaultBalancePerMonth[currentMonth] -=
+            defaultBalancePerMonth[currentMonth] =defaultBalancePerMonth[currentMonth]-
               daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
           }
         }
@@ -392,50 +388,50 @@ export class LeaveTypesAndRequestsService {
   //   }
   // }
 
-//   async getEmployeesOnLeaveToday(): Promise<any> {
-//     try {
-//         const today = new Date();
+  //   async getEmployeesOnLeaveToday(): Promise<any> {
+  //     try {
+  //         const today = new Date();
 
-//         const leaveRequests = await this.leaveRequestRepository.find({
-//             where: { status: 'approved' },
-//             // select: ['start_date', 'end_date'],
-//         });
+  //         const leaveRequests = await this.leaveRequestRepository.find({
+  //             where: { status: 'approved' },
+  //             // select: ['start_date', 'end_date'],
+  //         });
 
-//         // console.log("leaveRequests", leaveRequests);
+  //         // console.log("leaveRequests", leaveRequests);
 
-//         const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
-//             const startDate = new Date(leaveRequest.start_date);
-//             const endDate = leaveRequest.end_date?new Date(leaveRequest.end_date):null;
-//             // return today >= startDate && today <= endDate;
-//             if (endDate==null && startDate.toDateString() === today.toDateString()) {
-//               return true;
-//             }
-//             return (today >= startDate && today <= endDate);
-      
-//         });
-//         // console.log(filteredLeaveRequests )
-//         if (filteredLeaveRequests.length === 0) {
-//             console.log("No employees are on leave today.");
-//             return "No employees are on leave today.";
-//         }
+  //         const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
+  //             const startDate = new Date(leaveRequest.start_date);
+  //             const endDate = leaveRequest.end_date?new Date(leaveRequest.end_date):null;
+  //             // return today >= startDate && today <= endDate;
+  //             if (endDate==null && startDate.toDateString() === today.toDateString()) {
+  //               return true;
+  //             }
+  //             return (today >= startDate && today <= endDate);
 
-//         const employeeDetails = await Promise.all(
-//             filteredLeaveRequests.map(async (leaveRequest) => {
-//                 const employee = await this.employeeRepository.findOne({
-//                     where: { id: leaveRequest.emp_id },
-//                 });
-//                 return { ...leaveRequest, employee };
-//             })
-//         );
+  //         });
+  //         // console.log(filteredLeaveRequests )
+  //         if (filteredLeaveRequests.length === 0) {
+  //             console.log("No employees are on leave today.");
+  //             return "No employees are on leave today.";
+  //         }
 
-//         console.log("employeesOnLeaveToday", employeeDetails);
+  //         const employeeDetails = await Promise.all(
+  //             filteredLeaveRequests.map(async (leaveRequest) => {
+  //                 const employee = await this.employeeRepository.findOne({
+  //                     where: { id: leaveRequest.emp_id },
+  //                 });
+  //                 return { ...leaveRequest, employee };
+  //             })
+  //         );
 
-//         return employeeDetails;
-//     } catch (error) {
-//         console.error('Error fetching employees on leave today:', error);
-//         throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-//     }
-// }
+  //         console.log("employeesOnLeaveToday", employeeDetails);
+
+  //         return employeeDetails;
+  //     } catch (error) {
+  //         console.error('Error fetching employees on leave today:', error);
+  //         throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  // }
 
   async findAllRequestsByEmployeeId(emp_id: number): Promise<Employee[]> {
     if (emp_id)
@@ -453,48 +449,56 @@ export class LeaveTypesAndRequestsService {
     });
   }
 
-
-
-  async getEmployeesOnLeaveToday(managerId: number,role:string): Promise<Employee[]> {
-
+  async getEmployeesOnLeaveToday(
+    managerId: number,
+    role: string,
+  ): Promise<Employee[]> {
     try {
       const today = new Date();
       const leaveRequests = await this.leaveRequestRepository.find({
         where: { status: 'approved' },
         relations: ['employee'],
       });
-       
+
       const filteredLeaveRequests = leaveRequests.filter((leaveRequest) => {
         const startDate = new Date(leaveRequest.start_date);
-        const endDate = leaveRequest.end_date?new Date(leaveRequest.end_date):null;
+        const endDate = leaveRequest.end_date
+          ? new Date(leaveRequest.end_date)
+          : null;
         // console.log(endDate)
         // return (today >= startDate && today <= endDate);
-        console.log(role)
+        console.log(role);
 
-        if (role=='Admin'){
-          return (endDate == null && startDate.toDateString() === today.toDateString()
-        || (today >= startDate && today <= endDate)) 
+        if (role == 'Admin') {
+          return (
+            (endDate == null &&
+              startDate.toDateString() === today.toDateString()) ||
+            (today >= startDate && today <= endDate)
+          );
+        } else {
+          return (
+            ((endDate == null &&
+              startDate.toDateString() === today.toDateString()) ||
+              (today >= startDate && today <= endDate)) &&
+            leaveRequest.employee.manager_id === managerId
+          );
         }
-        else{
-        return (endDate == null && startDate.toDateString() === today.toDateString()
-        || (today >= startDate && today <= endDate)) 
-        && leaveRequest.employee.manager_id === managerId;}
-});
-      const employeesOnLeaveToday: any[] = filteredLeaveRequests.map((leaveRequest) => {
-        return {
+      });
+      const employeesOnLeaveToday: any[] = filteredLeaveRequests.map(
+        (leaveRequest) => {
+          return {
             // employee: leaveRequest.employee,
-            leaveRequest
-        };
-    });
+            leaveRequest,
+          };
+        },
+      );
       return employeesOnLeaveToday;
-
-    
     } catch (error) {
       console.error('Error fetching employees on leave today:', error);
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-  
-  
-  
 }

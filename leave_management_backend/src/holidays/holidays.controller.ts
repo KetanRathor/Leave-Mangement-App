@@ -29,9 +29,9 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiTags,
-  ApiConsumes
+  ApiConsumes,
 } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
@@ -176,7 +176,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All Holidays List',
