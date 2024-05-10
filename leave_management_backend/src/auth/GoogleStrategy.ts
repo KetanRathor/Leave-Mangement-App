@@ -95,12 +95,17 @@ import { AuthService } from "./auth.service";
 import { use } from "passport";
 import * as dotenv from 'dotenv';
 import { VerifiedCallback } from "passport-jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Employee } from "src/employee/entities/Employee.entity";
+import { Repository } from "typeorm";
 
 dotenv.config();
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
+    @InjectRepository(Employee)
+        private readonly employeeRepository: Repository<Employee>,
     private jwtService: JwtService,
     @Inject('AUTH_SERVICE') private readonly authService: AuthService
   ) {
@@ -120,6 +125,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     //     throw new Error('Unauthorized domain');
     //   }
 
+
+
       const idToken = profile.id; 
 
       const { name, emails, photos } = profile;
@@ -127,11 +134,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         email: emails[0].value,
         name: profile.displayName,
         
+        
       });
 
       if (!user) {
         return done(new Error('User not found'), null);
       }
+
+    //   const { deleted_at } = await this.employeeRepository.findOne({
+    //     where: { id: user.id, deleted_at: null },
+    //   });
+    // if (deleted_at !== null) {
+    //   return done(new Error('User is deleted'), null);
+    // }
+
       const { role, ...userDetails } = await this.authService.showProfile(user.id);
       const userForToken = {
         id: user.id, 
@@ -144,7 +160,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       const payload = { user: userForToken };
       const jwtToken = await this.jwtService.sign(payload); 
 
-      return done(null, { accessToken, user, idToken: idToken, jwtToken }); 
+      return done(null, { 
+        accessToken, 
+        // user,
+        //  idToken: idToken,
+          jwtToken
+         }); 
     } catch (error) {
       return done(error, false);
     }

@@ -25,7 +25,7 @@ import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  // @UseGuards(AuthGuard)
+    
 
   @Post()
   @ApiCreatedResponse({
@@ -53,7 +53,7 @@ export class DepartmentController {
   }
 
 
-  // @UseGuards(AuthGuard)
+    
   @Delete(':id')
   @ApiOkResponse({
     description: 'department will be deleted as response'

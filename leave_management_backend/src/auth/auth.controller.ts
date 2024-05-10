@@ -1,3 +1,72 @@
+import { Controller, Get, Inject, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { GoogleAuthGuard } from './guards/auth.guard';
+import { Request } from 'express';
+import { AuthService } from './auth.service';
+
+@Controller('auth')
+export class AuthController {
+  constructor(@Inject('AUTH_SERVICE') private readonly authService:AuthService){}
+  @Get('google/login')
+  @UseGuards(GoogleAuthGuard)
+  googleAuth(@Req() req) {} 
+  @Get('google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req)
+  }
+
+
+  @Get('status')
+  async user(@Req() request:Request){
+    console.log(request.user);
+    if(request.user){
+        return {msg:'Authenticated'};
+
+    }
+    else{
+        return{msg:'Not AUthenticated'}
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  // @Get('google/redirect')
+  // @UseGuards(GoogleAuthGuard)
+  // googleAuthRedirect(@Req() req) {
+  //   try {
+  //     if (req.user) {
+  //       const accessToken = req.user.accessToken;
+  
+  //       return { message: 'Success', accessToken };
+  //     } else {
+  //       return { message: 'Failure' };
+  //     }
+  //   } catch (error) {
+  //     if (error.message === 'Unauthorized domain') {
+  //       return { message: 'Login restricted to specific domain' };
+  //     }
+  //     throw error;
+  //   }
+  // }
+
+  
+
+
+
+
+
+
 // import { AuthService } from './auth.service';
 // import { AuthPayloadDto } from './dto/auth.dto';
 // import { AuthGuard } from './guards/auth.guard';
@@ -96,54 +165,3 @@
 
 // auth.controller.ts
 
-import { Controller, Get, Inject, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { GoogleAuthGuard } from './guards/auth.guard';
-import { Request } from 'express';
-import { AuthService } from './auth.service';
-
-@Controller('auth')
-export class AuthController {
-  constructor(@Inject('AUTH_SERVICE') private readonly authService:AuthService){}
-  @Get('google/login')
-  @UseGuards(GoogleAuthGuard)
-  googleAuth(@Req() req) {} 
-
-  // @Get('google/redirect')
-  // @UseGuards(GoogleAuthGuard)
-  // googleAuthRedirect(@Req() req) {
-  //   try {
-  //     if (req.user) {
-  //       const accessToken = req.user.accessToken;
-  
-  //       return { message: 'Success', accessToken };
-  //     } else {
-  //       return { message: 'Failure' };
-  //     }
-  //   } catch (error) {
-  //     if (error.message === 'Unauthorized domain') {
-  //       return { message: 'Login restricted to specific domain' };
-  //     }
-  //     throw error;
-  //   }
-  // }
-
-  @Get('google/redirect')
-  @UseGuards(GoogleAuthGuard)
-  googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req)
-  }
-
-
-  @Get('status')
-  async user(@Req() request:Request){
-    console.log(request.user);
-    if(request.user){
-        return {msg:'Authenticated'};
-
-    }
-    else{
-        return{msg:'Not AUthenticated'}
-    }
-  }
-}

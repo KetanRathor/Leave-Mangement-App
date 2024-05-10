@@ -29,9 +29,13 @@ export class ProjectService {
       
       throw new Error('Manager not found for the provided ID');
     }
+    
     newProject.manager = manager
-
-    return this.projectRepository.save(newProject)
+    const newProject1 = await this.projectRepository.save(newProject)
+    await this.assignProject({ employeeId: manager.id, projectId: newProject1.id });
+  
+    return newProject1
+    
   }
 
   async showAllProjects() {

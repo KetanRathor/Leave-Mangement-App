@@ -35,7 +35,7 @@ export class HolidaysController {
   imageService: any;
   constructor(private readonly holidaysService: HolidaysService) { }
 
-  // @UseGuards(AuthGuard)
+    
   @Post('upload')
   @ApiBody({
     type: Holidays
@@ -96,7 +96,7 @@ export class HolidaysController {
   }
 
 
-  // @UseGuards(AuthGuard)
+    
   @Get()
   @ApiOkResponse({
     description: 'Get all Holidays',
@@ -120,7 +120,7 @@ export class HolidaysController {
   // }
 
 
-  // @UseGuards(AuthGuard)
+    
   // @Put('update/upload/:id')
   // @ApiBody({ type: Holidays })
   // @ApiOkResponse({ description: 'Holiday updated successfully' })
@@ -146,7 +146,7 @@ export class HolidaysController {
   //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
   // }
 
-  // @UseGuards(AuthGuard)
+    
   @Get('upcoming')
   @ApiOkResponse({
     description: 'Get upcoming Holidays',
@@ -161,7 +161,7 @@ export class HolidaysController {
     };
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Delete(':id')
   @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
@@ -175,7 +175,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  // @UseGuards(AuthGuard)
+    
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',

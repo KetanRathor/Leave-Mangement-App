@@ -41,7 +41,7 @@ export class LeaveTypesAndRequestsController {
     private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
   ) {}
 
-  // @UseGuards(AuthGuard)
+    
   @Post()
   @ApiCreatedResponse({
     description: 'Leave request created',
@@ -60,7 +60,7 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Get()
   @ApiOkResponse({
     description: 'Get all leave requests',
@@ -70,7 +70,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.findAll();
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Get(':leave_request_id')
   @ApiOkResponse({
     description: 'Get leave requests of employee with given id',
@@ -80,7 +80,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.findOne(leave_request_id);
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
     description: 'leave request status will be updated as response'
@@ -120,7 +120,7 @@ export class LeaveTypesAndRequestsController {
     return { leaveRequest, message };
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Get('employees/pending-requests')
   @ApiOkResponse({
     description:'Get employee list whose leave request status is pending'
@@ -138,7 +138,7 @@ export class LeaveTypesAndRequestsController {
       );
     }
   }
-  // @UseGuards(AuthGuard)
+ 
   @Get('remaining-balance/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
@@ -148,7 +148,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
   
-  // @UseGuards(AuthGuard)
+ 
   @Get('remaining-balance/work-from-home/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {
@@ -169,7 +169,7 @@ export class LeaveTypesAndRequestsController {
 //   const numEmployeesOnLeave = await this.leaveTypesAndRequestsService.getNumberOfEmployeesOnLeaveToday();
 //   return { numEmployeesOnLeave };
 // }
-// @UseGuards(AuthGuard)
+  
 @Get('/employees/employees-leave-on-today')
 
 async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
@@ -184,7 +184,7 @@ async getEmployeesOnLeaveToday(): Promise<Employee[]> {
   }
 }
 
-// @UseGuards(AuthGuard)
+  
 @Get(':employeeId/pending-requests')
 @ApiOkResponse({
   description:'Get list of pending leave requests of employees who have manager with given id',

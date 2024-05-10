@@ -27,7 +27,7 @@ export class InventoryController {
 
  
 
-  // @UseGuards(AuthGuard)
+    
   @Post()
   @ApiCreatedResponse({
     description:'Inventory will be created as response',
@@ -44,7 +44,7 @@ export class InventoryController {
   }
 
 
-  // @UseGuards(AuthGuard)
+    
   @Get()
   @ApiOkResponse({
     description:'Get List of all Inventories',
@@ -60,7 +60,7 @@ export class InventoryController {
     return this.inventoryService.ListOfInventories();
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Get('oneInventory/:id')
   @ApiOkResponse({
     description:'Get Inventory of given ID',
@@ -71,7 +71,7 @@ export class InventoryController {
   }
 
 
-  // @UseGuards(AuthGuard)
+    
   @Patch(':id')
   @ApiCreatedResponse({
     description:'Inventory will be updated as response',
@@ -88,7 +88,7 @@ export class InventoryController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Delete(':id')
   @ApiOkResponse({
     description:'Inventory will be deleted as response'
@@ -142,7 +142,7 @@ async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inv
   }
 }
 
-// @UseGuards(AuthGuard)
+  
 @Post("/category")
 @ApiCreatedResponse({
   description:'Category will be created as response',
@@ -165,7 +165,7 @@ async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDt
 }
 
 
-// @UseGuards(AuthGuard)
+  
   @Get('allCategory')
   @ApiOkResponse({
     description:'Get List Of All Categories of Inventories',

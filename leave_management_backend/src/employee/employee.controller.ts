@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // // @UseGuards(AuthGuard)
+  //   
   // @Post()
   // @ApiCreatedResponse({
   //   description: 'created user object as response',
@@ -42,7 +42,7 @@ export class EmployeeController {
   
  
 
-  // @UseGuards(AuthGuard)
+      
   // @UseGuards(GoogleAuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
@@ -67,7 +67,7 @@ export class EmployeeController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+    
   @Delete(':id')
   @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
@@ -84,7 +84,7 @@ export class EmployeeController {
   }
 
   //Show Profile or display employee details
-  // @UseGuards(AuthGuard)
+    
   @Get('employee/:id')
   @ApiOkResponse({
     description:'Get employee by id',
@@ -100,7 +100,7 @@ export class EmployeeController {
 
   
 
-  // @UseGuards(AuthGuard)
+    
   @Get()
   @ApiOkResponse({
     description:'All employees List',

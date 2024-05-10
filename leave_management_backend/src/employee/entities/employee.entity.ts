@@ -15,7 +15,6 @@ export class Employee {
     description:'The id of Employee'
   })
   id: number;
-
   
   @Column({ nullable: false })
   @ApiProperty({
@@ -159,7 +158,7 @@ export class Employee {
   inventories: Inventory[]
 
   @ApiProperty()
-  @OneToMany(() => Project, (project) => project.employee)
+  @OneToMany(() => Project, (projects) => projects.employee)
   projects: Project[]
 
   @ManyToMany(() => Project)

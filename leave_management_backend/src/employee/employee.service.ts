@@ -118,12 +118,12 @@ export class EmployeeService {
 
         const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
 
-        if (userCredentials) {
-          // userCredentials.deleted_by = req_mail;
-          // userCredentials.deleted_at = new Date();
-          await this.userCredentialRepository.save(userCredentials);
+        // if (userCredentials) {
+        //   // userCredentials.deleted_by = req_mail;
+        //   // userCredentials.deleted_at = new Date();
+        //   await this.userCredentialRepository.save(userCredentials);
             
-        }
+        // }
 
         // employee.deleted_by = req_mail;
         // employee.deleted_at = new Date()
@@ -139,7 +139,7 @@ export class EmployeeService {
         try {
           const employee = await this.employeeRepository.findOne({
             where: { id, deleted_at: IsNull() },
-            relations: ['manager', 'department', 'inventories', 'project'],
+            relations: ['manager', 'department', 'inventories', 'project',],
           });
           const managerIDs =  await this.employeeRepository.find({
           where: { deleted_at:IsNull() },
