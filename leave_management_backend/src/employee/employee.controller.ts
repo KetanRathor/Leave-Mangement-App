@@ -19,7 +19,7 @@ import {
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 import {
   ApiBearerAuth,
@@ -32,35 +32,43 @@ import {
 } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GoogleAuthGuard } from 'src/auth/guards/auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 @ApiTags('Employees')
-@ApiBearerAuth('JWT-auth')
+@ApiBearerAuth("JWT-auth")
+
 @Controller('employees')
+@UseGuards(JwtAuthGuard)
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // @UseGuards(AuthGuard)
-  @Post()
-  @ApiCreatedResponse({
-    description: 'created user object as response',
-    type: Employee,
-  })
-  async createEmployee(
-    @Body() createEmployeeDto: CreateEmployeeDto,
-    // @Request() req,
-  ) {
-    // const req_mail = req.user.email;
-    try {
-      return await this.employeeService.createEmployee(
-        createEmployeeDto,
-        // req_mail,
-      );
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
+  // // @UseGuards(AuthGuard)
+  // @Post()
+  // @ApiCreatedResponse({
+  //   description: 'created user object as response',
+  //   type: Employee,
+  // })
 
-  @UseGuards(AuthGuard)
+  // async createEmployee(
+  //   @Body() createEmployeeDto: CreateEmployeeDto,
+  //   // @Request() req,
+  // ) {
+  //   // const req_mail = req.user.email;
+  //   try {
+  //     return await this.employeeService.createEmployee(
+  //       createEmployeeDto,
+  //       // req_mail,
+  //     );
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+  
+ 
+
+  // @UseGuards(AuthGuard)
+  // @UseGuards(GoogleAuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
     description: 'Employee with given ID will be updated as response',
@@ -71,25 +79,26 @@ export class EmployeeController {
     @Body() updateEmployeeDto: UpdateEmployeeDto,
     @Request() req,
   ) {
-    const req_mail = req.user.email;
+    const req_mail =  req.user.user.email;
+    // console.log("req.........",req);
+    console.log("req.user......",req.user)
+    console.log("req_mail.....",req_mail)
     try {
-      return await this.employeeService.updateEmployee(
-        id,
-        updateEmployeeDto,
-        req_mail,
+      return await this.employeeService.updateEmployee(id, updateEmployeeDto,
+        req_mail
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description: 'Employee with given ID will be deleted as response',
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     try {
       await this.employeeService.deleteEmployee(id, req_mail);
       return 'Employee Deleted Successfully';
@@ -99,7 +108,7 @@ export class EmployeeController {
   }
 
   //Show Profile or display employee details
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('employee/:id')
   @ApiOkResponse({
     description: 'Get employee by id',
@@ -113,7 +122,9 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  
+
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All employees List',

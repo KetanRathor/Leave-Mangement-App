@@ -37,13 +37,14 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 @ApiTags('Leave Request')
 @ApiBearerAuth('JWT-auth')
 @Controller('leave')
+@UseGuards(JwtAuthGuard)
 export class LeaveTypesAndRequestsController {
   leaveService: any;
   constructor(
     private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
   ) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'Leave request will be created as response',
@@ -63,7 +64,7 @@ export class LeaveTypesAndRequestsController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'Get all leave requests',
@@ -83,7 +84,7 @@ export class LeaveTypesAndRequestsController {
   //   return this.leaveTypesAndRequestsService.findOne(leave_request_id);
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
     description: 'leave request status will be updated as response',
@@ -109,7 +110,7 @@ export class LeaveTypesAndRequestsController {
     return { leaveRequest, message };
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('employees/pending-requests')
   @ApiOkResponse({
     description:'Get employee list whose leave request status is pending'

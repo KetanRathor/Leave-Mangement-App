@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
+import * as session from 'express-session'
+import * as passport from 'passport'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
@@ -12,6 +14,7 @@ async function bootstrap() {
       bodyParser:true,
     }
   );
+
   const config = new DocumentBuilder()
   .setTitle('Leave Management API')
   .setDescription('leave management api description')
@@ -27,6 +30,17 @@ async function bootstrap() {
   .build();
 const document = SwaggerModule.createDocument(app, config);
 SwaggerModule.setup('api', app, document);
+app.use(session({
+  secret:'kjansckjnascnalscascnacasnlk',
+  saveUninitialized:false,
+  resave:false,
+  cookie:{
+    maxAge:60000
+  },
+}),
+);
+app.use(passport.initialize());
+app.use(passport.session());
   await app.listen(process.env.SERVER_PORT);
 }
 bootstrap();

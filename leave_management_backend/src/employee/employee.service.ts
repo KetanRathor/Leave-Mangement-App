@@ -32,71 +32,72 @@ export class EmployeeService {
       private readonly mailService: MailService,
   ) { }
 
-  //Create employee
-  async createEmployee(createEmployeeDto: CreateEmployeeDto,
-      // req_mail:any
-  ): Promise<Employee> {
-      const newEmployee = this.employeeRepository.create(createEmployeeDto);
-      // newEmployee.created_by=req_mail;
-      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-      if (!emailRegex.test(createEmployeeDto.email)) {
-          throw new Error('Invalid email format. Please enter a valid email address.');
-      }
-      const mobileRegex = /^\d{10}$/;
-      if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
-          throw new Error('Invalid mobile number format. Please enter a valid phone number.');
-      }
+    //Create employee
+    // async createEmployee(createEmployeeDto: CreateEmployeeDto,
+    //     // req_mail:any
+    // ): Promise<Employee> {
+    //     const newEmployee = this.employeeRepository.create(createEmployeeDto);
+    //     // newEmployee.created_by=req_mail;
+    //     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    //     if (!emailRegex.test(createEmployeeDto.email)) {
+    //         throw new Error('Invalid email format. Please enter a valid email address.');
+    //     }
+    //     const mobileRegex = /^\d{10}$/;
+    //     if (!mobileRegex.test(createEmployeeDto.mobile_number)) {
+    //         throw new Error('Invalid mobile number format. Please enter a valid phone number.');
+    //     }
 
-      // const inventory = await this.inventoryRepository
+    //     // const inventory = await this.inventoryRepository
+    //      const savedEmployee = await this.employeeRepository.save(newEmployee);
+    //     const isInventry = createEmployeeDto?.inventory_id;
+    //     if(isInventry){
+          
+    //       await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
+    //     }
+        
+    //     const employeeId = savedEmployee.id
+    //     // const userPassword = await this.authService.registerUser(createEmployeeDto.email)
+    //     // const userPassword = await this.authService.registerUser(employeeId)
 
+    //     // await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
 
-      const savedEmployee = await this.employeeRepository.save(newEmployee);
-      const isInventry = createEmployeeDto?.inventory_id;
-      if(isInventry){
-        await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
-      }
-      
-      const employeeId = savedEmployee.id
-      const userPassword = await this.authService.registerUser(createEmployeeDto.email)
-      // const userPassword = await this.authService.registerUser(employeeId)
+    //     return savedEmployee;
+    // }
 
-      await this.mailService.sendPasswordEmail(createEmployeeDto.email, userPassword);
+    //Update employee using id
+    async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto, 
+      req_mail
+    ): Promise<Employee> {
+        const employee = await this.employeeRepository.findOneBy({ id });
+        if (!employee) {
+            throw new NotFoundException('Employee not found.');
+        }
 
-      return savedEmployee;
-  }
+        // const oldEmail = employee.email;
+        // console.log("oldEmail",oldEmail)
+        for (const key in updatedEmployeeDetails) {
+          if (updatedEmployeeDetails[key] !== undefined)
+            employee[key] = updatedEmployeeDetails[key]
+          if (key === 'inventory_id') {
+            const existingAssignment = await this.inventoryRepository.findOne({
+              where: { id: updatedEmployeeDetails.inventory_id },
+              relations: ['employee', 'category'],
+            });
+    
+            if (existingAssignment && existingAssignment.employee) {
+              throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
+            } else {
+              await this.inventoryService.assignInventoryToEmployee(employee.id, updatedEmployeeDetails.inventory_id);
+            }
+            }
+        }
+        employee.updated_by = req_mail;
 
-  //Update employee using id
-  async updateEmployee(id: number, updatedEmployeeDetails: UpdateEmployeeDto, req_mail): Promise<Employee> {
-      const employee = await this.employeeRepository.findOneBy({ id });
-      if (!employee) {
-          throw new NotFoundException('Employee not found.');
-      }
-
-      const oldEmail = employee.email;
-      console.log("oldEmail",oldEmail)
-      for (const key in updatedEmployeeDetails) {
-        if (updatedEmployeeDetails[key] !== undefined)
-          employee[key] = updatedEmployeeDetails[key]
-        if (key === 'inventory_id') {
-          const existingAssignment = await this.inventoryRepository.findOne({
-            where: { id: updatedEmployeeDetails.inventory_id },
-            relations: ['employee', 'category'],
-          });
-  
-          if (existingAssignment && existingAssignment.employee) {
-            throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
-          } else {
-            await this.inventoryService.assignInventoryToEmployee(employee.id, updatedEmployeeDetails.inventory_id);
-          }
-          }
-      }
-      employee.updated_by = req_mail;
-
-      const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
-      if (userCredential) {
-      userCredential.email = updatedEmployeeDetails.email;
-      await this.userCredentialRepository.save(userCredential);
-}
+        // const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
+//         if (userCredential) {
+//         userCredential.email = updatedEmployeeDetails.email;
+//         await this.userCredentialRepository.save(userCredential);
+// }
 
       return await this.employeeRepository.save(employee);
   }
@@ -117,12 +118,12 @@ export class EmployeeService {
 
       const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
 
-      if (userCredentials) {
-        userCredentials.deleted_by = req_mail;
-        userCredentials.deleted_at = new Date();
-        await this.userCredentialRepository.save(userCredentials);
-          
-      }
+        if (userCredentials) {
+          // userCredentials.deleted_by = req_mail;
+          // userCredentials.deleted_at = new Date();
+          await this.userCredentialRepository.save(userCredentials);
+            
+        }
 
       // employee.deleted_by = req_mail;
       // employee.deleted_at = new Date()

@@ -158,7 +158,9 @@ export class InventoryService {
     }
   }
 
-  async createCategory(createCategoryDto: CreateInvetoryCategoryDto, req_mail: any) {
+  async createCategory(createCategoryDto: CreateInvetoryCategoryDto, 
+    req_mail: any
+  ) {
     const newCategory = this.categoryRepository.create(createCategoryDto);
     newCategory.created_by = req_mail;
 

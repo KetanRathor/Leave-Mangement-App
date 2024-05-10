@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+// import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateInventoryDto } from 'src/inventory/dto/update-inventory.dto';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
@@ -14,19 +14,20 @@ import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } fr
 @ApiTags('Project')
 @ApiBearerAuth("JWT-auth")
 @Controller('project')
+@UseGuards(JwtAuthGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService,
     // private readonly employeeService: EmployeeService
   ) { }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   @ApiCreatedResponse({
     description: 'Project will be added as response',
     type: Project
   })
   async addProject(@Body() createProjectDto: CreateProjectDto, @Request() req) {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     try {
       return await this.projectService.addProject(createProjectDto, req_mail);
     }
@@ -36,7 +37,7 @@ export class ProjectController {
   }
 
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
     description: 'All project List',
@@ -46,7 +47,7 @@ export class ProjectController {
     return this.projectService.showAllProjects();
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOkResponse({
     description: 'The project with given ID',
@@ -56,14 +57,14 @@ export class ProjectController {
     return await this.projectService.findOneProject(id);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Patch(':id')
   @ApiCreatedResponse({
     description: 'project will be updated as response',
     type: Project
   })
   async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
-    const req_mail = req.user.email
+    const req_mail = req.user.user.email
     try {
       return await this.projectService.updateProject(id, updateProjectDto, req_mail);
     } catch (error) {
@@ -77,9 +78,9 @@ export class ProjectController {
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
     @Body() { employeeId, projectId }: AssignProjectDto,
-    //  @Request() req
+     @Request() req
   ) {
-    // const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
 
     try {
       return await this.projectService.assignProject({ employeeId, projectId });
@@ -97,7 +98,7 @@ export class ProjectController {
   //   return await this.projectService.getAssignedEmployees(projectId);
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Put('/status/:project_id')
   @ApiCreatedResponse({
     description: 'status of the project will be updated as response',
@@ -110,7 +111,7 @@ export class ProjectController {
         },}
 })
   async updateProjectStatus(@Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
     }

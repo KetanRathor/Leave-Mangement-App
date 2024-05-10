@@ -34,15 +34,17 @@ import {
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 @ApiBearerAuth('JWT-auth')
 @ApiTags('holidays')
 @Controller('holidays')
+@UseGuards(JwtAuthGuard)
 export class HolidaysController {
   imageService: any;
   constructor(private readonly holidaysService: HolidaysService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('upload')
   @ApiCreatedResponse({
     description: 'create holiday object ',
@@ -80,7 +82,7 @@ export class HolidaysController {
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
-    const req_mail = req.user.email;
+    const req_mail = req.user.user.email;
     const newHoliday = await this.holidaysService.uploadImage(
       createHolidayDto.date,
       createHolidayDto.day,
@@ -131,7 +133,7 @@ export class HolidaysController {
   //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('upcoming')
   @ApiOkResponse({
     description: 'Get upcoming Holidays',
@@ -147,7 +149,7 @@ export class HolidaysController {
     };
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description: 'Employee with given ID will be deleted as response',
@@ -160,7 +162,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',
