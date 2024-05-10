@@ -9,6 +9,8 @@ import * as dotenv from 'dotenv';
 import { MailModule } from 'src/mail/mail.module';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
+import { GoogleStrategy } from './GoogleStrategy';
+import { SessionSerializer } from './utils/Serializer';
 // import { MailService } from 'src/mail/mail.service';
 // import { Employee } from 'src/employee/entities/Employee.entity';
 // import { EmployeeModule } from 'src/employee/employee.module';
@@ -20,6 +22,7 @@ dotenv.config();
   imports: [
     TypeOrmModule.forFeature([UserCredentials,Employee,UserOtp])
     , PassportModule,
+    // JwtModule
     
     JwtModule.register({
       global: true,
@@ -33,7 +36,14 @@ dotenv.config();
     
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService]
+  providers: [GoogleStrategy,
+    SessionSerializer,
+    {
+      provide:'AUTH_SERVICE',
+      useClass:AuthService,
+    }
+
+  ],
+  // exports: [AuthService]
 })
 export class AuthModule { }

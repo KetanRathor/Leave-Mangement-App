@@ -15,7 +15,6 @@ export class Employee {
     description:'The id of Employee'
   })
   id: number;
-
   
   @Column({ nullable: false })
   @ApiProperty({
@@ -31,13 +30,13 @@ export class Employee {
   email: string;
 
   
-  @Column({ nullable: false,unique: true })
+  @Column({ nullable: true,unique: true })
   @ApiProperty({
     description:'The mobile number of Employee'
   })
   mobile_number: string;
 
-  @Column({ type:'timestamp'})
+  @Column({ type:'timestamp',nullable: true})
   @ApiProperty({
     description:'The date of birth of Employee'
   })
@@ -56,9 +55,10 @@ export class Employee {
   // gender: string;
 
   @Column({
+    nullable: true,
     type: 'enum',
     enum: ['Male', 'Female', 'Other'],
-    default: 'Male',
+    // default: 'Male',
   })
   @ApiProperty({
     description:'The gender of Employee'
@@ -158,7 +158,7 @@ export class Employee {
   inventories: Inventory[]
 
   @ApiProperty()
-  @OneToMany(() => Project, (project) => project.employee)
+  @OneToMany(() => Project, (projects) => projects.employee)
   projects: Project[]
 
   @ManyToMany(() => Project)
