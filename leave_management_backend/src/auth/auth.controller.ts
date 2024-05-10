@@ -14,7 +14,7 @@ import {
     Request,
     UseGuards
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -35,6 +35,16 @@ export class AuthController {
 
     
 @Post('forgotpassword')
+@ApiCreatedResponse({
+    description:'get otp on given mail',
+})
+@ApiBody({
+    schema: {
+        type: 'object',
+        properties: {
+            email: { type: 'string' }
+        },}
+})
 async forgotPassword(@Body('email') email: string) {
     try {
         const result = await this.authService.forgotPassword(email);
@@ -46,6 +56,7 @@ async forgotPassword(@Body('email') email: string) {
 }
 
 @Post('reset-password')
+
     async resetPasswordWithOTP(@Body() resetPasswordDto: ResetPasswordDto) {
         try {
             const { email, otp, newPassword, confirmPassword } = resetPasswordDto;

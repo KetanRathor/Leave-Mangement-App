@@ -8,7 +8,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
 import { AssignProjectDto } from './dto/assign-project.dto';
 import { Employee } from 'src/employee/entities/Employee.entity';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 // import { Project } from './entities/project.entity';
 
 @ApiTags('Project')
@@ -72,7 +72,7 @@ export class ProjectController {
     }
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
@@ -101,8 +101,14 @@ export class ProjectController {
   @Put('/status/:project_id')
   @ApiCreatedResponse({
     description: 'status of the project will be updated as response',
-    type: Project
   })
+  @ApiBody({
+    schema: {
+        type: 'object',
+        properties: {
+            status: { type: 'string' }
+        },}
+})
   async updateProjectStatus(@Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
     const req_mail = req.user.email;
     if (!body.status) {

@@ -12,7 +12,4 @@ export class AuthPayloadDto {
         description:'password of employee'
     })
     password: string;
-
-    @ApiProperty()
-    role : string
 }

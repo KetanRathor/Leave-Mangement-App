@@ -7,7 +7,7 @@ import * as crypto from 'crypto'
 import { text } from 'stream/consumers';
 import { Inventory } from './entities/inventory.entity';
 import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Category } from './entities/inventoryCategory.entity';
 
 
@@ -20,10 +20,6 @@ export class InventoryController {
     
   ) { }
 
-  
-
-
- 
 
   @UseGuards(AuthGuard)
   @Post()
@@ -45,15 +41,19 @@ export class InventoryController {
   @UseGuards(AuthGuard)
   @Get()
   @ApiOkResponse({
-    description:'Get List of all Inventories',
+    description:'Get List of Inventories which are not assigned to any employee',
     type:[Inventory]
   })
   findAllInventories() {
     return this.inventoryService.showAllInventories();
   }
 
-
+  @UseGuards(AuthGuard)
   @Get('/list_of_inventories')
+  @ApiOkResponse({
+    description:'Get List of all Inventories ',
+    type:[Inventory]
+  })
   ListOfInventories() {
     return this.inventoryService.ListOfInventories();
   }
@@ -159,7 +159,7 @@ async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDt
 }
 
 
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
   @Get('allCategory')
   @ApiOkResponse({
     description:'Get List Of All Categories of Inventories',

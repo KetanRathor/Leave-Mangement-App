@@ -23,7 +23,7 @@ import { Department } from './entity/Department.entity';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
 
   @Post()
   @ApiCreatedResponse({
@@ -45,8 +45,10 @@ export class DepartmentController {
   }
 
   @Get()
+  @ApiOkResponse({
+    description:'Get List of Departments'
+  })
   async showDepartmentList() {
-    // console.log("first..............")
     return await this.departmentService.findDepartmentList();
   }
 

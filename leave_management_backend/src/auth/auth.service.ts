@@ -1,11 +1,17 @@
-import { HttpException, HttpStatus, Injectable, Post, Request } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import { FindOneOptions, IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto'
+import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
@@ -30,52 +36,61 @@ export class AuthService {
     ) { }
 
 
-    encrypt(text: string): string {
-        console.log("tets", text)
-        const cipher = crypto.createCipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
-        console.log("key", process.env.ENCRYPTION_KEY)
-        let encrypted = cipher.update(text, 'utf8', 'hex');
-        console.log("first", encrypted);
-        encrypted += cipher.final('hex');
-        console.log("finalenc", encrypted);
-        return encrypted;
-    }
+  encrypt(text: string): string {
+    console.log('tets', text);
+    const cipher = crypto.createCipheriv(
+      process.env.ALGORITHM,
+      process.env.ENCRYPTION_KEY,
+      this.iv,
+    );
+    console.log('key', process.env.ENCRYPTION_KEY);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    console.log('first', encrypted);
+    encrypted += cipher.final('hex');
+    console.log('finalenc', encrypted);
+    return encrypted;
+  }
 
-    decrypt(encryptedText: string): string {
-        // console.log("Tesxttttt",encryptedText)
-        // console.log("Key", this.key );
+  decrypt(encryptedText: string): string {
+    // console.log("Tesxttttt",encryptedText)
+    // console.log("Key", this.key );
 
-        console.log("key dec", process.env.ENCRYPTION_KEY)
-        const decipher = crypto.createDecipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
-        let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        console.log("decrypted : ", decrypted);
+    console.log('key dec', process.env.ENCRYPTION_KEY);
+    const decipher = crypto.createDecipheriv(
+      process.env.ALGORITHM,
+      process.env.ENCRYPTION_KEY,
+      this.iv,
+    );
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    console.log('decrypted : ', decrypted);
 
-        return decrypted;
-    }
+    return decrypted;
+  }
 
-    async showProfile(id: number): Promise<any> {
-        try {
-            const employee = await this.employeeRepository.findOne({
-                where: { id, deleted_at: IsNull() },
-                // relations: ['manager', 'department', 'inventories', 'project'],
-            });
-            const managerIDs = await this.employeeRepository.find({
-                where: { deleted_at: IsNull() },
-                // select: ['manager_id'],
+  async showProfile(id: number): Promise<any> {
+    try {
+      const employee = await this.employeeRepository.findOne({
+        where: { id, deleted_at: IsNull() },
+        // relations: ['manager', 'department', 'inventories', 'project'],
+      });
+      const managerIDs = await this.employeeRepository.find({
+        where: { deleted_at: IsNull() },
+        // select: ['manager_id'],
 
-                // relations: ['manager'], 
-            });
-            if (employee) {
-                let role;
-                if (employee.admin) {
-                    role = 'Admin';
-                } else if (managerIDs.some(manager => manager.manager_id === employee.id)) {
-
-                    role = 'Manager';
-                } else {
-                    role = 'Employee';
-                }
+        // relations: ['manager'],
+      });
+      if (employee) {
+        let role;
+        if (employee.admin) {
+          role = 'Admin';
+        } else if (
+          managerIDs.some((manager) => manager.manager_id === employee.id)
+        ) {
+          role = 'Manager';
+        } else {
+          role = 'Employee';
+        }
 
                 return { ...employee, role };
 
@@ -89,12 +104,12 @@ export class AuthService {
     }
 
 
-    async validateUser({ email, password }: AuthPayloadDto) {
-        console.log("Inside Validate User...");
+  async validateUser({ email, password }: AuthPayloadDto) {
+    console.log('Inside Validate User...');
 
-        const user = await this.userCredentialsRepository.findOne({
-            where: { email },
-        })
+    const user = await this.userCredentialsRepository.findOne({
+      where: { email },
+    });
 
         const employeeId = (await this.employeeRepository.findOne({
             where: {
@@ -125,16 +140,16 @@ export class AuthService {
         }
     } 
 
-    async registerUser(email: string) {
-        const generatedPassword = this.generateRandomPassword(10);
-        const encryptedPassword = this.encrypt(generatedPassword);
+  async registerUser(email: string) {
+    const generatedPassword = this.generateRandomPassword(10);
+    const encryptedPassword = this.encrypt(generatedPassword);
 
-        const newUser = this.userCredentialsRepository.create({
-            email,
-            password: encryptedPassword,
-        });
+    const newUser = this.userCredentialsRepository.create({
+      email,
+      password: encryptedPassword,
+    });
 
-        await this.userCredentialsRepository.save(newUser);
+    await this.userCredentialsRepository.save(newUser);
 
         return generatedPassword;
     }  
@@ -161,15 +176,14 @@ export class AuthService {
         return OTP;
     }
 
-    async forgotPassword(email: string) {
+  async forgotPassword(email: string) {
+    const expiresAt = new Date(Date.now() + 300000);
+    const currentTimestamp = new Date();
 
-        const expiresAt = new Date(Date.now() + 300000)
-        const currentTimestamp = new Date();
-
-        const user = await this.userCredentialsRepository.findOne({
-            where: { email },
-        });
-        console.log("user", user);
+    const user = await this.userCredentialsRepository.findOne({
+      where: { email },
+    });
+    console.log('user', user);
 
         if (!user) {
             // console.log("hiii")
@@ -246,9 +260,9 @@ export class AuthService {
             throw new HttpException('Password must be at least 6 characters long', 400);
         }
 
-        if (newPassword !== confirmPassword) {
-            throw new HttpException('Passwords do not match', 400);
-        }
+    if (newPassword !== confirmPassword) {
+      throw new HttpException('Passwords do not match', 400);
+    }
 
         const encryptedPassword = this.encrypt(newPassword);
 
@@ -261,17 +275,16 @@ export class AuthService {
     
 }
 
-    // async hashPassword(password: string): Promise<string> {
-    //     const saltOrRounds = 10;
-    //     return bcrypt.hash(password, saltOrRounds);
-    // }
+  // async hashPassword(password: string): Promise<string> {
+  //     const saltOrRounds = 10;
+  //     return bcrypt.hash(password, saltOrRounds);
+  // }
 
-    // async comparePasswords(plainPassword: string, hashedPassword: string): Promise<boolean> {
-    //     console.log("plainPassword:", plainPassword);
-    // //    console.log("hashedPassword:", hashedPassword(plainPassword));
-    // const hashedPassword1 =await this.hashPassword(plainPassword);
-    // console.log("hashedPassword1...",hashedPassword1);
-
+  // async comparePasswords(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  //     console.log("plainPassword:", plainPassword);
+  // //    console.log("hashedPassword:", hashedPassword(plainPassword));
+  // const hashedPassword1 =await this.hashPassword(plainPassword);
+  // console.log("hashedPassword1...",hashedPassword1);
 
     //     return bcrypt.compare(plainPassword, hashedPassword);
     // }
