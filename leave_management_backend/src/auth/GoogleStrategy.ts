@@ -128,11 +128,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
 
       const idToken = profile.id; 
+      console.log("profile",profile);
 
       const { name, emails, photos } = profile;
       const user = await this.authService.validateUserGoogle({
         email: emails[0].value,
         name: profile.displayName,
+        // image:profile.photos[0].value  
+        
         
         
       });
@@ -154,6 +157,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         email: emails[0].value,
         name,
         role,
+        image:profile.photos[0].value 
         
       };
 
