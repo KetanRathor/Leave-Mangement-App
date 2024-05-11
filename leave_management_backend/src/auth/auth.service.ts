@@ -1,11 +1,17 @@
-import { HttpException, HttpStatus, Injectable, Post, Request } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthPayloadDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserCredentials } from './entities/UserCredentials.entity';
 import { FindOneOptions, IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto'
+import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
@@ -30,20 +36,24 @@ export class AuthService {
     ) { }
 
 
-    encrypt(text: string): string {
-        console.log("tets", text)
-        const cipher = crypto.createCipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
-        console.log("key", process.env.ENCRYPTION_KEY)
-        let encrypted = cipher.update(text, 'utf8', 'hex');
-        console.log("first", encrypted);
-        encrypted += cipher.final('hex');
-        console.log("finalenc", encrypted);
-        return encrypted;
-    }
+  encrypt(text: string): string {
+    console.log('tets', text);
+    const cipher = crypto.createCipheriv(
+      process.env.ALGORITHM,
+      process.env.ENCRYPTION_KEY,
+      this.iv,
+    );
+    console.log('key', process.env.ENCRYPTION_KEY);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    console.log('first', encrypted);
+    encrypted += cipher.final('hex');
+    console.log('finalenc', encrypted);
+    return encrypted;
+  }
 
-    decrypt(encryptedText: string): string {
-        // console.log("Tesxttttt",encryptedText)
-        // console.log("Key", this.key );
+  decrypt(encryptedText: string): string {
+    // console.log("Tesxttttt",encryptedText)
+    // console.log("Key", this.key );
 
         console.log("key dec", process.env.ENCRYPTION_KEY)
         const decipher = crypto.createDecipheriv(process.env.ALGORITHM, process.env.ENCRYPTION_KEY, this.iv);
@@ -89,8 +99,8 @@ export class AuthService {
     }
 
 
-    async validateUser({ email, password }: AuthPayloadDto) {
-        console.log("Inside Validate User...");
+  async validateUser({ email, password }: AuthPayloadDto) {
+    console.log('Inside Validate User...');
 
         const user = await this.userCredentialsRepository.findOne({
             where: { email },
@@ -125,44 +135,20 @@ export class AuthService {
         }
     } 
 
-    async registerUser(email: string) {
-        const generatedPassword = this.generateRandomPassword(10);
-        const encryptedPassword = this.encrypt(generatedPassword);
+  async registerUser(email: string) {
+    const generatedPassword = this.generateRandomPassword(10);
+    const encryptedPassword = this.encrypt(generatedPassword);
 
-        const newUser = this.userCredentialsRepository.create({
-            email,
-            password: encryptedPassword,
-        });
+    const newUser = this.userCredentialsRepository.create({
+      email,
+      password: encryptedPassword,
+    });
 
     await this.userCredentialsRepository.save(newUser);
 
         return generatedPassword;
     }  
 
-    // async registerUser(
-    //     // email: string,
-    //      employeeId:number
-    //     ) {
-    //     const generatedPassword = this.generateRandomPassword(10);
-    //     const encryptedPassword = this.encrypt(generatedPassword);
-
-    //     const employee = await this.employeeRepository.findOne({ where: { id: employeeId } });
-
-    //     if (!employee) {
-    //     throw new Error('Employee with the provided ID not found');
-    //     }
-
-    //     const newUser = this.userCredentialsRepository.create({
-    //         // email,
-    //         password: encryptedPassword,
-    //         employee: employee
-            
-    //     });
-
-    //     await this.userCredentialsRepository.save(newUser);
-
-    //     return generatedPassword;
-    // }
 
     generateRandomPassword(length: number): string {
         const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -270,15 +256,13 @@ export class AuthService {
             throw new HttpException('Password must be at least 6 characters long', 400);
         }
 
-        if (newPassword !== confirmPassword) {
-            throw new HttpException('Passwords do not match', 400);
-        }
+    if (newPassword !== confirmPassword) {
+      throw new HttpException('Passwords do not match', 400);
+    }
 
         const encryptedPassword = this.encrypt(newPassword);
 
-        await this.userCredentialsRepository.update({ email }, { password: encryptedPassword });
-
-        await this.mailService.sendPasswordResetEmail(email)
+    await this.mailService.sendPasswordResetEmail(email);
 
     }
 

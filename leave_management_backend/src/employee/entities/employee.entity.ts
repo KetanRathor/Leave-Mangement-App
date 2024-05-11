@@ -12,7 +12,7 @@ export class Employee {
   
   @PrimaryGeneratedColumn()
   @ApiProperty({
-    description: 'The name of Employee',
+    description:'The id of Employee'
   })
   id: number;
 
@@ -26,14 +26,14 @@ export class Employee {
   
   @Column({ nullable: false, unique: true })
   @ApiProperty({
-    description: 'The email of Employee',
+    description:'The email of Employee'
   })
   email: string;
 
   
   @Column({ nullable: false,unique: true })
   @ApiProperty({
-    description: 'The mobile number of Employee',
+    description:'The mobile number of Employee'
   })
   mobile_number: string;
 
@@ -106,7 +106,7 @@ export class Employee {
 
   @Column({ default: null })
   @ApiProperty({
-    description: 'The manager id of Employee',
+    description:'The manager id of Employee'
   })
   manager_id: number | null;
 
@@ -149,15 +149,16 @@ export class Employee {
   image: Buffer;
 
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
-  @JoinColumn({ name: 'leave_request_id' })
+  @JoinColumn({ name: 'leave_request_id'})
   leaveRequests: LeaveRequest[];
 
   @ApiProperty()
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
+  @JoinColumn({ name: 'employee_id' })
   inventories: Inventory[]
 
   @ApiProperty()
-  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  @OneToMany(() => Project, (project) => project.employee)
   projects: Project[]
 
   @ManyToMany(() => Project)
@@ -168,8 +169,8 @@ export class Employee {
   @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade:true })
   userOtp: UserOtp;
 
-  @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
-  // @JoinColumn({ name: 'employee_id' })
-  userCredentials: UserCredentials | null;
+  // @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
+  // // @JoinColumn({ name: 'employee_id' })
+  // userCredentials: UserCredentials | null;
   
 }

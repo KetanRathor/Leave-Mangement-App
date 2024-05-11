@@ -21,12 +21,21 @@ import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
 import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
 import { extname } from 'path';
 
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @ApiTags('holidays')
 @Controller('holidays')
 export class HolidaysController {
@@ -35,17 +44,39 @@ export class HolidaysController {
 
   @UseGuards(AuthGuard)
   @Post('upload')
-  @ApiBody({
-    type: Holidays,
-  })
   @ApiCreatedResponse({
     description: 'create holiday object ',
     type: Holidays,
   })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file, @Body() body: any,
-  @Request() req,) {
-
+  @ApiBody({
+    description: 'Image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        data1: {
+          type: 'object',
+          properties: {
+            date: {
+              type: 'string',
+            },
+            day: {
+              type: 'string',
+            },
+            occasion: {
+              type: 'string',
+            },
+          },
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadImage(@UploadedFile() file, @Body() body: any, @Request() req) {
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
@@ -56,28 +87,12 @@ export class HolidaysController {
       createHolidayDto.occasion,
       file.buffer,
       req_mail,
-      
     );
-    
+
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
       req_mail,
-    };
-  }
-
-
-  @UseGuards(AuthGuard)
-  @Get()
-  @ApiOkResponse({
-    description: 'Get all Holidays',
-    type: [Holidays],
-  })
-  async getAllHolidays() {
-    const holidays = await this.holidaysService.getAllHolidays();
-    return {
-      message: 'All holidays retrieved successfully',
-      holidays: holidays,
     };
   }
 
@@ -89,7 +104,6 @@ export class HolidaysController {
   //     count: count,
   //   };
   // }
-
 
   // @UseGuards(AuthGuard)
   // @Put('update/upload/:id')
@@ -125,7 +139,8 @@ export class HolidaysController {
   })
   async getUpcomingHolidays() {
     const currentDate = new Date();
-    const upcomingHolidays = await this.holidaysService.getUpcomingHolidays(currentDate);
+    const upcomingHolidays =
+      await this.holidaysService.getUpcomingHolidays(currentDate);
     return {
       message: 'Upcoming holidays retrieved successfully',
       holidays: upcomingHolidays,
@@ -135,13 +150,12 @@ export class HolidaysController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
-
+    description: 'Employee with given ID will be deleted as response',
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.holidaysService.deleteHolidays(id);
-      return 'Holiday Deleted Successfully'
+      return 'Holiday Deleted Successfully';
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -153,11 +167,20 @@ export class HolidaysController {
   })
   async getRemainingHolidays(): Promise<{ remainingHolidays: number }> {
     try {
-      const remainingHolidays = await this.holidaysService.getRemainingHolidays();
+      const remainingHolidays =
+        await this.holidaysService.getRemainingHolidays();
       return { remainingHolidays };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(AuthGuard)
+  @Get()
+  @ApiOkResponse({
+    description: 'All Holidays List',
+    type: [Holidays],
+  })
+  showHolidaysList() {
+    return this.holidaysService.findAll();
+  }
 }

@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from './entity/Department.entity';
@@ -36,7 +31,9 @@ export class DepartmentService {
     return await this.departmentRepository.remove(department);
   }
 
-  async findDepartmentList() {
-    return await this.departmentRepository.find();
+
+  async findDepartmentList(){
+    return await this.departmentRepository.find()
+
   }
 }

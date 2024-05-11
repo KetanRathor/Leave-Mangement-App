@@ -34,19 +34,20 @@ export class Holidays {
   @Column('longblob', { nullable: true })
   @ApiProperty({
     description: 'occasion image',
+    type: 'string',
+    format: 'binary',
   })
   image: Buffer;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
-    description:'When holiday was Created'
+    description: 'When holiday was Created',
   })
   created_at: Date;
 
-
   @Column({ default: '' })
   @ApiProperty({
-    description:'Holiday created by'
+    description: 'Holiday created by',
   })
   created_by: string;
 }

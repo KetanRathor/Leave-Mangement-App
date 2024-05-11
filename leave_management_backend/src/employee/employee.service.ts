@@ -48,11 +48,10 @@ export class EmployeeService {
         }
 
         // const inventory = await this.inventoryRepository
-
-
-        const savedEmployee = await this.employeeRepository.save(newEmployee);
+         const savedEmployee = await this.employeeRepository.save(newEmployee);
         const isInventry = createEmployeeDto?.inventory_id;
         if(isInventry){
+          
           await this.inventoryService.assignInventoryToEmployee(savedEmployee.id,isInventry)
         }
         
@@ -96,24 +95,30 @@ export class EmployeeService {
         }
         employee.updated_by = req_mail;
 
-        const userCredential = await this.userCredentialRepository.findOneBy({ email: oldEmail });
-        if (userCredential) {
-        userCredential.email = updatedEmployeeDetails.email;
-        await this.userCredentialRepository.save(userCredential);
-}
+    const userCredential = await this.userCredentialRepository.findOneBy({
+      email: oldEmail,
+    });
+    if (userCredential) {
+      userCredential.email = updatedEmployeeDetails.email;
+      await this.userCredentialRepository.save(userCredential);
+    }
 
     return await this.employeeRepository.save(employee);
   }
 
-  //Delete employee using id
-  async deleteEmployee(id: number, req_mail: string) {
-    const employee = await this.employeeRepository.findOneBy({ id });
-    if (!employee) {
-      throw new NotFoundException('Employee not found.');
+    //Delete employee using id
+    async deleteEmployee(id: number, req_mail: string) {
+        const employee = await this.employeeRepository.findOneBy({ id })
+        if (!employee) {
+            throw new NotFoundException('Employee not found.');
+        }
+        const inventory = await this.inventoryRepository.findOne({ where: { employee: employee } });
+    if (inventory) {
+        inventory.employee = null; 
+        await this.inventoryRepository.save(inventory);
     }
-    //  await this.employeeRepository.remove(employee);
-    employee.deleted_by = req_mail;
-    employee.deleted_at = new Date();
+        employee.deleted_by = req_mail;
+        employee.deleted_at = new Date()
 
     const userCredentials = await this.userCredentialRepository.findOne({
       where: { email: employee.email },
@@ -123,22 +128,18 @@ export class EmployeeService {
           userCredentials.deleted_by = req_mail;
           userCredentials.deleted_at = new Date();
           await this.userCredentialRepository.save(userCredentials);
-            // await this.userCredentialRepository.remove(userCredentials);
+            
         }
 
-    employee.deleted_by = req_mail;
-    employee.deleted_at = new Date();
-    await this.employeeRepository.save(employee);
+        // employee.deleted_by = req_mail;
+        // employee.deleted_at = new Date()
+        
+        await this.employeeRepository.save(employee)
 
     return 'Employee and associated UserCredentials deleted successfully.';
   }
 
-    //Show Employe Profile
-    // async showProfile(id: number) {
-    //     return this.employeeRepository.findOne({ where : { id ,deleted_at: IsNull()},
-    //          relations: ['manager','department','inventories','project'] });
-             
-    // }
+    
     async showProfile(id: number): Promise<any> {
         try {
           const employee = await this.employeeRepository.findOne({
@@ -171,17 +172,7 @@ export class EmployeeService {
         }
       }
 
-    
-    
-
-    //Show Employee List
-    // async findEmployees() {
-
-    //     return await this.employeeRepository.find({ where: { deleted_at: IsNull() },relations:['manager','department','project','inventories'] })
-    // }
-
-
-    async findEmployees() {
+     async findEmployees() {
         try {
           const employees = await this.employeeRepository.find({
             where: { deleted_at: IsNull() },
@@ -210,14 +201,8 @@ export class EmployeeService {
         }
       }
       
-
-
-    // async findManagerList(){
-    //     return await this.employeeRepository.find({where:{role:'Manager'},relations:['manager','department']})
-    // }
-
-
-    async uploadImage(employeeId: number, imageData: Buffer) {
+      
+  async uploadImage(employeeId: number, imageData: Buffer) {
         const employee = await this.employeeRepository.findOneBy({id:employeeId});
         if (!employee) {
           throw new Error(`Employee with ID ${employeeId} not found`);
@@ -226,20 +211,7 @@ export class EmployeeService {
         return await this.employeeRepository.save(employee);
       }
 
-
-
-// async findManagers() {
-  
-//   const managerEmployees = await this.employeeRepository.find({
-//     where: [
-//       { manager_id: IsNull(), deleted_at: IsNull() }, 
-//       { admin: true, deleted_at: IsNull() }, 
-//     ],
-//   });
-
-//   return managerEmployees;
-// }
-async findAll(): Promise<Employee[]> {
+  async findAll(): Promise<Employee[]> {
     return await this.employeeRepository.find();
   }
 
@@ -247,16 +219,11 @@ async findAll(): Promise<Employee[]> {
     return await this.employeeRepository.findOneBy({ id });
   }
 
-
   async getManagerIds(): Promise<any[]> {
     return await this.employeeRepository.find({
-        where: { deleted_at:IsNull() },
-        select: ['manager_id'],
-        relations: ['manager'], 
-
-        
+      where: { deleted_at: IsNull() },
+      select: ['manager_id'],
+      relations: ['manager'],
     });
-    
   }
-
 }

@@ -38,18 +38,9 @@ import { HolidaysModule } from './holidays/holidays.module';
     MailModule,
     InventoryModule,
     ProjectModule,
-    // HolidaysModule
-    // ProjectModule,
     HolidaysModule,
-    // CategoryModule
-    // MyRedisModule.register({
-    //   host: 'localhost', // Redis host
-    //   port: 6379, // Redis port
-    //   // other configuration options if needed
-    // }),
-    // RedisModule,
   ],
   controllers: [AppController, MailController],
   providers: [AppService, MailService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,15 +1,32 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Put,
+  Param,
+  ParseIntPipe,
+  Delete,
+  Get,
+  UseGuards,
+  Request,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
@@ -100,22 +117,32 @@ export class EmployeeController {
 
   @Get('/manager')
   async showManagerList() {
-    console.log("first..............")
+    console.log('first..............');
     return await this.employeeService.getManagerIds();
   }
-
-  
 
   @Post('upload-image/:id')
   @ApiConsumes('multipart/form-data')
 @UseInterceptors(FileInterceptor('image'))
+@ApiBody({
+  description: 'Image upload',
+  schema: {
+    type: 'object',
+    properties: {
+      image: {
+        type: 'string',
+        format: 'binary',
+      },
+    },
+  },
+})
 async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
   
   if (!image) {
     throw new Error('No image uploaded');
   }
 
-  const employee = await this.employeeService.uploadImage(id, image.buffer);
+    const employee = await this.employeeService.uploadImage(id, image.buffer);
 
   return employee;
 }
@@ -124,8 +151,3 @@ async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer
 
 
 }
-
-  
-
-  
-

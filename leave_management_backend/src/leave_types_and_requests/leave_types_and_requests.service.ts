@@ -8,17 +8,15 @@ import {
 } from '@nestjs/common';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
-import { Between, In, LessThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { start } from 'repl';
 import { Console } from 'console';
 import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
 
-
 @Injectable()
 export class LeaveTypesAndRequestsService {
-  
   // private readonly leaveTypes = [
   //   { leave_type_id: 1,
   //      leave_type_name: 'full',
@@ -43,17 +41,23 @@ export class LeaveTypesAndRequestsService {
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
-    private readonly holidaysService: HolidaysService,
-    // @InjectRepository(LeaveType)
-    // private readonly leaveTypeRepository: Repository<LeaveType>,
-  ) { }
+    private readonly mailService: MailService, // Inject MailService
+    @InjectRepository(Employee) // Inject Employee repository
+    private readonly employeeRepository: Repository<Employee>,
+  ) {}
 
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
     req_mail: string,
-    emp_id: number
-
+    emp_id: number,
   ): Promise<LeaveRequest> {
+    const newRequest = new LeaveRequest();
+
+    // if (!createLeaveDto.emp_id) {
+    //   throw new BadRequestException('Employee ID (emp_id) is required');
+    // }
+
+    // newRequest.emp_id = createLeaveDto.emp_id;
 
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     newLeaveRequest.created_by = req_mail;
@@ -65,7 +69,6 @@ export class LeaveTypesAndRequestsService {
   const fromDateAndStartDate = `${createLeaveDto.start_date} to ${createLeaveDto.end_date}`
   
     try {
-
       const employee = await this.employeeRepository.findOne({
         where: { id: emp_id },
         relations: ['manager'],
@@ -76,7 +79,7 @@ export class LeaveTypesAndRequestsService {
       }
 
       const managerEmail = employee.manager?.email;
-      console.log("managerEmail:", managerEmail)
+      console.log('managerEmail:', managerEmail);
 
       if (!managerEmail) {
         console.warn('Manager email not found for employee:', employee.id);
@@ -91,27 +94,44 @@ export class LeaveTypesAndRequestsService {
     }
   }
 
-
-
-
   findOne(id: number): Promise<LeaveRequest> {
     console.log(id);
     return this.leaveRequestRepository.findOneBy({ id });
   }
 
-
   async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
     return await this.leaveRequestRepository.find({
-      where: { emp_id }, 
-      // relations: ['employee'],
+      where: { emp_id }, // Filter by employeeId
+      relations: ['employee'], // Include related employee information (optional)
     });
   }
 
+  //  async findOne(id: number): Promise<LeaveRequest> {
+  //     console.log(id);
+  //     const rrr= await this.leaveRequestRepository.find({where:{id}, relations: ['employee']});
+  //     return rrr;
+  //   }
+
+  // async findOne(id: number): Promise<LeaveRequest | undefined> {
+  //   try {
+  //     const request = await this.leaveRequestRepository.findOne({
+  //       where: { id }, // Clear object property syntax
+  //       relations: ['employee'], // Include related employee information if needed
+  //     });
+
+  //     if (!request) { // Handle case where request is not found
+  //       return undefined;
+  //     }
+
+  //     return request;
+  //   } catch (error) {
+  //     console.error('Error fetching leave request:', error);
+  //     // Handle the error appropriately (e.g., throw, log)
+  //   }
+  // }
 
   findAll() {
-    return this.leaveRequestRepository.find({
-      // relations: ['employee'] 
-    });
+    return this.leaveRequestRepository.find({ relations: ['employee'] });
   }
 
  
@@ -127,17 +147,8 @@ export class LeaveTypesAndRequestsService {
     const employee = await this.employeeRepository.findOne({ where: { email: req_mail } });
   const employeeName = employee ? employee.name : "Unknown";
   
-  // const employeeId = await this.employeeRepository.findOne({ where: { email: leaveRequest.created_by } });
-
-  // if (!employeeId) {
-  //   throw new Error(`Employee with email ${leaveRequest.created_by} not found`);
-  // }
   const employeeEmail = leaveRequest.created_by;
-  // console.log("employeeId",employeeId.email)
-
-
-
-    const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
+  const updatedLeaveRequest = await this.leaveRequestRepository.save(leaveRequest);
     const message = `Your leave request has been ${status} by ${employeeName}.`;
     if (updatedLeaveRequest) {
       await this.mailService.sendLeaveStatusEmail(employeeEmail, message); 
@@ -155,13 +166,15 @@ export class LeaveTypesAndRequestsService {
     return leaveRequest;
   }
 
-  async getEmployeesWithPendingLeaveRequests(): Promise<{
-    employeeName: string;
-    start_date: Date;
-    end_date: Date;
-    leave_type: string;
-    reason: string;
-  }[]> {
+  async getEmployeesWithPendingLeaveRequests(): Promise<
+    {
+      employeeName: string;
+      start_date: Date;
+      end_date: Date;
+      leave_type: string;
+      reason: string;
+    }[]
+  > {
     try {
       const pendingRequests = await this.leaveRequestRepository.find({
         where: {
@@ -189,52 +202,71 @@ export class LeaveTypesAndRequestsService {
   
 
 
-async getRemainingLeaveBalance(id: number): Promise<any> {
-  try {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    const approvedRequests = await this.leaveRequestRepository.find({
-      where: {
-        emp_id: id,
-        status: 'approved',
-      },
-    });
+  async getRemainingLeaveBalance(id: number): Promise<any> {
+    try {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear =
+        currentMonth >= 3
+          ? currentDate.getFullYear()
+          : currentDate.getFullYear() - 1; // Adjust year based on current month
+      const approvedRequests = await this.leaveRequestRepository.find({
+        where: {
+          emp_id: id,
+          status: 'approved',
+        },
+      });
 
-    let default_balance = 21;
-    let remainingBalance = default_balance;
+      let default_balance = 21;
+      let remainingBalance = default_balance;
 
-    approvedRequests.forEach((request) => {
-      const startDate = new Date(request.start_date);
-      const endDate = new Date(request.end_date);
-      const leaveType = request.leave_type;
+      approvedRequests.forEach((request) => {
+        const startDate = new Date(request.start_date);
+        const endDate = request.end_date ? new Date(request.end_date) : null; // Convert end date if provided
 
-      const startYear = startDate.getFullYear();
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth();
 
-      if (startYear === currentYear) {
-        const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (startYear === currentYear && startMonth >= 3) {
+          // Check if leave started after 1st April of current year
+          let daysDifference: number;
+          if (endDate) {
+            const millisecondsPerDay = 1000 * 60 * 60 * 24;
+            const differenceInMilliseconds =
+              endDate.getTime() - startDate.getTime();
+            daysDifference =
+              Math.ceil(differenceInMilliseconds / millisecondsPerDay) + 1;
+          } else {
+            daysDifference = 1;
+          }
 
-        switch (leaveType) {
-          case 'full':
-            remainingBalance -= daysDifference;
-            break;
-          case 'first half':
-          case 'second half':
-            remainingBalance -= daysDifference / 2;
-            break;
-          default:
-            break;
+          switch (request.leave_type) {
+            case 'full':
+              remainingBalance -= daysDifference;
+              break;
+            case 'first half':
+            case 'second half':
+              remainingBalance -= daysDifference / 2;
+              break;
+            default:
+              break;
+          }
         }
-      }
-    });
+      });
 
-    remainingBalance = Math.max(remainingBalance, 0);
+      remainingBalance = Math.max(remainingBalance, 0);
 
-    return {remainingBalance:remainingBalance,default_balance:default_balance};
-  } catch (error) {
-    throw new BadRequestException('Failed to calculate remaining leave balance');
+      return {
+        remainingBalance: remainingBalance,
+        default_balance: default_balance,
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        'Failed to calculate remaining leave balance',
+      );
+    }
   }
-}
+
 
 
 async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
