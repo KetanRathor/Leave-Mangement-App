@@ -31,9 +31,11 @@ export class Department {
 
   // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   // updated_at: Date;
+  @Column({ type: 'timestamp', nullable: true,onUpdate: 'CURRENT_TIMESTAMP' })
+  updated_at: Date;
 
-  // @Column({ default: ''})
-  // updated_by: string;
+  @Column({ default: ''})
+  updated_by: string;
 
   @ApiProperty({
     description: 'The date on which department deleted',
@@ -47,6 +49,7 @@ export class Department {
   @Column({ default: '' })
   deleted_by: string;
 
+  @ApiProperty()
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
 

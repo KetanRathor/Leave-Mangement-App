@@ -1,36 +1,15 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpException,
-  HttpStatus,
-  Put,
-  Param,
-  ParseIntPipe,
-  Delete,
-  Get,
-  UseGuards,
-  Request,
-  Req,
-  UseInterceptors,
-  UploadedFile,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Param, ParseIntPipe, Delete, Get, UseGuards, Request, Req, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Employees')
-// @ApiBearerAuth()
+@ApiBearerAuth("JWT-auth")
 @Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
@@ -94,18 +73,6 @@ export class EmployeeController {
     }
   }
 
-  // @UseGuards(AuthGuard)
-
-  // @Delete('/department/:id')
-  // async deleteDepartment(@Param('id', ParseIntPipe) id: number) {
-  //   try {
-  //     await this.employeeService.deleteDepartment(id);
-  //     return 'Department Deleted Successfully'
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
-  //   }
-  // }
-
   //Show Profile or display employee details
   @UseGuards(AuthGuard)
   @Get('employee/:id')
@@ -130,4 +97,35 @@ export class EmployeeController {
   showEmployeeList() {
     return this.employeeService.findEmployees();
   }
+
+  @Get('/manager')
+  async showManagerList() {
+    console.log("first..............")
+    return await this.employeeService.getManagerIds();
+  }
+
+  
+
+  @Post('upload-image/:id')
+  @ApiConsumes('multipart/form-data')
+@UseInterceptors(FileInterceptor('image'))
+async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+  
+  if (!image) {
+    throw new Error('No image uploaded');
+  }
+
+  const employee = await this.employeeService.uploadImage(id, image.buffer);
+
+  return employee;
 }
+
+
+
+
+}
+
+  
+
+  
+

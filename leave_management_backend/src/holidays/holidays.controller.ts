@@ -8,26 +8,26 @@ import {
   Res,
   Body,
   UseGuards,
+  Delete,
+  ParseIntPipe,
+  HttpException,
+  HttpStatus,
+  UploadedFiles,
   Put,
+  Request,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
 // import { MulterFile } from 'multer';
-import { Multer } from 'multer';
+import { Multer, diskStorage } from 'multer';
 import { CreateHolidaysDto } from './dto/create-holidays.dto';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Holidays } from './entities/holidays.entity';
+import { extname } from 'path';
 
-@ApiBearerAuth()
-@ApiTags('Holidays')
+@ApiBearerAuth("JWT-auth")
+@ApiTags('holidays')
 @Controller('holidays')
 export class HolidaysController {
   imageService: any;
@@ -43,22 +43,29 @@ export class HolidaysController {
     type: Holidays,
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file, @Body() body: any) {
+  async uploadImage(@UploadedFile() file, @Body() body: any,
+  @Request() req,) {
+
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
+    const req_mail = req.user.email;
     const newHoliday = await this.holidaysService.uploadImage(
       createHolidayDto.date,
       createHolidayDto.day,
       createHolidayDto.occasion,
       file.buffer,
+      req_mail,
+      
     );
-
+    
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
+      req_mail,
     };
   }
+
 
   @UseGuards(AuthGuard)
   @Get()
@@ -83,51 +90,74 @@ export class HolidaysController {
   //   };
   // }
 
-  @UseGuards(AuthGuard)
-  @Put('update/upload/:id')
-  @ApiBody({ type: Holidays })
-  @ApiOkResponse({ description: 'Holiday updated successfully' })
-  @ApiConflictResponse({ description: 'Conflict during update' })
-  @UseInterceptors(FileInterceptor('file'))
-  async updateHoliday(
-    @Param('id') id: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    // const inputData = body.data1;
-    // const { date, day, occasion } = body
-    // const createHolidayDto: CreateHolidaysDto = JSON.parse({ date, day, occasion });
 
-    // const newHoliday = await this.holidaysService.uploadImage(
-    //   createHolidayDto.date,
-    //   createHolidayDto.day,
-    //   createHolidayDto.occasion,
-    //   file.buffer,
-    // );
-    console.log('body......', file);
-    // const updatedHoliday = await this.holidaysService.updateHoliday({ id: id, date: date, day: day, occasion: occasion, image: file.buffer });
-    // // console.log("___________________________", updatedHoliday)
-    // if (!updatedHoliday) {
-    return { message: 'Holiday update failed' };
-    // }
-    // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
+  // @UseGuards(AuthGuard)
+  // @Put('update/upload/:id')
+  // @ApiBody({ type: Holidays })
+  // @ApiOkResponse({ description: 'Holiday updated successfully' })
+  // @ApiConflictResponse({ description: 'Conflict during update' })
+  // @UseInterceptors(FileInterceptor('file'))
+  // async updateHoliday(@Param('id') id: number, @UploadedFile() file: Express.Multer.File) {
+  //   // const inputData = body.data1;
+  //   // const { date, day, occasion } = body
+  //   // const createHolidayDto: CreateHolidaysDto = JSON.parse({ date, day, occasion });
+
+  //   // const newHoliday = await this.holidaysService.uploadImage(
+  //   //   createHolidayDto.date,
+  //   //   createHolidayDto.day,
+  //   //   createHolidayDto.occasion,
+  //   //   file.buffer,
+  //   // );
+  //   console.log("body......", file)
+  //   // const updatedHoliday = await this.holidaysService.updateHoliday({ id: id, date: date, day: day, occasion: occasion, image: file.buffer });
+  //   // // console.log("___________________________", updatedHoliday)
+  //   // if (!updatedHoliday) {
+  //   return { message: 'Holiday update failed' };
+  //   // }
+  //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
+  // }
+
+  @UseGuards(AuthGuard)
+  @Get('upcoming')
+  @ApiOkResponse({
+    description: 'Get upcoming Holidays',
+    type: [Holidays],
+  })
+  async getUpcomingHolidays() {
+    const currentDate = new Date();
+    const upcomingHolidays = await this.holidaysService.getUpcomingHolidays(currentDate);
+    return {
+      message: 'Upcoming holidays retrieved successfully',
+      holidays: upcomingHolidays,
+    };
   }
 
-  //   @Get('images/:id')
-  //   async getHolidayImage(@Param('id') id: number, @Res() res: Response) {
-  //     try {
-  //       const imagePath = await this.imageService.getImagePathById(id);
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  @ApiOkResponse({
+    description:'Employee with given ID will be deleted as response'
 
-  //       if (!imagePath) {
-  //         return res.status(404).send({ message: 'Image not found' });
-  //       }
+  })
+  async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.holidaysService.deleteHolidays(id);
+      return 'Holiday Deleted Successfully'
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+  @UseGuards(AuthGuard)
+  @Get('remaining-holidays')
+  @ApiOkResponse({
+    description: 'Get remaining holidays',
+  })
+  async getRemainingHolidays(): Promise<{ remainingHolidays: number }> {
+    try {
+      const remainingHolidays = await this.holidaysService.getRemainingHolidays();
+      return { remainingHolidays };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
-  //       const imageFullPath = join('uploads', imagePath); // Assuming images are stored in 'uploads' folder
-  //       const imageBuffer = await asyncReadFile(imageFullPath);
-
-  //       res.setHeader('Content-Type', 'image/jpeg'); // Adjust content type based on your image type
-  //       res.end(imageBuffer);
-  //     } catch (error) {
-  //       res.status(500).send({ message: 'Internal server error' });
-  //     }
-  //   }
 }

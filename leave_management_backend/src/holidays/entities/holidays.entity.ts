@@ -36,4 +36,17 @@ export class Holidays {
     description: 'occasion image',
   })
   image: Buffer;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @ApiProperty({
+    description:'When holiday was Created'
+  })
+  created_at: Date;
+
+
+  @Column({ default: '' })
+  @ApiProperty({
+    description:'Holiday created by'
+  })
+  created_by: string;
 }

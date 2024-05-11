@@ -1,9 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { Department } from '../../department/entity/Department.entity';
 import { LeaveRequest } from '../../leave_types_and_requests/entities/LeaveRequest.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Project } from 'src/project/entities/project.entity';
+import { UserOtp } from 'src/auth/entities/userOtp.entity';
+import { UserCredentials } from 'src/auth/entities/UserCredentials.entity';
 
 @Entity('employee')
 export class Employee {
@@ -29,7 +31,7 @@ export class Employee {
   email: string;
 
   
-  @Column({ nullable: false })
+  @Column({ nullable: false,unique: true })
   @ApiProperty({
     description: 'The mobile number of Employee',
   })
@@ -76,8 +78,7 @@ export class Employee {
   })
   created_by: string;
 
-  
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', nullable: true,onUpdate: 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     description:'When employee was Updated'
   })
@@ -102,43 +103,48 @@ export class Employee {
   })
   deleted_by: string;
 
-  // @Column({ nullable: false })
-  // @Column()
-  // manager_id: number;
-  
+
   @Column({ default: null })
   @ApiProperty({
     description: 'The manager id of Employee',
   })
   manager_id: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Employee)
   @JoinColumn({ name: 'manager_id' })
   manager: Employee | null;
 
-  // @Column({ nullable: false })
+  
   @Column({ default: null })
   @ApiProperty({
     description:'The department id of Employee'
   })
   department_id: number | null;
 
+  @ApiProperty()
   @ManyToOne(() => Department, (department) => department.employees)
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @Column({
-    type: 'enum',
-    enum: ['Employee', 'Manager', 'Admin'],
-  })
+  // @Column({
+  //   type: 'enum',
+  //   enum: ['Employee', 'Manager', 'Admin'],
+  // })
+  // @ApiProperty({
+  //   description:'The role of employee'
+  // })
+  // role: string;
+
+  @Column({ default: false })  
   @ApiProperty({
-    description:'The role of employee'
+    description: 'Is the employee an admin?'
   })
-  role: string;
+  admin: boolean;
 
   @Column('longblob', { nullable: true })
   @ApiProperty({
-    description:'occasion image'
+    description:'employee image'
   })
   image: Buffer;
 
@@ -146,11 +152,24 @@ export class Employee {
   @JoinColumn({ name: 'leave_request_id' })
   leaveRequests: LeaveRequest[];
 
+  @ApiProperty()
   @OneToMany(() => Inventory, (inventory) => inventory.employee, { cascade: true })
   inventories: Inventory[]
+
+  @ApiProperty()
+  @OneToMany(() => Project, (project) => project.employee, { cascade: true })
+  projects: Project[]
 
   @ManyToMany(() => Project)
     @JoinTable({name:"employee_project"})
     project: Project[]
+
+
+  @OneToOne(() => UserOtp, (userOtp) => userOtp.employeeId, { cascade:true })
+  userOtp: UserOtp;
+
+  @OneToOne(() => UserCredentials, (userCredentials) => userCredentials.employee, { nullable: true })
+  // @JoinColumn({ name: 'employee_id' })
+  userCredentials: UserCredentials | null;
   
 }

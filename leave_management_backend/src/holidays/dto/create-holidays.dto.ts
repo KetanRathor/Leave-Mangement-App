@@ -18,4 +18,11 @@ export class CreateHolidaysDto {
     example: 'New Year',
   })
   occasion: string;
+
+  @ApiProperty({
+    description:'occasion image',
+    example:'example.jpg'
+  })
+  file:any;
+
 }

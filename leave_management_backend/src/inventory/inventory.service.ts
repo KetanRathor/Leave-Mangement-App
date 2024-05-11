@@ -21,45 +21,21 @@ export class InventoryService {
     private categoryRepository: Repository<Category>,
   ) { }
 
-  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-  //   const newInventory =  this.inventoryRepository.create(createInventoryDto);
-  //   newInventory.created_by = req_mail;
-  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
-
-  //   return this.inventoryRepository.save(newInventory,category);
-  // //   return this.inventoryRepository.save({ ...createInventoryDto, category_id : createInventoryDto.category_id, created_by: req_mail });
-  // }
-
-  // async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
-  //   try {
-  //     const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } })
-  //     const newInventory = await this.inventoryRepository.save({ ...createInventoryDto, category, created_by: req_mail });
-  //     console.log('New inventory saved:', newInventory);
-  //     return newInventory;
-  //   } catch (error) {
-  //     console.error('Error saving inventory:', error);
-  //     throw error; // Rethrow the error to propagate it to the caller
-  //   }
-  // }
-
 
   async createInventory(createInventoryDto: CreateInventoryDto, req_mail: any) {
     try {
-
       const newInventory = this.inventoryRepository.create(createInventoryDto);
-
       newInventory.created_by = req_mail;
+      if (!createInventoryDto.category_id) {
+        throw new Error('Category ID is required to create inventory.');
+      }
 
       const category = await this.categoryRepository.findOne({ where: { id: createInventoryDto.category_id } });
-
-
       newInventory.category = category;
-      const savedInventory = await this.inventoryRepository.save(newInventory);
 
-      console.log('New inventory saved:', savedInventory);
+      const savedInventory = await this.inventoryRepository.save(newInventory);
       return savedInventory;
     } catch (error) {
-      console.error('Error saving inventory:', error);
       throw error;
     }
   }
@@ -84,24 +60,26 @@ export class InventoryService {
 
 
   async showAllInventories() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } , relations: ['category']});
+    return await this.inventoryRepository.find({ where: { deleted_at: IsNull(), employee: IsNull() }, relations: ['category', 'employee'] });
+  }
+
+  async ListOfInventories() {
+    const inventories = await this.inventoryRepository.find({ where: { deleted_at: IsNull() }, relations: ['category', 'employee'] });
+    // console.log("inventories",inventories)
+    return inventories
   }
 
   async findOneInventory(id: number) {
     const inventory = await this.inventoryRepository.findOne({ where: { id, deleted_at: IsNull() }, relations: ['employee'] });
     // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
-
-
     if (!inventory) {
       return { message: `Inventory with ID ${id} not found`, inventory };
     }
-
     return inventory;
   }
 
 
-
-  async deleteInventory(id: number, req_mail: any): Promise<void> {
+  async deleteInventory(id: number, req_mail: any) {
     const inventory = await this.inventoryRepository.findOneBy({ id });
 
     if (!inventory) {
@@ -113,57 +91,57 @@ export class InventoryService {
 
     await this.inventoryRepository.save(inventory)
 
-    console.log(`Inventory with ID ${id} deleted by ${req_mail}`);
+    return (`Inventory with ID ${id} deleted by ${req_mail}`);
   }
 
-  async findOneInventoryBySN(serial_number: string): Promise<any> | null {
-    try {
-      const inventory = await this.inventoryRepository.findOne({ where: { serial_number } });
-      return inventory
-    } catch (error) {
-      console.log("findOneInventoryBySN Error: ", error)
-      return null
-    }
-  }
+  // async findOneInventoryBySN(serial_number: string): Promise<any> | null {
+  //   try {
+  //     const inventory = await this.inventoryRepository.findOne({ where: { serial_number } });
+  //     return inventory
+  //   } catch (error) {
+  //     console.log("findOneInventoryBySN Error: ", error)
+  //     return null
+  //   }
+  // }
 
-  async assignInventory({ inventoryId, employeeId, categoryId }: { inventoryId: number, employeeId: number, categoryId: number }) {
-    try {
-      const [inventory, employee, category] = await Promise.all([
-        this.inventoryRepository.findOne({ where: { id: inventoryId } }),
-        this.employeeRepository.findOne({ where: { id: employeeId } }),
-        this.categoryRepository.findOne({ where: { id: categoryId } })
-      ]);
+  // async assignInventory({ inventoryId, employeeId, categoryId }: { inventoryId: number, employeeId: number, categoryId: number }) {
+  //   try {
+  //     const [inventory, employee, category] = await Promise.all([
+  //       this.inventoryRepository.findOne({ where: { id: inventoryId } }),
+  //       this.employeeRepository.findOne({ where: { id: employeeId } }),
+  //       this.categoryRepository.findOne({ where: { id: categoryId } })
+  //     ]);
 
-      if (!inventory) {
-        throw new NotFoundException('Inventory not found');
-      }
+  //     if (!inventory) {
+  //       throw new NotFoundException('Inventory not found');
+  //     }
 
-      if (!employee) {
-        throw new NotFoundException('Employee not found');
-      }
+  //     if (!employee) {
+  //       throw new NotFoundException('Employee not found');
+  //     }
 
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
+  //     if (!category) {
+  //       throw new NotFoundException('Category not found');
+  //     }
 
-      const existingAssignment = await this.inventoryRepository.findOne({
-        where: { id: inventoryId }, relations: ['employee', 'category'],
-      });
+  //     const existingAssignment = await this.inventoryRepository.findOne({
+  //       where: { id: inventoryId }, relations: ['employee', 'category'],
+  //     });
 
-      if (existingAssignment && existingAssignment.employee) {
-        throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
-      }
+  //     if (existingAssignment && existingAssignment.employee) {
+  //       throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
+  //     }
 
-      inventory.employee = employee;
-      inventory.category = category;
-      const updatedInventory = await this.inventoryRepository.save(inventory);
+  //     inventory.employee = employee;
+  //     inventory.category = category;
+  //     const updatedInventory = await this.inventoryRepository.save(inventory);
 
-      return updatedInventory;
-    } catch (error) {
-      throw error;
-    }
+  //     return updatedInventory;
+  //   } catch (error) {
+  //     throw error;
+  //   }
 
-  }
+  // }
 
 
 
@@ -189,11 +167,35 @@ export class InventoryService {
 
 
   async showAllCategory() {
-    return await this.inventoryRepository.find({ where: { deleted_at: IsNull() } });
+    return await this.categoryRepository.find({ where: { deleted_at: IsNull() } });
   }
 
 
+  async assignInventoryToEmployee(empId: number, inventoryId: number) {
+    try {
+      const inventory = await this.inventoryRepository.findOne({
+        where: { id: inventoryId },
+        relations: ['employee'], 
+      });
+  
+      if (!inventory) {      
+        return;
+      }
+  
+      const employee = await this.employeeRepository.findOne({ where: { id: empId } });
+      if (!employee) {
+        return;
+      }
+  
+      inventory.employee = employee; 
+      await this.inventoryRepository.save(inventory); 
+        } catch (error) {
+        console.error('Error assigning inventory to employee:', error);
+        }
+  }
 
+ 
+  
 
 
 }
