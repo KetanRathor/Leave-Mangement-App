@@ -1,12 +1,22 @@
-import { Controller, Get, Inject, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from './guards/auth.guard';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { GoogleStrategy } from './GoogleStrategy';
 
+
+async function refreshAccessToken(refreshToken: string){
+  
+}
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject('AUTH_SERVICE') private readonly authService:AuthService){}
+  constructor(@Inject('AUTH_SERVICE') private readonly authService:AuthService,
+   
+  
+){
+  
+}
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
   googleAuth(@Req() req) {} 
@@ -26,6 +36,17 @@ export class AuthController {
     }
     else{
         return{msg:'Not AUthenticated'}
+    }
+  }
+
+  @Post('refresh-token')
+  async refreshToken(@Req() req, @Res() res) {
+    try {
+      const { refreshToken } = req.body;
+      const newAccessToken = await refreshAccessToken(refreshToken);
+            res.json({ accessToken: newAccessToken });
+    } catch (error) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: error.message });
     }
   }
 }

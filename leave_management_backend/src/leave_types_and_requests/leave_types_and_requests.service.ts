@@ -248,9 +248,10 @@ export class LeaveTypesAndRequestsService {
 
   async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
     try {
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+  
       const approvedRequests = await this.leaveRequestRepository.find({
         where: {
           emp_id: id,
@@ -258,21 +259,21 @@ export class LeaveTypesAndRequestsService {
           status: In(['approved', 'pending']), // Only consider approved or pending requests
         },
       });
-
+  
       const defaultBalancePerMonth: number[] = new Array(12).fill(3); // Initialize array to hold default balance for each month with 3 for work from home
-
+  
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
         const endDate = request.end_date ? new Date(request.end_date) : null;
-
+  
         const startMonth = startDate.getMonth();
         const startYear = startDate.getFullYear();
         const endMonth = endDate ? endDate.getMonth() : null;
         const endYear = endDate ? endDate.getFullYear() : null;
-
+  
         let startDay = startDate.getDate();
         let endDay = endDate ? endDate.getDate() : null;
-
+  
         if (startYear === currentYear && startMonth === currentMonth) {
           if (
             endDate === null ||
@@ -283,36 +284,99 @@ export class LeaveTypesAndRequestsService {
             // If end date is null or end date is in the same month and same as start date (one-day leave)
             defaultBalancePerMonth[currentMonth] -= 1; // Subtract only 1 day
           } else if (endMonth === currentMonth) {
-            defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1; // Subtract the difference between end and start day
+            defaultBalancePerMonth[currentMonth] -= endDay - startDay; // Subtract the difference between end and start day
           } else {
             // If end month is different from current month
-            const daysInStartMonth = new Date(
-              startYear,
-              startMonth + 1,
-              0,
-            ).getDate();
-            defaultBalancePerMonth[currentMonth] -=
-              daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
+            const daysInStartMonth = new Date(startYear, startMonth + 1, 0).getDate();
+            defaultBalancePerMonth[currentMonth] -= daysInStartMonth - startDay; // Subtract remaining days in the start month
+  
+            // Subtract one day from next month if applicable
+            if (endMonth !== null && endYear !== null && endMonth !== startMonth && endYear === currentYear) {
+              defaultBalancePerMonth[endMonth] -= 1;
+            }
           }
         }
       });
-
+  
       // Calculate remaining balance for the current month
-      const remainingWorkFromHomeBalance = Math.max(
-        defaultBalancePerMonth[currentMonth],
-        0,
-      );
-
+      const remainingWorkFromHomeBalance = Math.max(defaultBalancePerMonth[currentMonth], 0);
+  
       return {
         remainingBalance: remainingWorkFromHomeBalance,
         defaultBalance: 3,
       };
     } catch (error) {
-      throw new BadRequestException(
-        'Failed to calculate remaining work from home balance',
-      );
+      throw new BadRequestException('Failed to calculate remaining work from home balance');
     }
   }
+
+  // async getRemainingLeaveBalanceforworkfromhome(id: number): Promise<any> {
+  //   try {
+  //     const currentMonth = new Date().getMonth();
+  //     const currentYear = new Date().getFullYear();
+
+  //     const approvedRequests = await this.leaveRequestRepository.find({
+  //       where: {
+  //         emp_id: id,
+  //         leave_type: 'work from home',
+  //         status: In(['approved', 'pending']), // Only consider approved or pending requests
+  //       },
+  //     });
+
+  //     const defaultBalancePerMonth: number[] = new Array(12).fill(3); // Initialize array to hold default balance for each month with 3 for work from home
+
+  //     approvedRequests.forEach((request) => {
+  //       const startDate = new Date(request.start_date);
+  //       const endDate = request.end_date ? new Date(request.end_date) : null;
+
+  //       const startMonth = startDate.getMonth();
+  //       const startYear = startDate.getFullYear();
+  //       const endMonth = endDate ? endDate.getMonth() : null;
+  //       const endYear = endDate ? endDate.getFullYear() : null;
+
+  //       let startDay = startDate.getDate();
+  //       let endDay = endDate ? endDate.getDate() : null;
+
+  //       if (startYear === currentYear && startMonth === currentMonth) {
+  //         if (
+  //           endDate === null ||
+  //           (endMonth !== null &&
+  //             endMonth === currentMonth &&
+  //             endDate.getTime() === startDate.getTime())
+  //         ) {
+  //           // If end date is null or end date is in the same month and same as start date (one-day leave)
+  //           defaultBalancePerMonth[currentMonth] -= 1; // Subtract only 1 day
+  //         } else if (endMonth === currentMonth) {
+  //           defaultBalancePerMonth[currentMonth] -= endDay - startDay + 1; // Subtract the difference between end and start day
+  //         } else {
+  //           // If end month is different from current month
+  //           const daysInStartMonth = new Date(
+  //             startYear,
+  //             startMonth + 1,
+  //             0,
+  //           ).getDate();
+  //           defaultBalancePerMonth[currentMonth] -=
+  //             daysInStartMonth - startDay + 1; // Subtract remaining days in the start month
+  //         }
+  //       }
+  //     });
+
+  //     // Calculate remaining balance for the current month
+  //     const remainingWorkFromHomeBalance = Math.max(
+  //       defaultBalancePerMonth[currentMonth],
+  //       0,
+  //     );
+
+  //     return {
+  //       remainingBalance: remainingWorkFromHomeBalance,
+  //       defaultBalance: 3,
+  //     };
+  //   } catch (error) {
+  //     throw new BadRequestException(
+  //       'Failed to calculate remaining work from home balance',
+  //     );
+  //   }
+  // }
 
 
 
