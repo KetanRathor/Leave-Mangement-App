@@ -301,7 +301,7 @@ export class LeaveTypesAndRequestsService {
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth();
       const currentYear = currentDate.getFullYear();
-  
+
       const approvedRequests = await this.leaveRequestRepository.find({
         where: {
           emp_id: id,
@@ -309,21 +309,21 @@ export class LeaveTypesAndRequestsService {
           status: In(['approved', 'pending']), // Only consider approved or pending requests
         },
       });
-  
+
       const defaultBalancePerMonth: number[] = new Array(12).fill(3); // Initialize array to hold default balance for each month with 3 for work from home
-  
+
       approvedRequests.forEach((request) => {
         const startDate = new Date(request.start_date);
         const endDate = request.end_date ? new Date(request.end_date) : null;
-  
+
         const startMonth = startDate.getMonth();
         const startYear = startDate.getFullYear();
         const endMonth = endDate ? endDate.getMonth() : null;
         const endYear = endDate ? endDate.getFullYear() : null;
-  
+
         let startDay = startDate.getDate();
         let endDay = endDate ? endDate.getDate() : null;
-  
+
         if (startYear === currentYear && startMonth === currentMonth) {
           if (
             endDate === null ||
@@ -337,29 +337,43 @@ export class LeaveTypesAndRequestsService {
             defaultBalancePerMonth[currentMonth] -= endDay - startDay; // Subtract the difference between end and start day
           } else {
             // If end month is different from current month
-            const daysInStartMonth = new Date(startYear, startMonth + 1, 0).getDate();
+            const daysInStartMonth = new Date(
+              startYear,
+              startMonth + 1,
+              0,
+            ).getDate();
             defaultBalancePerMonth[currentMonth] -= daysInStartMonth - startDay; // Subtract remaining days in the start month
-  
+
             // Subtract one day from next month if applicable
-            if (endMonth !== null && endYear !== null && endMonth !== startMonth && endYear === currentYear) {
+            if (
+              endMonth !== null &&
+              endYear !== null &&
+              endMonth !== startMonth &&
+              endYear === currentYear
+            ) {
               defaultBalancePerMonth[endMonth] -= 1;
             }
           }
         }
       });
-  
+
       // Calculate remaining balance for the current month
-      const remainingWorkFromHomeBalance = Math.max(defaultBalancePerMonth[currentMonth], 0);
-  
+      const remainingWorkFromHomeBalance = Math.max(
+        defaultBalancePerMonth[currentMonth],
+        0,
+      );
+
       return {
         remainingBalance: remainingWorkFromHomeBalance,
         defaultBalance: 3,
       };
     } catch (error) {
-      throw new BadRequestException('Failed to calculate remaining work from home balance');
+      throw new BadRequestException(
+        'Failed to calculate remaining work from home balance',
+      );
     }
   }
-  
+
   // async getEmployeesOnLeaveToday(): Promise<any> {
   //   try {
   //     const today = new Date();
@@ -462,25 +476,39 @@ export class LeaveTypesAndRequestsService {
         const endDate = leaveRequest.end_date
           ? new Date(leaveRequest.end_date)
           : null;
-        // console.log(endDate)
-        // return (today >= startDate && today <= endDate);
-        console.log(role);
 
-        if (role == 'Admin') {
-          return (
-            (endDate == null &&
-              startDate.toDateString() === today.toDateString()) ||
-            (today >= startDate && today <= endDate)
-          );
+        // Get the start and end timestamps for today
+        const todayStart = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+        );
+        const todayEnd = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          23,
+          59,
+          59,
+          999,
+        );
+
+        // Check if today falls within the leave period, including the end date
+        const isOnLeaveToday =
+          (endDate === null && startDate.getTime() === todayStart.getTime()) ||
+          (endDate !== null && todayStart <= endDate && todayEnd >= startDate);
+console.log(role);
+        if (role === 'Admin') {
+          // For Admin role, consider all leave requests
+          return isOnLeaveToday;
         } else {
+          // For other roles, additionally check if the employee's manager ID matches
           return (
-            ((endDate == null &&
-              startDate.toDateString() === today.toDateString()) ||
-              (today >= startDate && today <= endDate)) &&
-            leaveRequest.employee.manager_id === managerId
+            isOnLeaveToday && leaveRequest.employee.manager_id === managerId
           );
         }
       });
+
       const employeesOnLeaveToday: any[] = filteredLeaveRequests.map(
         (leaveRequest) => {
           return {
