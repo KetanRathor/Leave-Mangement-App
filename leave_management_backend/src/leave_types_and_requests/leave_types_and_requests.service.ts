@@ -493,11 +493,24 @@ export class LeaveTypesAndRequestsService {
           999,
         );
 
-        // Check if today falls within the leave period, including the end date
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+        const todayDateString = today.toISOString().slice(0, 10); // Extract YYYY-MM-DD part
+
         const isOnLeaveToday =
-          (endDate === null && startDate.getTime() === todayStart.getTime()) ||
-          (endDate !== null && todayStart <= endDate && todayEnd >= startDate);
-console.log(role);
+          (endDate === null && startDate.toISOString().slice(0, 10) === todayDateString) || // Leave for one day
+          (endDate !== null &&
+            startDate.toISOString().slice(0, 10) <= todayDateString &&
+            endDate.toISOString().slice(0, 10) >= todayDateString); // Leave spans across multiple days
+        
+      
+
+// console.log(role);
+// console.log("Start Date:", startDate);
+// console.log("End Date:", endDate);
+// console.log("Is on Leave Today:", isOnLeaveToday);
+// console.log("Employee:", leaveRequest.employee);
+
         if (role === 'Admin') {
           // For Admin role, consider all leave requests
           return isOnLeaveToday;
