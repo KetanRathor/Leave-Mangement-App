@@ -83,7 +83,7 @@ export class AuthService {
             } else {
                 
                 console.log('User not found. Creating...');
-                const newUser = this.employeeRepository.create(details);
+                const newUser = this.employeeRepository.create({...details,created_by:details.email});
                
                 console.log("details............",details)
                 console.log("newUser............",newUser)

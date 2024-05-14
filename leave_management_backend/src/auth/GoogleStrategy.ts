@@ -38,11 +38,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifiedCallback) {
     try {
-    //   const domain = profile.emails[0].value.split('@')[1];
+      // const domain = profile.emails[0].value.split('@')[1];
 
-    //   if (domain !== process.env.DOMAIN_NAME) {
-    //     throw new Error('Unauthorized domain');
-    //   }
+      // if (domain !== process.env.DOMAIN_NAME) {
+      //   throw new Error('Unauthorized domain');
+      // }
 
 
 
