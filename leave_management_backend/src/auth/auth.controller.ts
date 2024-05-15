@@ -4,6 +4,7 @@ import { GoogleAuthGuard } from './guards/auth.guard';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './GoogleStrategy';
+import { RefreshJwtAuthGuard } from './guards/Refresh.gurad';
 
 
 async function refreshAccessToken(refreshToken: string){
@@ -11,15 +12,15 @@ async function refreshAccessToken(refreshToken: string){
 }
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject('AUTH_SERVICE') private readonly authService:AuthService,
-   
-  
-){
-  
-}
+  constructor(
+    @Inject('AUTH_SERVICE') private readonly authService:AuthService,
+    ){ }
+
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
   googleAuth(@Req() req) {} 
+
+
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(@Req() req) {
@@ -40,11 +41,12 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @UseGuards(RefreshJwtAuthGuard)
   async refreshToken(@Req() req, @Res() res) {
     try {
       const { refreshToken } = req.body;
       const newAccessToken = await refreshAccessToken(refreshToken);
-            res.json({ accessToken: newAccessToken });
+            return({ accessToken: newAccessToken });
     } catch (error) {
       res.status(HttpStatus.UNAUTHORIZED).json({ message: error.message });
     }

@@ -21,6 +21,9 @@ import { ProjectModule } from './project/project.module';
 // import { ProjectModule } from './project/project.module';
 import { HolidaysModule } from './holidays/holidays.module';
 // import { CategoryModule } from './category/category.module';
+import { BotService } from './bot/bot.service';
+import { BotController } from './bot/bot.controller';
+import { BotModule } from './bot/bot.module';
 
 
 
@@ -39,8 +42,9 @@ import { HolidaysModule } from './holidays/holidays.module';
     InventoryModule,
     ProjectModule,
     HolidaysModule,
+    BotModule,
   ],
-  controllers: [AppController, MailController],
-  providers: [AppService, MailService],
+  controllers: [AppController, MailController, BotController],
+  providers: [AppService, MailService, BotService],
 })
 export class AppModule { }

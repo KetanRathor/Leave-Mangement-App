@@ -38,11 +38,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifiedCallback) {
     try {
-      // const domain = profile.emails[0].value.split('@')[1];
+      const domain = profile.emails[0].value.split('@')[1];
 
-      // if (domain !== process.env.DOMAIN_NAME) {
-      //   throw new Error('Unauthorized domain');
-      // }
+      if (domain !== process.env.DOMAIN_NAME) {
+        throw new Error('Unauthorized domain');
+      }
 
 
 
@@ -89,7 +89,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       const refreshAccessToken = async () => {
         try {
           // Implement logic to use the refresh token to obtain a new access token
-          const url = 'https://oauth2.googleapis.com/token'; // Google's token endpoint
+          const url = 'https://oauth2.googleapis.com/token'; 
           const data = {
             client_id: process.env.GOOGLE_CLIENT_ID,
             client_secret: process.env.GOOGLE_CLIENT_SECRET,
@@ -108,17 +108,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         accessToken, // Initial access token from Google
         refreshToken,
         jwtToken,
-        refreshAccessToken,
+        // refreshAccessToken,
         idToken
-         // Function to refresh access token
+         
       });
-      // return done(null, { 
-      //   accessToken, 
-      //   // user,
-      //   //  idToken: idToken,
-      //   refreshToken,
-      //     jwtToken
-      //    }); 
     } catch (error) {
       return done(error, false);
     }

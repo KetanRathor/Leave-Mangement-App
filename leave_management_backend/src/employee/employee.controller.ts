@@ -98,8 +98,6 @@ export class EmployeeController {
     }
   }
 
-  
-
     
   @Get()
   @ApiOkResponse({
