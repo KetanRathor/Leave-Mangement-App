@@ -13,6 +13,7 @@ import { UserOtp } from './entities/userOtp.entity';
 import { UserDetails } from './utils/types';
 import { OAuth2Client } from 'google-auth-library';
 import { profile } from 'console';
+import axios from 'axios';
 dotenv.config();
 
 @Injectable()
@@ -67,7 +68,7 @@ export class AuthService {
         }
     }
 
-     async validateUserGoogle(details:UserDetails){
+    async validateUserGoogle(details:UserDetails){
         console.log("*************************************")
             console.log('AuthService');
             console.log(details);
@@ -75,11 +76,27 @@ export class AuthService {
             // user.created_by=
             console.log(user);
             if (user) {
-                
-                console.log('User found. Updating...');
-                user = { ...user, ...details }; 
-                console.log("user............",user)
-                return this.employeeRepository.save(user);
+                if (user.deleted_at || user.deleted_by) {
+                    console.log('User is soft-deleted. Restoring...');
+                    user.deleted_at = null;
+                    user.deleted_by = null;
+                    user.department_id=null;
+                    user.manager_id=null;
+                    user.admin = false;
+                    user.name = details.name; 
+                    await this.employeeRepository.save(user);
+                    return user;
+                  } else {
+                    console.log('User found. Updating...');
+                    // Update existing user's details if desired
+                    user.name = details.name; // Update other details as needed
+                    await this.employeeRepository.save(user);
+                    return user;
+                  }
+                // console.log('User found. Updating...');
+                // user = { ...user, ...details }; 
+                // console.log("user............",user)
+                // return this.employeeRepository.save(user);
             } else {
                 
                 console.log('User not found. Creating...');
@@ -89,7 +106,7 @@ export class AuthService {
                 console.log("newUser............",newUser)
                 return this.employeeRepository.save(newUser);
             }
-        }
+    }
 
         async findUser(id:number){
         const user = await this.userCredentialsRepository.findOneBy({id});
@@ -105,8 +122,26 @@ export class AuthService {
                 user:req.user
             }
 
-          }
+        }
 
+        async refreshAccessToken(refreshToken: string) {
+            try {
+              // Implement logic to use the refresh token to obtain a new access token
+              const url = 'https://oauth2.googleapis.com/token';
+              const data = {
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                refresh_token: refreshToken,
+                grant_type: 'refresh_token',
+              };
+              const response = await axios.post(url, data);
+              return response.data.access_token;
+            } catch (error) {
+              console.error('Error refreshing token:', error);
+              throw new HttpException('Refresh token failed', HttpStatus.UNAUTHORIZED);
+            }
+          }
+}
 
 
 
@@ -288,7 +323,7 @@ export class AuthService {
     // }
 
 
-}
+
 
 // async hashPassword(password: string): Promise<string> {
 //     const saltOrRounds = 10;

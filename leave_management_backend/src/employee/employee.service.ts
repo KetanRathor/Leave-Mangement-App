@@ -116,7 +116,7 @@ export class EmployeeService {
         employee.deleted_by = req_mail;
         employee.deleted_at = new Date()
 
-        const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
+        // const userCredentials = await this.userCredentialRepository.findOne({ where: { email: employee.email } });
 
         // if (userCredentials) {
         //   // userCredentials.deleted_by = req_mail;
