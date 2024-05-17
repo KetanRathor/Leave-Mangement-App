@@ -7,9 +7,9 @@ import { GoogleStrategy } from './GoogleStrategy';
 import { RefreshJwtAuthGuard } from './guards/Refresh.gurad';
 
 
-async function refreshAccessToken(refreshToken: string){
+// async function refreshAccessToken(refreshToken: string){
   
-}
+// }
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -45,7 +45,8 @@ export class AuthController {
   async refreshToken(@Req() req, @Res() res) {
     try {
       const { refreshToken } = req.body;
-      const newAccessToken = await refreshAccessToken(refreshToken);
+      console.log('Received refresh token:', { refreshToken });
+      const newAccessToken = await this.authService.refreshAccessToken(refreshToken);
             return({ accessToken: newAccessToken });
     } catch (error) {
       res.status(HttpStatus.UNAUTHORIZED).json({ message: error.message });

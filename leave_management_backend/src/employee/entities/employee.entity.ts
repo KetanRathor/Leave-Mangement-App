@@ -84,7 +84,7 @@ export class Employee {
   })
   updated_at: Date;
 
-  @Column({ default: ''})
+  @Column({ default: null})
   @ApiProperty({
     description:'Employee Updated By'
   })
@@ -97,7 +97,7 @@ export class Employee {
   })
   deleted_at: Date;
 
-  @Column({ default: ''})
+  @Column({ default: null})
   @ApiProperty({
     description:'employee deleted by'
   })

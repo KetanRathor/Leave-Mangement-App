@@ -38,11 +38,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifiedCallback) {
     try {
-      const domain = profile.emails[0].value.split('@')[1];
+      // const domain = profile.emails[0].value.split('@')[1];
 
-      if (domain !== process.env.DOMAIN_NAME) {
-        throw new Error('Unauthorized domain');
-      }
+      // if (domain !== process.env.DOMAIN_NAME) {
+      //   throw new Error('Unauthorized domain');
+      // }
 
 
 
@@ -86,36 +86,26 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
       const payload = { user: userForToken };
       const jwtToken = await this.jwtService.sign(payload); 
-      const refreshAccessToken = async () => {
-        try {
-          // Implement logic to use the refresh token to obtain a new access token
-          const url = 'https://oauth2.googleapis.com/token'; 
-          const data = {
-            client_id: process.env.GOOGLE_CLIENT_ID,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET,
-            refresh_token: refreshToken,
-            grant_type: 'refresh_token',
-          };
-          const response = await axios.post(url, data);
-          return response.data.access_token;
-        } catch (error) {
-          console.error('Error refreshing token:', error);
-          throw new HttpException('Refresh token failed', HttpStatus.UNAUTHORIZED);
-        }
-      };
-
+      
       return done(null, {
-        accessToken, // Initial access token from Google
+        accessToken, 
         refreshToken,
         jwtToken,
-        // refreshAccessToken,
-        idToken
+        // idToken,
+        
          
       });
     } catch (error) {
       return done(error, false);
     }
   }
+
+
+//   private extractIdToken(profile: Profile): string {
+//     // Extract id_token from the profile or any other appropriate source
+//     // For example, if Google returns id_token as a property of profile, you can extract it like this:
+//     return profile.id_token;
+
 }
 
 
