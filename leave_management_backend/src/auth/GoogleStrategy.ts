@@ -46,10 +46,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
 
 
-      const idToken = profile.id; 
+      // const idToken = profile.id; 
       console.log("profile",profile);
 
-      const { name, emails, photos } = profile;
+      const { displayName, emails, photos } = profile;
       const user = await this.authService.validateUserGoogle({
         email: emails[0].value,
         name: profile.displayName,
@@ -78,7 +78,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       const userForToken = {
         id: user.id, 
         email: emails[0].value,
-        name,
+        displayName,
         role,
         image:profile.photos[0].value 
         
@@ -86,11 +86,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
       const payload = { user: userForToken };
       const jwtToken = await this.jwtService.sign(payload); 
+
+      
       
       return done(null, {
         accessToken, 
         refreshToken,
         jwtToken,
+        // user
         // idToken,
         
          
@@ -99,12 +102,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       return done(error, false);
     }
   }
-
-
-//   private extractIdToken(profile: Profile): string {
-//     // Extract id_token from the profile or any other appropriate source
-//     // For example, if Google returns id_token as a property of profile, you can extract it like this:
-//     return profile.id_token;
 
 }
 
