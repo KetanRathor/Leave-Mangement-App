@@ -11,7 +11,7 @@ import { MailService } from 'src/mail/mail.service';
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
 import { UserDetails } from './utils/types';
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client, auth } from 'google-auth-library';
 import { profile } from 'console';
 import axios from 'axios';
 dotenv.config();
@@ -109,14 +109,16 @@ export class AuthService {
     }
 
         async findUser(id:number){
-        const user = await this.userCredentialsRepository.findOneBy({id});
+        const user = await this.employeeRepository.findOneBy({id});
         return user;
         }
 
-        googleLogin(req){
+        googleLogin(req:any){
             if(!req.user){
                 return 'No user from google'
             }
+            console.log("req.user......",req)
+            console.log("req......",req.user)
             return{
                 message:'User Info from Google',
                 user:req.user
@@ -126,7 +128,6 @@ export class AuthService {
 
         async refreshAccessToken(refreshToken: string) {
             try {
-              // Implement logic to use the refresh token to obtain a new access token
               const url = 'https://oauth2.googleapis.com/token';
               const data = {
                 client_id: process.env.GOOGLE_CLIENT_ID,
