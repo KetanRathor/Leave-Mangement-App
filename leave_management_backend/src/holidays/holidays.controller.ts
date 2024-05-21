@@ -35,7 +35,7 @@ export class HolidaysController {
   imageService: any;
   constructor(private readonly holidaysService: HolidaysService) { }
 
-    
+
   @Post('upload')
   @ApiBody({
     type: Holidays
@@ -73,7 +73,7 @@ export class HolidaysController {
     },
   })
   async uploadImage(@UploadedFile() file, @Body() body: any,
-  @Request() req,) {
+    @Request() req,) {
 
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
@@ -85,9 +85,9 @@ export class HolidaysController {
       createHolidayDto.occasion,
       file.buffer,
       req_mail,
-      
+
     );
-    
+
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
@@ -96,7 +96,6 @@ export class HolidaysController {
   }
 
 
-    
   @Get()
   @ApiOkResponse({
     description: 'Get all Holidays',
@@ -110,43 +109,7 @@ export class HolidaysController {
     };
   }
 
-  // @Get('count')
-  // async getHolidaysCount() {
-  //   const count = await this.holidaysService.getHolidaysCount();
-  //   return {
-  //     message: 'Total count of holidays retrieved successfully',
-  //     count: count,
-  //   };
-  // }
 
-
-    
-  // @Put('update/upload/:id')
-  // @ApiBody({ type: Holidays })
-  // @ApiOkResponse({ description: 'Holiday updated successfully' })
-  // @ApiConflictResponse({ description: 'Conflict during update' })
-  // @UseInterceptors(FileInterceptor('file'))
-  // async updateHoliday(@Param('id') id: number, @UploadedFile() file: Express.Multer.File) {
-  //   // const inputData = body.data1;
-  //   // const { date, day, occasion } = body
-  //   // const createHolidayDto: CreateHolidaysDto = JSON.parse({ date, day, occasion });
-
-  //   // const newHoliday = await this.holidaysService.uploadImage(
-  //   //   createHolidayDto.date,
-  //   //   createHolidayDto.day,
-  //   //   createHolidayDto.occasion,
-  //   //   file.buffer,
-  //   // );
-  //   console.log("body......", file)
-  //   // const updatedHoliday = await this.holidaysService.updateHoliday({ id: id, date: date, day: day, occasion: occasion, image: file.buffer });
-  //   // // console.log("___________________________", updatedHoliday)
-  //   // if (!updatedHoliday) {
-  //   return { message: 'Holiday update failed' };
-  //   // }
-  //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
-  // }
-
-    
   @Get('upcoming')
   @ApiOkResponse({
     description: 'Get upcoming Holidays',
@@ -161,10 +124,10 @@ export class HolidaysController {
     };
   }
 
-    
+
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
+    description: 'Employee with given ID will be deleted as response'
 
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number) {
@@ -175,7 +138,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-    
+
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',

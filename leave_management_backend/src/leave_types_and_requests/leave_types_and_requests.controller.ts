@@ -14,7 +14,7 @@ import {
   BadRequestException,
   UseGuards,
   Request,
-  
+
 } from '@nestjs/common';
 
 
@@ -39,9 +39,9 @@ export class LeaveTypesAndRequestsController {
   leaveService: any;
   constructor(
     private readonly leaveTypesAndRequestsService: LeaveTypesAndRequestsService,
-  ) {}
+  ) { }
 
-    
+
   @Post()
   @ApiCreatedResponse({
     description: 'Leave request created',
@@ -50,17 +50,16 @@ export class LeaveTypesAndRequestsController {
   createRequest(
     @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto,
     @Request() req
-  ) 
-  {
-    const req_mail=req.user.user.email;
+  ) {
+    const req_mail = req.user.user.email;
     const emp_id = req.user.user.id
 
     return this.leaveTypesAndRequestsService.createRequest(
-      createLeaveTypesAndRequestDto,req_mail,emp_id
+      createLeaveTypesAndRequestDto, req_mail, emp_id
     );
   }
 
-    
+
   @Get()
   @ApiOkResponse({
     description: 'Get all leave requests',
@@ -70,39 +69,25 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.findAll();
   }
 
-    
+
   @Get(':leave_request_id')
   @ApiOkResponse({
     description: 'Get leave requests of employee with given id',
     type: LeaveRequest
   })
-  findOne(@Param('leave_request_id',ParseIntPipe) leave_request_id: number) {
+  findOne(@Param('leave_request_id', ParseIntPipe) leave_request_id: number) {
     return this.leaveTypesAndRequestsService.findOne(leave_request_id);
   }
 
-    
+
   @Put(':leave_request_id/status')
   @ApiCreatedResponse({
     description: 'leave request status will be updated as response'
   })
   @ApiBody({
-    type:UpdateLeaveStatus
+    type: UpdateLeaveStatus
   })
-  // async updateStatus(
-  //   @Param('leave_request_id') leave_request_id: number,
-  //   @Body() body: { status: string },
-  //   @Request() req,
-  // ): Promise<LeaveRequest> {
-  //   const req_mail = req.user.email;
-  //   if (!body.status) {
-  //     throw new BadRequestException('Status is required');
-  //   }   
-  //   return this.leaveTypesAndRequestsService.updateStatus(
-  //     leave_request_id,
-  //     body.status,
-  //     req_mail
-  //   );
-  // }
+
   async updateStatus(
     @Param('leave_request_id') leave_request_id: number,
     @Body() body: { status: string },
@@ -111,7 +96,7 @@ export class LeaveTypesAndRequestsController {
     const req_mail = req.user.user.email;
     if (!body.status) {
       throw new BadRequestException('Status is required');
-    }   
+    }
     const { leaveRequest, message } = await this.leaveTypesAndRequestsService.updateStatus(
       leave_request_id,
       body.status,
@@ -120,10 +105,10 @@ export class LeaveTypesAndRequestsController {
     return { leaveRequest, message };
   }
 
-    
+
   @Get('employees/pending-requests')
   @ApiOkResponse({
-    description:'Get employee list whose leave request status is pending'
+    description: 'Get employee list whose leave request status is pending'
   })
   async getEmployeesWithPendingRequests() {
     try {
@@ -138,7 +123,7 @@ export class LeaveTypesAndRequestsController {
       );
     }
   }
- 
+
   @Get('remaining-balance/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
@@ -147,8 +132,8 @@ export class LeaveTypesAndRequestsController {
     }
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
-  
- 
+
+
   @Get('remaining-balance/work-from-home/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {
@@ -157,78 +142,55 @@ export class LeaveTypesAndRequestsController {
     }
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalanceforworkfromhome(id);
   }
-  
+
 
   @Get(':employeeId/requests')
   async findAllByEmployeeId(@Param('employeeId') employeeId: number): Promise<LeaveRequest[]> {
     return await this.leaveTypesAndRequestsService.findAllByEmployeeId(employeeId);
   }
 
-//   @Get('leave/employees_on_leave_today')
-// async getEmployeesOnLeaveToday() {
-//   const numEmployeesOnLeave = await this.leaveTypesAndRequestsService.getNumberOfEmployeesOnLeaveToday();
-//   return { numEmployeesOnLeave };
-// }
-  
-// @Get('/employees/employees-leave-on-today')
-
-// async getEmployeesOnLeaveToday(): Promise<Employee[]> { 
-//   try {
-//     console.log(".............................");
-    
-//     const employeesOnLeave = await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday();
-//     return employeesOnLeave;
-//   } catch (error) {
-//     console.error('Error fetching employees on leave today:', error);
-//     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-//   }
-// }
-
-
-
-@Get('employees/employees-leave-on-today')
+  @Get('employees/employees-leave-on-today')
   @ApiOkResponse({
     description: 'Get employees on leave today ',
   })
-async getEmployeesOnLeaveToday(@Request() req): Promise<Employee[]> {
-  const loggedInEmployeeId = req.user.user.id; // Assuming you're storing the logged-in user's ID in req.user.id
-  const role = req.user.user.role;
-  // console.log(req.user);
-  // console.log(role);
-  try {
-    const employeesOnLeave =
-      await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday(
-        loggedInEmployeeId,
-        role,
+  async getEmployeesOnLeaveToday(@Request() req): Promise<Employee[]> {
+    const loggedInEmployeeId = req.user.user.id;
+    const role = req.user.user.role;
+
+    try {
+      const employeesOnLeave =
+        await this.leaveTypesAndRequestsService.getEmployeesOnLeaveToday(
+          loggedInEmployeeId,
+          role,
+        );
+      return employeesOnLeave;
+    } catch (error) {
+      console.error('Error fetching employees on leave today:', error);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    return employeesOnLeave;
-  } catch (error) {
-    console.error('Error fetching employees on leave today:', error);
-    throw new HttpException(
-      'Internal server error',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
-  }
-}
-
-  
-@Get(':employeeId/pending-requests')
-@ApiOkResponse({
-  description:'Get list of pending leave requests of employees who have manager with given id',
-  type:LeaveRequest
-})
-  async findAllRequestsByEmployeeId(@Param('employeeId') employeeId: number): Promise<{ pendingRequests: LeaveRequest[] }> {
-    try{
-    const pendingRequests: LeaveRequest[] = [];
-
-    const ab=await this.leaveTypesAndRequestsService.findAllRequestsByEmployeeId(employeeId);
-
-    for (const employee of ab) {
-      const employeeRequests = await this.leaveTypesAndRequestsService.findPendingRequestsByEmployeeId(employee.id);
-      pendingRequests.push(...employeeRequests);
     }
-    return { pendingRequests };
-    }catch(error){
+  }
+
+
+  @Get(':employeeId/pending-requests')
+  @ApiOkResponse({
+    description: 'Get list of pending leave requests of employees who have manager with given id',
+    type: LeaveRequest
+  })
+  async findAllRequestsByEmployeeId(@Param('employeeId') employeeId: number): Promise<{ pendingRequests: LeaveRequest[] }> {
+    try {
+      const pendingRequests: LeaveRequest[] = [];
+
+      const ab = await this.leaveTypesAndRequestsService.findAllRequestsByEmployeeId(employeeId);
+
+      for (const employee of ab) {
+        const employeeRequests = await this.leaveTypesAndRequestsService.findPendingRequestsByEmployeeId(employee.id);
+        pendingRequests.push(...employeeRequests);
+      }
+      return { pendingRequests };
+    } catch (error) {
       console.error('Error occurred while fetching pending requests:', error);
     }
   }

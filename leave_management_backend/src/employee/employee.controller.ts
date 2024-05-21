@@ -16,48 +16,23 @@ import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 @Controller('employees')
 @UseGuards(JwtAuthGuard)
 export class EmployeeController {
-  constructor(private readonly employeeService: EmployeeService) {}
+  constructor(private readonly employeeService: EmployeeService) { }
 
-  //   
-  // @Post()
-  // @ApiCreatedResponse({
-  //   description: 'created user object as response',
-  //   type: Employee,
-  // })
 
-  // async createEmployee(
-  //   @Body() createEmployeeDto: CreateEmployeeDto,
-  //   // @Request() req,
-  // ) {
-  //   // const req_mail = req.user.email;
-  //   try {
-  //     return await this.employeeService.createEmployee(
-  //       createEmployeeDto,
-  //       // req_mail,
-  //     );
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-  
- 
-
-      
-  // @UseGuards(GoogleAuthGuard)
   @Put(':id')
   @ApiCreatedResponse({
-    description:'Employee with given ID will be updated as response',
-    type:Employee
+    description: 'Employee with given ID will be updated as response',
+    type: Employee
   })
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
     @Request() req,
   ) {
-    const req_mail =  req.user.user.email;
+    const req_mail = req.user.user.email;
     // console.log("req.........",req);
-    console.log("req.user......",req.user)
-    console.log("req_mail.....",req_mail)
+    console.log("req.user......", req.user)
+    console.log("req_mail.....", req_mail)
     try {
       return await this.employeeService.updateEmployee(id, updateEmployeeDto,
         req_mail
@@ -67,16 +42,16 @@ export class EmployeeController {
     }
   }
 
-    
+
   @Delete(':id')
   @ApiOkResponse({
-    description:'Employee with given ID will be deleted as response'
+    description: 'Employee with given ID will be deleted as response'
 
   })
   async deleteEmployee(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.user.email;
     try {
-      await this.employeeService.deleteEmployee(id,req_mail);
+      await this.employeeService.deleteEmployee(id, req_mail);
       return 'Employee Deleted Successfully'
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -84,11 +59,11 @@ export class EmployeeController {
   }
 
   //Show Profile or display employee details
-    
+
   @Get('employee/:id')
   @ApiOkResponse({
-    description:'Get employee by id',
-    type:Employee
+    description: 'Get employee by id',
+    type: Employee
   })
   async showProfile(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -98,11 +73,11 @@ export class EmployeeController {
     }
   }
 
-    
+
   @Get()
   @ApiOkResponse({
-    description:'All employees List',
-    type:[Employee]
+    description: 'All employees List',
+    type: [Employee]
   })
   showEmployeeList() {
     return this.employeeService.findEmployees();
@@ -114,40 +89,39 @@ export class EmployeeController {
     return await this.employeeService.getManagerIds();
   }
 
-  
 
   @Post('upload-image/:id')
   @ApiConsumes('multipart/form-data')
-@UseInterceptors(FileInterceptor('image'))
-@ApiBody({
-  description: 'Image upload',
-  schema: {
-    type: 'object',
-    properties: {
-      image: {
-        type: 'string',
-        format: 'binary',
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiBody({
+    description: 'Image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
       },
     },
-  },
-})
-async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
-  
-  if (!image) {
-    throw new Error('No image uploaded');
+  })
+  async uploadImage(@Param('id') id: number, @UploadedFile() image: Express.Multer.File) {
+
+    if (!image) {
+      throw new Error('No image uploaded');
+    }
+
+    const employee = await this.employeeService.uploadImage(id, image.buffer);
+
+    return employee;
   }
 
-  const employee = await this.employeeService.uploadImage(id, image.buffer);
-
-  return employee;
-}
-
 
 
 
 }
 
-  
 
-  
+
+
 

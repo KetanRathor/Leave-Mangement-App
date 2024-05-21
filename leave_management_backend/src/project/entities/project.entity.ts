@@ -77,17 +77,17 @@ export class Project {
   @Column({ default: '' })
   updated_by: string;
 
-  @ApiProperty({
-    description:'the date on which project deleted'
-  })
-  @Column({ type: 'timestamp', nullable: true })
-  deleted_at: Date;
+  // @ApiProperty({
+  //   description:'the date on which project deleted'
+  // })
+  // @Column({ type: 'timestamp', nullable: true })
+  // deleted_at: Date;
 
-  @ApiProperty({
-    description:'project deleted by'
-  })
-  @Column({ default: '' })
-  deleted_by: string;
+  // @ApiProperty({
+  //   description:'project deleted by'
+  // })
+  // @Column({ default: '' })
+  // deleted_by: string;
 
   // @ApiProperty({
   //   description: 'Employee assigned to this project (one-to-one)',

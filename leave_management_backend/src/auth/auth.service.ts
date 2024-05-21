@@ -60,7 +60,7 @@ export class AuthService {
 
             } else {
                 // return null;
-                return {message:"user deleted"};
+                return { message: "user deleted" };
             }
         } catch (error) {
             console.error(error);
@@ -68,73 +68,73 @@ export class AuthService {
         }
     }
 
-    async validateUserGoogle(details:UserDetails){
+    async validateUserGoogle(details: UserDetails) {
         console.log("*************************************")
-            console.log('AuthService');
-            console.log(details);
-            let user = await this.employeeRepository.findOneBy({email:details.email});
-            // user.created_by=
-            console.log(user);
-            if (user) {
-                if (user.deleted_at || user.deleted_by) {
-                    console.log('User is soft-deleted. Restoring...');
-                    user.deleted_at = null;
-                    user.deleted_by = null;
-                    user.department_id=null;
-                    user.manager_id=null;
-                    user.admin = false;
-                    user.name = details.name; 
-                    await this.employeeRepository.save(user);
-                    return user;
-                  } else {
-                    console.log('User found. Updating...');
-                    user.name = details.name; 
-                    await this.employeeRepository.save(user);
-                    return user;
-                  }
+        console.log('AuthService');
+        console.log(details);
+        let user = await this.employeeRepository.findOneBy({ email: details.email });
+        // user.created_by=
+        console.log(user);
+        if (user) {
+            if (user.deleted_at || user.deleted_by) {
+                console.log('User is soft-deleted. Restoring...');
+                user.deleted_at = null;
+                user.deleted_by = null;
+                user.department_id = null;
+                user.manager_id = null;
+                user.admin = false;
+                user.name = details.name;
+                await this.employeeRepository.save(user);
+                return user;
             } else {
-                console.log('User not found. Creating...');
-                const newUser = this.employeeRepository.create({...details,created_by:details.email});
-                console.log("details............",details)
-                console.log("newUser............",newUser)
-                return this.employeeRepository.save(newUser);
+                console.log('User found. Updating...');
+                user.name = details.name;
+                await this.employeeRepository.save(user);
+                return user;
             }
+        } else {
+            console.log('User not found. Creating...');
+            const newUser = this.employeeRepository.create({ ...details, created_by: details.email });
+            console.log("details............", details)
+            console.log("newUser............", newUser)
+            return this.employeeRepository.save(newUser);
+        }
     }
 
-        async findUser(id:number){
-        const user = await this.employeeRepository.findOneBy({id});
+    async findUser(id: number) {
+        const user = await this.employeeRepository.findOneBy({ id });
         return user;
+    }
+
+    googleLogin(req: any) {
+        if (!req.user) {
+            return 'No user from google'
+        }
+        // console.log("req.user......",req)
+        // console.log("req......",req.user)
+        return {
+            message: 'User Info from Google',
+            user: req.user
         }
 
-        googleLogin(req:any){
-            if(!req.user){
-                return 'No user from google'
-            }
-            // console.log("req.user......",req)
-            // console.log("req......",req.user)
-            return{
-                message:'User Info from Google',
-                user:req.user
-            }
+    }
 
-        }
-
-        async refreshAccessToken(refreshToken: string) {
-            try {
-              const url = 'https://oauth2.googleapis.com/token';
-              const data = {
+    async refreshAccessToken(refreshToken: string) {
+        try {
+            const url = 'https://oauth2.googleapis.com/token';
+            const data = {
                 client_id: process.env.GOOGLE_CLIENT_ID,
                 client_secret: process.env.GOOGLE_CLIENT_SECRET,
                 refresh_token: refreshToken,
                 grant_type: 'refresh_token',
-              };
-              const response = await axios.post(url, data);
-              return response.data.access_token;
-            } catch (error) {
-              console.error('Error refreshing token:', error);
-              throw new HttpException('Refresh token failed', HttpStatus.UNAUTHORIZED);
-            }
-          }
+            };
+            const response = await axios.post(url, data);
+            return response.data.access_token;
+        } catch (error) {
+            console.error('Error refreshing token:', error);
+            throw new HttpException('Refresh token failed', HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
 
 
