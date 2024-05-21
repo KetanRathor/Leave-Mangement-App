@@ -18,20 +18,13 @@ import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 @UseGuards(JwtAuthGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService,
-              // private readonly categoryService: CategoryService,
-    
   ) { }
 
-  
 
-
- 
-
-    
   @Post()
   @ApiCreatedResponse({
-    description:'Inventory will be created as response',
-    type:Inventory
+    description: 'Inventory will be created as response',
+    type: Inventory
   })
   async createInventory(@Body() createInventoryDto: CreateInventoryDto, @Request() req) {
     const req_mail = req.user.user.email;
@@ -44,11 +37,10 @@ export class InventoryController {
   }
 
 
-    
   @Get()
   @ApiOkResponse({
-    description:'Get List of all Inventories',
-    type:[Inventory]
+    description: 'Get List of all Inventories',
+    type: [Inventory]
   })
   findAllInventories() {
     return this.inventoryService.showAllInventories();
@@ -60,22 +52,21 @@ export class InventoryController {
     return this.inventoryService.ListOfInventories();
   }
 
-    
+
   @Get('oneInventory/:id')
   @ApiOkResponse({
-    description:'Get Inventory of given ID',
-    type:Inventory
+    description: 'Get Inventory of given ID',
+    type: Inventory
   })
   async findOneInventory(@Param('id', ParseIntPipe) id: number) {
     return await this.inventoryService.findOneInventory(id);
   }
 
 
-    
   @Patch(':id')
   @ApiCreatedResponse({
-    description:'Inventory will be updated as response',
-    type:Inventory
+    description: 'Inventory will be updated as response',
+    type: Inventory
   })
   async updateInventory(@Param('id', ParseIntPipe) id: number, @Body() updateInventoryDto: UpdateInventoryDto, @Request() req) {
     const req_mail = req.user.user.email;
@@ -88,10 +79,10 @@ export class InventoryController {
     }
   }
 
-    
+
   @Delete(':id')
   @ApiOkResponse({
-    description:'Inventory will be deleted as response'
+    description: 'Inventory will be deleted as response'
   })
   async deleteInventory(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const req_mail = req.user.user.email;
@@ -99,91 +90,54 @@ export class InventoryController {
   }
 
 
-//   @UseGuards(AuthGuard)
-// @Post('assign/:employeeId')
-// @ApiCreatedResponse({
-//   description:'Assign Inventory to given Employee Id'
-// })
-// async assignInventory(@Body() createInventoryDto: CreateInventoryDto, @Param('employeeId') employeeId: number, @Request() req) {
-//   const req_mail = req.user.email;
-
-//   try {
-//     const existingInventory = await this.inventoryService.findOneInventoryBySN(createInventoryDto.serial_number);
-
-//     if (existingInventory) {
-//       return await this.inventoryService.assignInventory({ inventoryId: existingInventory.id, employeeId, categoryId:createInventoryDto.category_id });
-//     }
-//     else{
-//       return {message:"Inventory not available"}
-//     }
-
-//     // const createdInventory = await this.inventoryService.createInventory(createInventoryDto, req_mail);
-//     // return await this.inventoryService.assignInventory({ inventoryId: createdInventory.id, employeeId });
-//   } catch (error) {
-//     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-//   }
-//   }
-
-
-
-  
-
-@Get('assigned/:employeeId')
-@ApiOkResponse({
-  description:'Get list of Inventories assigned to given employee ID',
-  type:Inventory
-})
-async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inventory[]> {
-  try {
-    const assignedInventory = await this.inventoryService.getAssignedInventory(employeeId);
-    return assignedInventory;
-  } catch (error) {
-    throw error;
+  @Get('assigned/:employeeId')
+  @ApiOkResponse({
+    description: 'Get list of Inventories assigned to given employee ID',
+    type: Inventory
+  })
+  async getAssignedInventory(@Param('employeeId') employeeId: number): Promise<Inventory[]> {
+    try {
+      const assignedInventory = await this.inventoryService.getAssignedInventory(employeeId);
+      return assignedInventory;
+    } catch (error) {
+      throw error;
+    }
   }
-}
 
-  
-@Post("/category")
-@ApiCreatedResponse({
-  description:'Category will be created as response',
-  type:Category
-})
-async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDto, 
-@Request() req
-) {
-  const req_mail = req.user.user.email;
-  try {
-    console.log("..................................");
-    
-    return await this.inventoryService.createCategory(createInvetoryCategoryDto, 
-      req_mail
-    );
+
+  @Post("/category")
+  @ApiCreatedResponse({
+    description: 'Category will be created as response',
+    type: Category
+  })
+  async createCategory(@Body() createInvetoryCategoryDto: CreateInvetoryCategoryDto,
+    @Request() req
+  ) {
+    const req_mail = req.user.user.email;
+    try {
+      console.log("..................................");
+
+      return await this.inventoryService.createCategory(createInvetoryCategoryDto,
+        req_mail
+      );
+    }
+    catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
-  catch (error) {
-    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  }
-}
 
 
-  
   @Get('allCategory')
   @ApiOkResponse({
-    description:'Get List Of All Categories of Inventories',
-    type:[Category]
+    description: 'Get List Of All Categories of Inventories',
+    type: [Category]
   })
   findAllCategory() {
     return this.inventoryService.showAllCategory();
   }
 
 
-
- 
-
-
-
-
-
 }
 
-  
+
 

@@ -44,25 +44,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       //   throw new Error('Unauthorized domain');
       // }
 
-
-
-      // const idToken = profile.id; 
-      console.log("profile",profile);
-
       const { displayName, emails, photos } = profile;
       const user = await this.authService.validateUserGoogle({
         email: emails[0].value,
         name: profile.displayName,
-        
         // image:profile.photos[0].value  
-        
-        
-        
       });
-      console.log("Profile.....",profile)
-      console.log("RefreshToken.....",refreshToken)
-
-
+    
       if (!user) {
         return done(new Error('User not found'), null);
       }
@@ -86,23 +74,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
       const payload = { user: userForToken };
       const jwtToken = await this.jwtService.sign(payload); 
-
-      
-      
       return done(null, {
         accessToken, 
         refreshToken,
         jwtToken,
-        // user
-        // idToken,
-        
-         
       });
     } catch (error) {
       return done(error, false);
     }
   }
-
 }
 
 

@@ -33,13 +33,13 @@ export class AuthController {
     console.log(request.user);
     if(request.user){
         return {msg:'Authenticated'};
-
     }
     else{
         return{msg:'Not AUthenticated'}
     }
   }
 
+  
   @Post('refresh-token')
   @UseGuards(RefreshJwtAuthGuard)
   async refreshToken(@Req() req, @Res() res) {

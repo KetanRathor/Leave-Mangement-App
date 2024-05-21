@@ -21,7 +21,7 @@ export class ProjectController {
     // private readonly employeeService: EmployeeService
   ) { }
 
-    
+
   @Post()
   @ApiCreatedResponse({
     description: 'Project will be added as response',
@@ -38,7 +38,7 @@ export class ProjectController {
   }
 
 
-    
+
   @Get()
   @ApiOkResponse({
     description: 'All project List',
@@ -48,7 +48,7 @@ export class ProjectController {
     return this.projectService.showAllProjects();
   }
 
-    
+
   @Get(':id')
   @ApiOkResponse({
     description: 'The project with given ID',
@@ -58,7 +58,7 @@ export class ProjectController {
     return await this.projectService.findOneProject(id);
   }
 
-    
+
   @Patch(':id')
   @ApiCreatedResponse({
     description: 'project will be updated as response',
@@ -74,12 +74,12 @@ export class ProjectController {
     }
   }
 
-    
+
   @Post('/assign_project')
   async assignProject(
     // @Param('adminId', ParseIntPipe) adminId: number, 
     @Body() { employeeId, projectId }: AssignProjectDto,
-     @Request() req
+    @Request() req
   ) {
     const req_mail = req.user.user.email;
 
@@ -90,7 +90,7 @@ export class ProjectController {
     }
   }
 
-    
+
   // @Get(':projectId/assigned-employees')
   // @ApiOkResponse({
   //   description: 'get list of employees who are assigned the project of given ID'
@@ -99,7 +99,7 @@ export class ProjectController {
   //   return await this.projectService.getAssignedEmployees(projectId);
   // }
 
-    
+
   @Put('/status/:project_id')
   @ApiCreatedResponse({
     description: 'status of the project will be updated as response',

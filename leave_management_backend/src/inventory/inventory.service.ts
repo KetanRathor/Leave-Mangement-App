@@ -5,8 +5,6 @@ import { Inventory } from './entities/inventory.entity';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from 'src/employee/entities/Employee.entity';
-import { triggerAsyncId } from 'async_hooks';
-// import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
 import { CreateInvetoryCategoryDto } from './dto/create-inventoryCategory.dto';
 import { Category } from './entities/inventoryCategory.entity';
 
@@ -65,13 +63,11 @@ export class InventoryService {
 
   async ListOfInventories() {
     const inventories = await this.inventoryRepository.find({ where: { deleted_at: IsNull() }, relations: ['category', 'employee'] });
-    // console.log("inventories",inventories)
     return inventories
   }
 
   async findOneInventory(id: number) {
     const inventory = await this.inventoryRepository.findOne({ where: { id, deleted_at: IsNull() }, relations: ['employee'] });
-    // return this.employeeRepository.findOne({ where : { id }, relations: ['manager','department'] });
     if (!inventory) {
       return { message: `Inventory with ID ${id} not found`, inventory };
     }
@@ -94,56 +90,6 @@ export class InventoryService {
     return (`Inventory with ID ${id} deleted by ${req_mail}`);
   }
 
-  // async findOneInventoryBySN(serial_number: string): Promise<any> | null {
-  //   try {
-  //     const inventory = await this.inventoryRepository.findOne({ where: { serial_number } });
-  //     return inventory
-  //   } catch (error) {
-  //     console.log("findOneInventoryBySN Error: ", error)
-  //     return null
-  //   }
-  // }
-
-  // async assignInventory({ inventoryId, employeeId, categoryId }: { inventoryId: number, employeeId: number, categoryId: number }) {
-  //   try {
-  //     const [inventory, employee, category] = await Promise.all([
-  //       this.inventoryRepository.findOne({ where: { id: inventoryId } }),
-  //       this.employeeRepository.findOne({ where: { id: employeeId } }),
-  //       this.categoryRepository.findOne({ where: { id: categoryId } })
-  //     ]);
-
-  //     if (!inventory) {
-  //       throw new NotFoundException('Inventory not found');
-  //     }
-
-  //     if (!employee) {
-  //       throw new NotFoundException('Employee not found');
-  //     }
-
-  //     if (!category) {
-  //       throw new NotFoundException('Category not found');
-  //     }
-
-  //     const existingAssignment = await this.inventoryRepository.findOne({
-  //       where: { id: inventoryId }, relations: ['employee', 'category'],
-  //     });
-
-  //     if (existingAssignment && existingAssignment.employee) {
-  //       throw new HttpException('Inventory already assigned to another employee', HttpStatus.BAD_REQUEST);
-  //     }
-
-  //     inventory.employee = employee;
-  //     inventory.category = category;
-  //     const updatedInventory = await this.inventoryRepository.save(inventory);
-
-  //     return updatedInventory;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-
-  // }
-
-
 
   async getAssignedInventory(employeeId: number): Promise<Inventory[]> {
     try {
@@ -158,7 +104,7 @@ export class InventoryService {
     }
   }
 
-  async createCategory(createCategoryDto: CreateInvetoryCategoryDto, 
+  async createCategory(createCategoryDto: CreateInvetoryCategoryDto,
     req_mail: any
   ) {
     const newCategory = this.categoryRepository.create(createCategoryDto);
@@ -177,23 +123,23 @@ export class InventoryService {
     try {
       const inventory = await this.inventoryRepository.findOne({
         where: { id: inventoryId },
-        relations: ['employee'], 
+        relations: ['employee'],
       });
-  
-      if (!inventory) {      
+
+      if (!inventory) {
         throw new Error('No inventory found.');
       }
-  
+
       const employee = await this.employeeRepository.findOne({ where: { id: empId } });
       if (!employee) {
         throw new Error('No employee found.');
       }
-  
-      inventory.employee = employee; 
-      await this.inventoryRepository.save(inventory); 
-        } catch (error) {
-        console.error('Error assigning inventory to employee:', error);
-        }
+
+      inventory.employee = employee;
+      await this.inventoryRepository.save(inventory);
+    } catch (error) {
+      console.error('Error assigning inventory to employee:', error);
+    }
   }
 
 
