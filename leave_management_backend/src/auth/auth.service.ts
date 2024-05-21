@@ -88,20 +88,13 @@ export class AuthService {
                     return user;
                   } else {
                     console.log('User found. Updating...');
-                    // Update existing user's details if desired
-                    user.name = details.name; // Update other details as needed
+                    user.name = details.name; 
                     await this.employeeRepository.save(user);
                     return user;
                   }
-                // console.log('User found. Updating...');
-                // user = { ...user, ...details }; 
-                // console.log("user............",user)
-                // return this.employeeRepository.save(user);
             } else {
-                
                 console.log('User not found. Creating...');
                 const newUser = this.employeeRepository.create({...details,created_by:details.email});
-               
                 console.log("details............",details)
                 console.log("newUser............",newUser)
                 return this.employeeRepository.save(newUser);
@@ -117,8 +110,8 @@ export class AuthService {
             if(!req.user){
                 return 'No user from google'
             }
-            console.log("req.user......",req)
-            console.log("req......",req.user)
+            // console.log("req.user......",req)
+            // console.log("req......",req.user)
             return{
                 message:'User Info from Google',
                 user:req.user

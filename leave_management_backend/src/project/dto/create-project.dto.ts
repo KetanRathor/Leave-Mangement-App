@@ -19,16 +19,16 @@ export class CreateProjectDto {
     @ApiProperty({
       description:'start date of the project'
     })
-    startDate: Date;
+    start_date: Date;
 
     @ApiProperty({
       description:'end date of the project'
     })
-    endDate?: Date;
+    end_date?: Date;
 
     @ApiProperty({
       description:'status of the project'
     })
     status: 'active' | 'inactive';
-    // manager_name?: string; 
+    
   }

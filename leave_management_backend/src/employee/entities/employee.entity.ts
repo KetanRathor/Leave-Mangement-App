@@ -161,7 +161,7 @@ export class Employee {
   @OneToMany(() => Project, (projects) => projects.employee)
   projects: Project[]
 
-  @ManyToMany(() => Project)
+  @ManyToMany(() => Project, { cascade: true })
     @JoinTable({name:"employee_project"})
     project: Project[]
 

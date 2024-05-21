@@ -42,45 +42,66 @@ export class ProjectService {
     return await this.projectRepository.find({ where: { deleted_at: IsNull() },relations:['employee','manager'] });
   }
 
+
+
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee','manager']});
+    const project = await this.projectRepository.findOne({
+        where: { id, deleted_at: IsNull() },
+        relations: ['employee', 'manager']
+    });
 
     if (!project) {
-      return { message: `Project with ID ${id} not found`, project };
+        return { message: `Inventory with ID ${id} not found`, project };
     }
-    return project;
-  }
+    const activeEmployees = project.employee.filter(emp => emp.deleted_at === null);
 
-  async updateProject(id: number, updatedProjectDetails: UpdateProjectDto, req_mail: any): Promise<Project> {
-    const project = await this.projectRepository.findOneBy({ id });
+    const allEmployees = [
+        { ...project.manager, role: 'manager' },
+        ...activeEmployees.map(emp => ({ ...emp, role: 'employee' })) 
+    ];
+    return { ...project, employee: allEmployees };
+}
+  // async findOneProject(id: number) {
+  //   const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee','manager']});
 
-    if (!project) {
-      throw new NotFoundException('Project not found.');
-    }
+  //   if (!project) {
+  //     return { message: `Project with ID ${id} not found`, project };
+  //   }
+  //   return project;
+  // }
 
-    if(updatedProjectDetails.manager_id){
-      const manager_id = updatedProjectDetails.manager_id
-      const manager = await this.employeeRepository.findOneBy({id: manager_id})
-      project.manager = manager
-    }else{
-      for (const key in updatedProjectDetails) {
-        if (updatedProjectDetails[key] !== undefined) {
-          project[key] = updatedProjectDetails[key];
-        }
-      }
-      
-    }
+  
 
- 
-    project.updated_by = req_mail;
-
-    console.log("project....", project)
-
-    const res =  await this.projectRepository.save(project);
-    console.log(res)
+  async updateProject(projectId: number, updateProjectDto: UpdateProjectDto, req_mail: any) {
     
-    return res
+    const project = await this.projectRepository.findOne({
+      relations: {
+          employee: true,
+      },
+      where: { id: projectId }
+  });
+    
+    if (!project) {
+      throw new Error('Project not found for the provided ID');
+    }      
+    Object.assign(project, updateProjectDto);
+    project.updated_by = req_mail;
+  
+    if (updateProjectDto.manager_id && updateProjectDto.manager_id !== project.manager?.id) {
+      const newManager = await this.employeeRepository.findOneBy({ id: updateProjectDto.manager_id });
+      if (!newManager) {
+        throw new Error('Manager not found for the provided ID');
+      }
+      project.manager = newManager; 
+      project.employee = [newManager]
+      
+
   }
+    const updatedProject = await this.projectRepository.save(project);
+    return updatedProject;
+  }
+  
+  
 
   async assignProject({employeeId, projectId }): Promise<string> {
     try {
@@ -141,19 +162,6 @@ export class ProjectService {
       throw error;
     }
   }
-
-
-
-// async updateProjectStatus(
-//   project_id: number,
-//   status: string,
-//   req_mail:string,
-// ): Promise<Project> {
-//   const project = await this.findOne(project_id);
-//   project.status = status;
-//   project.updated_by=req_mail;
-//   return this.projectRepository.save(project);
-// }
 
 async updateProjectStatus(
   projectId: number,
