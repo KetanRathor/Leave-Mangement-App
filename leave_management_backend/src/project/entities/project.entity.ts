@@ -20,7 +20,7 @@ export class Project {
   @ManyToOne(() => Employee, (employee) => employee.projects,{ eager: false })
   @JoinColumn({name:'manager_id'})
     @ApiProperty({
-        description:'prject manager',
+        description:'project manager',
         type:CreateEmployeeDto
     })
     manager: Employee | null;
@@ -35,13 +35,13 @@ export class Project {
     description:'start date of project'
   })
   @Column({ nullable: true })
-  startDate?: Date;
+  start_date?: Date;
 
   @ApiProperty({
     description:'end date of project'
   })
   @Column({ nullable: true })
-  endDate?: Date;
+  end_date?: Date;
 
   @ApiProperty({
     description:'status of project'
@@ -101,7 +101,7 @@ export class Project {
     description:'employees of project',
     type:CreateEmployeeDto
   })
-  @ManyToMany(() => Employee)
+  @ManyToMany(() => Employee, { cascade: true })
     @JoinTable({name:'employee_project'})
     employee: Employee[]
 
