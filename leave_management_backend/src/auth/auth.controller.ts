@@ -1,15 +1,12 @@
 import { Controller, Get, HttpStatus, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GoogleAuthGuard } from './guards/auth.guard';
+import { GoogleAuthGuard } from './guards/GoogleAuth.guard';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { GoogleStrategy } from './GoogleStrategy';
 import { RefreshJwtAuthGuard } from './guards/Refresh.gurad';
 
 
-// async function refreshAccessToken(refreshToken: string){
-  
-// }
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -39,7 +36,7 @@ export class AuthController {
     }
   }
 
-  
+
   @Post('refresh-token')
   @UseGuards(RefreshJwtAuthGuard)
   async refreshToken(@Req() req, @Res() res) {
@@ -61,28 +58,6 @@ export class AuthController {
 
 
 
-
-
-
-
-  // @Get('google/redirect')
-  // @UseGuards(GoogleAuthGuard)
-  // googleAuthRedirect(@Req() req) {
-  //   try {
-  //     if (req.user) {
-  //       const accessToken = req.user.accessToken;
-  
-  //       return { message: 'Success', accessToken };
-  //     } else {
-  //       return { message: 'Failure' };
-  //     }
-  //   } catch (error) {
-  //     if (error.message === 'Unauthorized domain') {
-  //       return { message: 'Login restricted to specific domain' };
-  //     }
-  //     throw error;
-  //   }
-  // }
 
   
 
@@ -170,22 +145,9 @@ export class AuthController {
 // //         return { error: error.message };
 // //     }
 // // }
-// @Get('google')
-//   @UseGuards(new AuthGuard('google'))
-//   googleAuth() {} // Passport handles the Google authentication
-
-//   @Get('google/callback')
-//   @UseGuards(new AuthGuard('google/callback'))
-//   googleAuthRedirect(@Req() req) {
-//     // After successful authentication, handle redirection or response
-//     // You can access user profile through req.user
-//     return req.user ? { message: 'Success' } : { message: 'Failure' };
-//   }
-    
 
 
 
-// }
 
-// auth.controller.ts
+
 

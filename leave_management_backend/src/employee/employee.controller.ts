@@ -7,7 +7,7 @@ import { CreateDepartmentDto } from 'src/department/dto/create-department.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/Employee.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { GoogleAuthGuard } from 'src/auth/guards/auth.guard';
+import { GoogleAuthGuard } from 'src/auth/guards/GoogleAuth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 
 @ApiTags('Employees')
