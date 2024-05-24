@@ -4,16 +4,42 @@ import * as dotenv from 'dotenv';
 import * as session from 'express-session'
 import * as passport from 'passport'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cors from 'cors';
 
 dotenv.config();
 async function bootstrap() {
+  
   const app = await NestFactory.create(AppModule,
     {
       rawBody:true,
-      cors:true,
+      // cors:true,
       bodyParser:true,
     }
   );
+
+  var corsOptions = {
+    origin: "http://localhost:3000"
+  };
+  
+  app.use(cors(corsOptions));
+  // app.enableCors({
+  //   origin: 'http://localhost:3000', // React app URL
+  //   credentials: true,
+  // });
+  
+//   const corsOptions = {
+//   origin: (origin, callback) => {
+//     const allowedOrigins = ['http://localhost:3000'];
+//     if (allowedOrigins.includes(origin)) {
+//       callback(null, origin);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,
+// };
+
+// app.use(cors(corsOptions));
 
   const config = new DocumentBuilder()
   .setTitle('Leave Management API')

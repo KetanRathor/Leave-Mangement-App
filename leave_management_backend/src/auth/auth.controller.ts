@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from './guards/GoogleAuth.guard';
 import { Request } from 'express';
@@ -20,9 +20,27 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
-  googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req)
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    try {
+     return res.redirect(
+                `http://localhost:3000/profile?accessToken=${req?.user?.accessToken}&refreshToken=${req?.user?.refreshToken}&jwtToken=${req?.user?.jwtToken}`
+              );
+    } catch (error) {
+      console.error('Error in googleAuthRedirect:', error);
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
+
+  // @Get('google/redirect')
+  // @UseGuards(GoogleAuthGuard)
+  // async googleAuthRedirect(@Req() req, @Res() res) {
+  //   try {
+  //     return this.authService.googleLogin(req,res);
+  //   } catch (error) {
+  //     console.error('Error in googleAuthRedirect:', error);
+  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
 
   @Get('status')

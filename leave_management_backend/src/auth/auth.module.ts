@@ -11,6 +11,7 @@ import { Employee } from 'src/employee/entities/Employee.entity';
 import { UserOtp } from './entities/userOtp.entity';
 import { GoogleStrategy } from './GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
+import { OAuth2Client } from 'google-auth-library';
 // import { MailService } from 'src/mail/mail.service';
 // import { Employee } from 'src/employee/entities/Employee.entity';
 // import { EmployeeModule } from 'src/employee/employee.module';
@@ -32,17 +33,20 @@ dotenv.config();
       
     }),
     MailModule,
+    
+    
     // EmployeeModule
     
   ],
   controllers: [AuthController],
   providers: [GoogleStrategy,
+    
     SessionSerializer,
     {
       provide:'AUTH_SERVICE',
       useClass:AuthService,
-    }
-
+    },
+OAuth2Client
   ],
   // exports: [AuthService]
 })
