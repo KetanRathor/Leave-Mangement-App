@@ -74,6 +74,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
       const payload = { user: userForToken };
       const jwtToken = await this.jwtService.sign(payload); 
+      
+
+      
       return done(null, {
         accessToken, 
         refreshToken,

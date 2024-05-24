@@ -14,6 +14,8 @@ import { UserDetails } from './utils/types';
 import { OAuth2Client, auth } from 'google-auth-library';
 import { profile } from 'console';
 import axios from 'axios';
+import { Profile } from 'passport';
+
 dotenv.config();
 
 @Injectable()
@@ -22,6 +24,7 @@ export class AuthService {
     private readonly iv = Buffer.from(process.env.ENCRYPTION_IV, 'hex');
     private readonly otpTTL = 300000;
     constructor(
+        // private readonly googleClient: OAuth2Client,
         private jwtService: JwtService,
         @InjectRepository(UserCredentials)
         private readonly userCredentialsRepository: Repository<UserCredentials>,
@@ -31,7 +34,12 @@ export class AuthService {
         private readonly userOtp: Repository<UserOtp>,
         private readonly mailService: MailService,
         // private employeeService : EmployeeService
-    ) { }
+    ) {
+    //     this.googleClient = new OAuth2Client({
+    //     clientId: process.env.GOOGLE_CLIENT_ID,
+    //     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    //   }); 
+    }
 
     async showProfile(id: number): Promise<any> {
         try {
@@ -106,35 +114,104 @@ export class AuthService {
         return user;
     }
 
-    googleLogin(req: any) {
-        if (!req.user) {
-            return 'No user from google'
-        }
-        // console.log("req.user......",req)
-        // console.log("req......",req.user)
-        return {
-            message: 'User Info from Google',
-            user: req.user
-        }
 
-    }
-
-    async refreshAccessToken(refreshToken: string) {
+    googleLogin(req: any ) {
         try {
-            const url = 'https://oauth2.googleapis.com/token';
-            const data = {
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                refresh_token: refreshToken,
-                grant_type: 'refresh_token',
-            };
-            const response = await axios.post(url, data);
-            return response.data.access_token;
+            if (!req.user) {
+                return 'No user from Google';
+            }
+            return {
+                message: 'User Info from Google',
+                user: req.user
+            }
+    
+            // return res.redirect(
+            //     `http://localhost:3000/profile?accessToken=${req?.user?.accessToken}&refreshToken=${req?.user?.refreshToken}&jwtToken=${req?.user?.jwtToken}`
+            //   );
         } catch (error) {
-            console.error('Error refreshing token:', error);
-            throw new HttpException('Refresh token failed', HttpStatus.UNAUTHORIZED);
+            console.error('Error during Google login:', error);
+            return {
+                success: false,
+                message: 'Failed to authenticate Google user',
+                error: error.message,
+            };
         }
     }
+    
+
+    // googleLogin(req: any) {
+    //     if (!req.user) {
+    //         return 'No user from google'
+    //     }
+    //     // console.log("req.user......",req)
+    //     // console.log("req......",req.user)
+        // return {
+        //     message: 'User Info from Google',
+        //     user: req.user
+        // }
+
+    // }
+
+    // async verifyToken(token: string): Promise<Profile> {
+    //     try {
+    //       const ticket = await this.googleClient.verifyIdToken({
+    //         idToken: token,
+    //         audience: process.env.GOOGLE_CLIENT_ID,
+    //       });
+    
+    //       const payload = ticket.getPayload();
+
+    //   const profile: Profile = {
+    //     id: payload.sub,
+    //     displayName: payload.name,
+    //     provider: 'google', // Assuming this value
+    //     emails: [{ value: payload.email }], // Assuming the email is present in payload
+    //     photos: [{ value: payload.picture }], // Assuming the picture is present in payload
+    //   };
+
+    //   return profile;
+    //     } catch (error) {
+    //       throw new Error('Token verification failed');
+    //     }
+    //   }
+    
+    //   async googleLogin(token: string) {
+    //     const profile = await this.verifyToken(token);
+    //     // Here you can perform additional operations like fetching user from database based on email
+    //     return {
+    //       message: 'User Info from Google',
+    //       user: profile,
+    //     };
+    //   }
+    
+
+    async refreshAccessToken(refreshToken: string): Promise<string> {
+        try {
+          const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              client_id: process.env.GOOGLE_CLIENT_ID,
+              client_secret: process.env.GOOGLE_CLIENT_SECRET,
+              refresh_token: refreshToken,
+              grant_type: 'refresh_token',
+            }),
+          });
+    
+          const data = await response.json();
+    
+          if (!data.access_token) {
+            throw new Error('Failed to obtain access token');
+          }
+    
+          return data.access_token;
+        } catch (error) {
+          throw new Error(`Error refreshing access token: ${error.message}`);
+        }
+      }
+    
 }
 
 
