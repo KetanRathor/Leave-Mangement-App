@@ -68,9 +68,10 @@ export class EmployeeService {
     if (!employee) {
       throw new NotFoundException('Employee not found.');
     }
+
     const inventory = await this.inventoryRepository.findOne({ where: { employee: employee } });
     if (inventory) {
-      inventory.employee = null;
+      inventory.employee=null
       await this.inventoryRepository.save(inventory);
     }
     employee.deleted_by = req_mail;
@@ -158,7 +159,10 @@ export class EmployeeService {
   }
 
   async findById(id: number): Promise<Employee | null> {
-    return await this.employeeRepository.findOneBy({ id });
+    return await this.employeeRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+      relations: [ 'inventories'],
+    });
   }
 
 

@@ -44,31 +44,32 @@ export class ProjectService {
 
 
 
-  async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({
-      where: { id, status: 'active' },
-      relations: ['employee', 'manager']
-    });
-
-    if (!project) {
-      return { message: `Project with ID ${id} is inactive`, project };
-    }
-    const activeEmployees = project.employee.filter(emp => emp.deleted_at === null);
-
-    const allEmployees = [
-      { ...project.manager, role: 'manager' },
-      ...activeEmployees.map(emp => ({ ...emp, role: 'employee' }))
-    ];
-    return { ...project, employee: allEmployees };
-  }
   // async findOneProject(id: number) {
-  //   const project = await this.projectRepository.findOne({ where: { id, deleted_at: IsNull() },relations:['employee','manager']});
+  //   const project = await this.projectRepository.findOne({
+  //     where: { id, status: 'active' },
+  //     relations: ['employee', 'manager']
+  //   });
 
   //   if (!project) {
-  //     return { message: `Project with ID ${id} not found`, project };
+  //     return { message: `Project with ID ${id} is inactive`, project };
   //   }
-  //   return project;
+  //   const activeEmployees = project.employee.filter(emp => emp.deleted_at === null);
+
+  //   const allEmployees = [
+  //     { ...project.manager, role: 'manager' },
+  //     ...activeEmployees.map(emp => ({ ...emp, role: 'employee' }))
+  //   ];
+  //   return { ...project, employee: allEmployees };
   // }
+  async findOneProject(id: number) {
+    const project = await this.projectRepository.findOne({ where: { id, status: 'active',},relations:['employee','manager']});
+
+    if (!project) {
+      return { message: `Project with ID ${id} not found`, project };
+    }
+    project.employee = project.employee.filter(emp => !emp.deleted_at);
+    return project;
+  }
 
 
 

@@ -23,7 +23,7 @@ export class AuthController {
   async googleAuthRedirect(@Req() req, @Res() res) {
     try {
      return res.redirect(
-                `http://localhost:3000/profile?accessToken=${req?.user?.accessToken}&refreshToken=${req?.user?.refreshToken}&jwtToken=${req?.user?.jwtToken}`
+                `http://localhost:3000/Employee?accessToken=${req?.user?.accessToken}&refreshToken=${req?.user?.refreshToken}&jwtToken=${req?.user?.jwtToken}`
               );
     } catch (error) {
       console.error('Error in googleAuthRedirect:', error);
