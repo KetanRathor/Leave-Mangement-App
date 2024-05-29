@@ -62,11 +62,12 @@ export class ProjectService {
   //   return { ...project, employee: allEmployees };
   // }
   async findOneProject(id: number) {
-    const project = await this.projectRepository.findOne({ where: { id, status: 'active' },relations:['employee','manager']});
+    const project = await this.projectRepository.findOne({ where: { id, status: 'active',},relations:['employee','manager']});
 
     if (!project) {
       return { message: `Project with ID ${id} not found`, project };
     }
+    project.employee = project.employee.filter(emp => !emp.deleted_at);
     return project;
   }
 

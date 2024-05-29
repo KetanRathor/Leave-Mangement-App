@@ -81,9 +81,8 @@ export class InventoryService {
     if (!inventory) {
       throw new NotFoundException(`Inventory with ID ${id} not found`);
     }
-
-    inventory.employee=null;
-
+    inventory.employee = null;
+    console.log("inventory.employee",inventory.employee)
     inventory.deleted_by = req_mail;
     inventory.deleted_at = new Date()
 

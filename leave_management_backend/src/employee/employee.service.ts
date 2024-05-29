@@ -71,7 +71,7 @@ export class EmployeeService {
 
     const inventory = await this.inventoryRepository.findOne({ where: { employee: employee } });
     if (inventory) {
-      inventory.employee = null;
+      inventory.employee=null
       await this.inventoryRepository.save(inventory);
     }
     employee.deleted_by = req_mail;
