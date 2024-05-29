@@ -139,11 +139,13 @@ export class LeaveTypesAndRequestsService {
       });
 
       return pendingRequests.map((request) => ({
+        id:request.id,
         employeeName: request.employee.name,
         start_date: request.start_date,
         end_date: request.end_date,
         leave_type: request.leave_type,
         reason: request.reason,
+        manager_id:request.employee.manager_id,
       }));
     } catch (error) {
       console.error('Error fetching employees with pending requests:', error);
