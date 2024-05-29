@@ -39,7 +39,7 @@ export class ProjectService {
   }
 
   async showAllProjects() {
-    return await this.projectRepository.find({ where: { status: 'active' }, relations: ['manager', 'employee'] });
+    return await this.projectRepository.find({  relations: ['manager', 'employee'] });
   }
 
 
