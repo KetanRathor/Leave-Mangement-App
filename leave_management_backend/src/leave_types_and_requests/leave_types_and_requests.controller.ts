@@ -138,7 +138,8 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get('remaining-balance/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
-  async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
+  async getRemainingLeaveBalance(@Param('empId') id: number,
+  @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto): Promise<number> {
     if (!id || isNaN(id)) {
       throw new BadRequestException('Invalid employee ID');
     }
@@ -148,7 +149,9 @@ export class LeaveTypesAndRequestsController {
   @UseGuards(AuthGuard)
   @Get('remaining-balance/work-from-home/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
-  async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {
+  async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number,
+  // @Body() createLeaveTypesAndRequestDto: CreateLeaveTypesAndRequestDto
+): Promise<number> {
     if (!id || isNaN(id)) {
       throw new BadRequestException('Invalid employee ID');
     }
