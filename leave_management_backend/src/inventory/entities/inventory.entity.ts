@@ -2,45 +2,65 @@ import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany, Ma
 import { Employee } from 'src/employee/entities/Employee.entity';
 import { Category } from './inventoryCategory.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
+import { CreateInvetoryCategoryDto } from '../dto/create-inventoryCategory.dto';
 
 
 @Entity('inventories')
 export class Inventory {
-
-    @ApiProperty()
     @PrimaryGeneratedColumn()
+    @ApiProperty({
+        description:'Id of the Inventory'
+    })
     id: number;
 
-    @ApiProperty()
     @Column()
+    @ApiProperty({
+        description:'Name of the Inventory'
+    })
     name: string;
 
-    @ApiProperty()
     @Column({ nullable: true })
+    @ApiProperty({
+        description:'serial Number of the Inventory'
+    })
     serial_number: string;
 
-    @ApiProperty()
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @ApiProperty({
+        description:'The date time at which inventory created'
+    })
     created_at: Date;
 
-    @ApiProperty()
     @Column({ default: '' })
+    @ApiProperty({
+        description:'Inventory created by'
+    })
     created_by: string;
 
-    @ApiProperty()
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @ApiProperty({
+        description:'The date time at which inventory updated'
+    })
     updated_at: Date;
 
-    @ApiProperty()
     @Column({ default: '' })
+    @ApiProperty({
+        description:'Inventory updated by'
+    })
     updated_by: string;
 
-    @ApiProperty()
     @Column({ type: 'timestamp', nullable: true })
+    @ApiProperty({
+        description:'The date time at which inventory deleted'
+    })
     deleted_at: Date;
 
-    @ApiProperty()
     @Column({ default: '' })
+    @ApiProperty({
+        description:'Inventory deleted by'
+    })
     deleted_by: string;
 
     //   @ManyToOne(() => Employee)
@@ -48,11 +68,18 @@ export class Inventory {
     // //   @Column({ nullable: true, default: null })
     //   employee: Employee;
 
-    @ApiProperty()
     @ManyToOne(() => Employee, (employee) => employee.inventories)
+    @ApiProperty({
+        description:'Employee who have inventory',
+        type:CreateEmployeeDto
+    })
     employee: Employee
 
     @ManyToOne(() => Category, (category) => category.inventories)
+    @ApiProperty({
+        description:'category of the inventory',
+        type:CreateInvetoryCategoryDto
+    })
     // @JoinColumn({ name: 'category_id' })
     category: Category;
 }

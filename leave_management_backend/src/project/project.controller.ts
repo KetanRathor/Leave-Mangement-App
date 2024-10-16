@@ -8,7 +8,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { Project } from './entities/project.entity';
 import { AssignProjectDto } from './dto/assign-project.dto';
 import { Employee } from 'src/employee/entities/Employee.entity';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 // import { Project } from './entities/project.entity';
 
 @ApiTags('Project')
@@ -21,6 +21,10 @@ export class ProjectController {
 
 @UseGuards(AuthGuard)
   @Post()
+  @ApiCreatedResponse({
+    description:'Project will be added as response',
+    type:Project
+  })
   async addProject(@Body() createProjectDto: CreateProjectDto, @Request() req) {
     const req_mail = req.user.email;
     try {
@@ -32,23 +36,32 @@ export class ProjectController {
   }
 
 
-
-
-
   @UseGuards(AuthGuard)
   @Get()
+  @ApiOkResponse({
+    description:'All project List',
+    type:[Project]
+  })
   findAllProject() {
     return this.projectService.showAllProjects();
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
+  @ApiOkResponse({
+    description:'The project with given ID',
+    type:Project
+  })
   async findOneProject(@Param('id', ParseIntPipe) id: number) {
     return await this.projectService.findOneProject(id);
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
+  @ApiCreatedResponse({
+    description:'project will be updated as response',
+    type:Project
+  })
   async updateProject(@Param('id', ParseIntPipe) id: number, @Body() updateProjectDto: UpdateProjectDto, @Request() req) {
     const req_mail = req.user.email
     try {
@@ -61,6 +74,10 @@ export class ProjectController {
 
   // @UseGuards(AuthGuard)
   @Post(':adminId')
+  @ApiCreatedResponse({
+    description:'project will be assigned to employee',
+    type:Project
+  })
   async assignProject(@Param('adminId', ParseIntPipe) adminId: number, @Body() { employeeId, projectId }: AssignProjectDto,
   //  @Request() req
   ) {
@@ -74,12 +91,19 @@ export class ProjectController {
   }
 
 @Get(':projectId/assigned-employees')
+@ApiOkResponse({
+  description:'get list of employees who are assigned the project of given ID'
+})
 async getAssignedEmployees(@Param('projectId') projectId: number): Promise<Employee[]> {
   return await this.projectService.getAssignedEmployees(projectId);
 }
 
 @UseGuards(AuthGuard)
 @Put('/status/:project_id')
+@ApiCreatedResponse({
+  description:'status of the project will be updated as response',
+  type:Project
+})
 async updateProjectStatus( @Param('project_id') project_id: number, @Body() body: { status: string }, @Request() req,): Promise<Project> {
 const req_mail = req.user.email;
 if (!body.status) {

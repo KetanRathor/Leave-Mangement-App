@@ -49,9 +49,9 @@ export class LeaveTypesAndRequestsController {
   ) 
   {
     const req_mail=req.user.email;
-
+const emp_id=req.user.id;
     return this.leaveTypesAndRequestsService.createRequest(
-      createLeaveTypesAndRequestDto,req_mail
+      createLeaveTypesAndRequestDto,req_mail,emp_id
     );
   }
 
@@ -117,7 +117,7 @@ export class LeaveTypesAndRequestsController {
       );
     }
   }
-
+  @UseGuards(AuthGuard)
   @Get('remaining-balance/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalance(@Param('empId') id: number): Promise<number> {
@@ -127,7 +127,7 @@ export class LeaveTypesAndRequestsController {
     return this.leaveTypesAndRequestsService.getRemainingLeaveBalance(id);
   }
   
-
+  @UseGuards(AuthGuard)
   @Get('remaining-balance/work-from-home/:empId')
   @ApiParam({ name: 'empId', description: 'Employee ID' })
   async getRemainingLeaveBalanceforworkfromhome(@Param('empId') id: number): Promise<number> {

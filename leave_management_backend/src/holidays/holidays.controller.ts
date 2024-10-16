@@ -14,6 +14,7 @@ import {
   HttpStatus,
   UploadedFiles,
   Put,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { HolidaysService } from './holidays.service';
@@ -42,21 +43,25 @@ export class HolidaysController {
     type: Holidays
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file, @Body() body: any) {
+  async uploadImage(@UploadedFile() file, @Body() body: any,
+  @Request() req,) {
 
     const inputData = body.data1;
     const createHolidayDto: CreateHolidaysDto = JSON.parse(inputData);
 
+    const req_mail = req.user.email;
     const newHoliday = await this.holidaysService.uploadImage(
       createHolidayDto.date,
       createHolidayDto.day,
       createHolidayDto.occasion,
       file.buffer,
+      req_mail,
     );
-
+    
     return {
       message: 'Image uploaded for holiday successfully',
       holiday: newHoliday,
+      req_mail,
     };
   }
 
@@ -111,7 +116,7 @@ export class HolidaysController {
   //   // return { message: 'Holiday updated successfully', holiday: updatedHoliday };
   // }
 
-
+  @UseGuards(AuthGuard)
   @Get('upcoming')
   @ApiOkResponse({
     description: 'Get upcoming Holidays',
@@ -126,7 +131,7 @@ export class HolidaysController {
     };
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOkResponse({
     description:'Employee with given ID will be deleted as response'
@@ -140,7 +145,7 @@ export class HolidaysController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+  @UseGuards(AuthGuard)
   @Get('remaining-holidays')
   @ApiOkResponse({
     description: 'Get remaining holidays',
