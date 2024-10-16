@@ -85,6 +85,31 @@ export class MailService {
     }
 
 
+    async sendLeaveRequestEmail(email: string, manager_email:string,reason:string){
+    
+            const adminMailOptions = {
+                from: email,
+                to: process.env.EMAIL_USER,
+                subject: `Leave request for: ${email}`,
+                text: `A leave request has been submitted by ${email}. Please review and take necessary actions.`,
+            };
+            
+            const managerMailOptions = {
+                from: email,
+                to: manager_email,
+                subject: `Leave request for: ${email}`,
+                text: `Hello,\n\n${reason}.\n\nRegards,\nThe Admin Team`,
+            };
+            
+            
+            await Promise.all([
+                this.transporter.sendMail(adminMailOptions),
+                this.transporter.sendMail(managerMailOptions),
+            ]);
+            
+        }
+
+
 
 
     

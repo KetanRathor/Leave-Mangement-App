@@ -38,12 +38,9 @@ export class Inventory {
     })
     created_by: string;
 
-
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-    @ApiProperty({
-        description:'The date time at which inventory updated'
-    })
-    updated_at: Date;
+    @ApiProperty()
+    @Column({ type: 'timestamp', nullable: true, onUpdate: 'CURRENT_TIMESTAMP'})
+  updated_at: Date;
 
     @Column({ default: '' })
     @ApiProperty({

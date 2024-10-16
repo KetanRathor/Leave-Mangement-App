@@ -3,6 +3,8 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateLeaveTypesAndRequestDto } from './dto/create-leave_types_and_request.dto';
 import { LeaveRequest } from './entities/LeaveRequest.entity';
@@ -10,6 +12,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { start } from 'repl';
 import { Console } from 'console';
+import { MailService } from 'src/mail/mail.service';
+import { Employee } from 'src/employee/entities/Employee.entity';
 
 
 @Injectable()
@@ -38,23 +42,90 @@ export class LeaveTypesAndRequestsService {
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRequestRepository: Repository<LeaveRequest>,
+    private readonly mailService: MailService, // Inject MailService
+    @InjectRepository(Employee) // Inject Employee repository
+    private readonly employeeRepository: Repository<Employee>,
   ) {}
 
   async createRequest(
     createLeaveDto: CreateLeaveTypesAndRequestDto,
     req_mail: string,
-    emp_id:number,
+    emp_id:number
+    
   ): Promise<LeaveRequest> {
     
     const newLeaveRequest = this.leaveRequestRepository.create(createLeaveDto);
     newLeaveRequest.created_by = req_mail;
-    newLeaveRequest.emp_id = emp_id;
-    return await this.leaveRequestRepository.save(newLeaveRequest);
+    newLeaveRequest.emp_id=emp_id
+    const savedLeaveRequest= await this.leaveRequestRepository.save(newLeaveRequest);
+    try{
+
+      const employee = await this.employeeRepository.findOne({
+        where: { id: emp_id},
+        relations: ['manager'], 
+      });
+  
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
+      }
+  
+      const managerEmail = employee.manager?.email; 
+      console.log("managerEmail:",managerEmail)
+  
+      if (!managerEmail) {
+        console.warn('Manager email not found for employee:', employee.id);
+      } else {
+        await this.mailService.sendLeaveRequestEmail(req_mail, managerEmail, createLeaveDto.reason);
+      }
+    return savedLeaveRequest;
+  } catch (error) {
+    console.error('Error creating leave request:', error);
+    throw new InternalServerErrorException('Error creating leave request');
   }
+} 
+  
+
+
+
   findOne(id: number): Promise<LeaveRequest> {
     console.log(id);
     return this.leaveRequestRepository.findOneBy({ id });
   }
+
+
+  async findAllByEmployeeId(emp_id: number): Promise<LeaveRequest[]> {
+    return await this.leaveRequestRepository.find({
+      where: { emp_id }, // Filter by employeeId
+      relations: ['employee'], // Include related employee information (optional)
+    });
+  }
+
+
+//  async findOne(id: number): Promise<LeaveRequest> {
+//     console.log(id);
+//     const rrr= await this.leaveRequestRepository.find({where:{id}, relations: ['employee']});
+//     return rrr;
+//   }
+
+// async findOne(id: number): Promise<LeaveRequest | undefined> {
+//   try {
+//     const request = await this.leaveRequestRepository.findOne({
+//       where: { id }, // Clear object property syntax
+//       relations: ['employee'], // Include related employee information if needed
+//     });
+
+//     if (!request) { // Handle case where request is not found
+//       return undefined;
+//     }
+
+//     return request;
+//   } catch (error) {
+//     console.error('Error fetching leave request:', error);
+//     // Handle the error appropriately (e.g., throw, log)
+//   }
+// }
+
+
 
   findAll() {
     return this.leaveRequestRepository.find({ relations: ['employee'] });
@@ -70,6 +141,7 @@ export class LeaveTypesAndRequestsService {
     leaveRequest.updated_by = req_mail;
     return this.leaveRequestRepository.save(leaveRequest);
   }
+
   async getLeaveRequest(id: number): Promise<LeaveRequest> {
     const leaveRequest = await this.leaveRequestRepository.findOneBy({ id });
     if (!leaveRequest) {

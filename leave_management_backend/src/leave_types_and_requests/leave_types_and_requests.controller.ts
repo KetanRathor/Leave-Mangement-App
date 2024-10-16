@@ -49,7 +49,8 @@ export class LeaveTypesAndRequestsController {
   ) 
   {
     const req_mail=req.user.email;
-const emp_id=req.user.id;
+    const emp_id = req.user.id
+
     return this.leaveTypesAndRequestsService.createRequest(
       createLeaveTypesAndRequestDto,req_mail,emp_id
     );
@@ -162,4 +163,9 @@ const emp_id=req.user.id;
   //     );
   //   }
   // }
+
+  @Get(':employeeId/requests')
+  async findAllByEmployeeId(@Param('employeeId') employeeId: number): Promise<LeaveRequest[]> {
+    return await this.leaveTypesAndRequestsService.findAllByEmployeeId(employeeId);
+  }
 }
